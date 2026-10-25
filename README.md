@@ -36,7 +36,9 @@ Plain HTML, CSS and JavaScript. Accessible by design (WCAG 2.2 AA), built on the
 
 ## Licence
 
-Add a licence of your choice.
+MIT License
+
+Copyright (c) 2026 Nuadyr
 
 ---
 
