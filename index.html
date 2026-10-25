@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Skathach: book finder</title>
+
+<!--
+  Skathach book finder. Single file, no build step, no dependencies.
+  Built on the Aengus design system by Nuadyr.
+
+  RULES AENGUS FOLLOWS
+  - Dark mode follows the system setting (light-dark() tokens). Motion follows the reduced motion setting.
+  - Text pairs are 7:1 or better, control edges 3:1 or better. Re-check any colour you change.
+  - Colour never carries meaning alone: every status has its own icon shape and a word.
+  - Touch targets are at least 2.75rem. Everything works with the keyboard and with reduced motion.
+  - Keep the tokens in section 1. Never touch 1c: the status colours are locked. Project styles go in section 5.
+-->
+
+<meta name="description" content="Build a library of books you know, tag it, then find more books to read. Searches Open Library by title, author, series or ISBN.">
+<meta name="author" content="Nuadyr">
+<meta name="application-name" content="Skathach">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f5f6f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111213" media="(prefers-color-scheme: dark)">
+<link rel="canonical" href="https://nuadyr.github.io/Skathach/">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231b1d1f'/%3E%3Cpath d='M9 24V9M16 24V7M23 24V11' fill='none' stroke='%23a0cde4' stroke-width='3.5' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Skathach">
+<meta property="og:title" content="Skathach: book finder">
+<meta property="og:description" content="Build a library of books you know, tag it, then find more books to read.">
+<meta property="og:url" content="https://nuadyr.github.io/Skathach/">
+<meta property="og:locale" content="en_GB">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Skathach: book finder">
+<meta name="twitter:description" content="Build a library of books you know, tag it, then find more books to read.">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Skathach",
+  "url": "https://nuadyr.github.io/Skathach/",
+  "description": "Build a library of books you know, tag it, then find more books to read using Open Library.",
+  "applicationCategory": "LifestyleApplication",
+  "operatingSystem": "Any",
+  "browserRequirements": "Requires JavaScript",
+  "inLanguage": "en-GB",
+  "isAccessibleForFree": true,
+  "author": { "@type": "Person", "name": "Nuadyr" }
+}
+</script>
+<script>
+/* One-off move of saved data from the old ArShelf storage names, and removal of the retired theme and motion settings.
+   Safe to delete once old saves are gone. */
+try { [['arshelf', 'skathach'], ['arshelf-last', 'skathach-last']].forEach(([o, n]) => { const v = localStorage.getItem(o); if (v === null) return; try { if (localStorage.getItem(n) === null) localStorage.setItem(n, v); localStorage.removeItem(o); } catch { /* storage full: keep the old save */ } }); ['kit-theme', 'kit-theme-mode', 'kit-motion-paused', 'aengus-theme', 'aengus-theme-mode', 'aengus-motion-paused'].forEach(k => localStorage.removeItem(k)); } catch { /* storage unavailable */ }
+</script>
+<style>
+/* Aengus design system.
+   Layers: 1 tokens, 2 base, 3 layout, 4 components, 5 your page, 6 user preferences and assistive modes. */
+
+/* 1. Tokens. light-dark(light value, dark value) follows the system setting.
+   1a primitives (Nuadyr Black Steel and Ice), 1b semantic roles, 1c LOCKED status colours.
+   The UI is monochrome on purpose: the only strong colours on a page are the status messages. */
+
+/* 1a. Primitives. Reference only: components never use these directly, they use the roles in 1b. */
+:root {
+  /* Black Steel: cool charcoal greys with a faint steel tint. Every neutral in the UI comes from here. */
+  --Nuadyr-color-steel-100: rgba(245, 246, 247, 1);
+  --Nuadyr-color-steel-200: rgba(233, 234, 236, 1);
+  --Nuadyr-color-steel-300: rgba(209, 211, 215, 1);
+  --Nuadyr-color-steel-400: rgba(173, 178, 184, 1);
+  --Nuadyr-color-steel-500: rgba(135, 141, 151, 1);
+  --Nuadyr-color-steel-600: rgba(100, 106, 115, 1);
+  --Nuadyr-color-steel-700: rgba(66, 71, 76, 1);
+  --Nuadyr-color-steel-800: rgba(43, 45, 49, 1);
+  --Nuadyr-color-steel-900: rgba(27, 29, 31, 1);
+  --Nuadyr-color-steel-950: rgba(17, 18, 19, 1);
+
+  /* Ice: the one accent hue, a muted steel cyan. Used only for actions, links, focus and chart marks. */
+  --Nuadyr-color-ice-100: rgba(233, 242, 247, 1);
+  --Nuadyr-color-ice-200: rgba(203, 224, 235, 1);
+  --Nuadyr-color-ice-300: rgba(166, 201, 221, 1);
+  --Nuadyr-color-ice-400: rgba(129, 179, 207, 1);
+  --Nuadyr-color-ice-500: rgba(89, 154, 192, 1);
+  --Nuadyr-color-ice-600: rgba(63, 129, 166, 1);
+  --Nuadyr-color-ice-700: rgba(49, 100, 129, 1);
+  --Nuadyr-color-ice-800: rgba(36, 74, 96, 1);
+  --Nuadyr-color-ice-900: rgba(27, 54, 70, 1);
+  --Nuadyr-color-ice-950: rgba(18, 37, 48, 1);
+
+  --Nuadyr-color-white: rgba(255, 255, 255, 1);
+}
+
+/* 1b. Roles. */
+:root {
+  color-scheme: light dark;
+
+  --font-body: "Atkinson Hyperlegible Next", "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-head: "Fraunces", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+
+  --paper:         light-dark(var(--Nuadyr-color-steel-100), var(--Nuadyr-color-steel-950));
+  --surface:       light-dark(var(--Nuadyr-color-white), var(--Nuadyr-color-steel-900));
+  --surface-2:     light-dark(var(--Nuadyr-color-steel-200), var(--Nuadyr-color-steel-800));
+  --ink:           light-dark(var(--Nuadyr-color-steel-950), var(--Nuadyr-color-steel-100));
+  --ink-soft:      light-dark(var(--Nuadyr-color-steel-700), var(--Nuadyr-color-steel-300));
+  --line:          light-dark(var(--Nuadyr-color-steel-600), var(--Nuadyr-color-steel-500));
+  --line-soft:     light-dark(var(--Nuadyr-color-steel-300), var(--Nuadyr-color-steel-700));
+
+  --brand:         light-dark(var(--Nuadyr-color-steel-900), var(--Nuadyr-color-steel-900));
+  --brand-2:       light-dark(var(--Nuadyr-color-steel-800), var(--Nuadyr-color-steel-800));
+  --on-brand:   var(--Nuadyr-color-steel-100);
+  --on-brand-soft: var(--Nuadyr-color-steel-300);
+
+  --action:        light-dark(var(--Nuadyr-color-ice-800), var(--Nuadyr-color-ice-300));
+  --action-hover:  light-dark(var(--Nuadyr-color-ice-900), var(--Nuadyr-color-ice-200));
+  --on-action:     light-dark(var(--Nuadyr-color-white), var(--Nuadyr-color-steel-950));
+  --link:          light-dark(var(--Nuadyr-color-ice-800), var(--Nuadyr-color-ice-300));
+  --focus:         light-dark(var(--Nuadyr-color-steel-950), var(--Nuadyr-color-ice-300));
+
+  /* Secondary emphasis stays monochrome: an inverted steel button. Never use it for status. */
+  --accent-2:      light-dark(var(--Nuadyr-color-steel-800), var(--Nuadyr-color-steel-200));
+  --accent-2-hover: light-dark(var(--Nuadyr-color-steel-950), var(--Nuadyr-color-steel-100));
+  --on-accent-2:   light-dark(var(--Nuadyr-color-white), var(--Nuadyr-color-steel-950));
+
+  --chart:         light-dark(var(--Nuadyr-color-ice-700), var(--Nuadyr-color-ice-400));
+  --chart-line: var(--ink);
+
+  --s-1: 0.25rem; --s-2: 0.5rem; --s-3: 0.75rem; --s-4: 1rem; --s-5: 1.5rem; --s-6: 2rem; --s-7: 3rem; --s-8: 4rem;
+  --r-1: 0.25rem; --r-2: 0.5rem; --r-3: 0.875rem;
+  --t-sm:   clamp(0.875rem, 0.84rem + 0.15vw, 0.9375rem);
+  --t-base: clamp(1rem, 0.95rem + 0.2vw, 1.0625rem);
+  --t-md:   clamp(1.125rem, 1.04rem + 0.4vw, 1.3125rem);
+  --t-lg:   clamp(1.375rem, 1.18rem + 0.85vw, 1.75rem);
+  --t-xl:   clamp(1.75rem, 1.35rem + 1.7vw, 2.5rem);
+  --pad-card: clamp(var(--s-4), 3vw, var(--s-5));
+  --target: 2.75rem;
+  --measure: 70rem;
+  --text-measure: 42rem;
+  --rule: 0.125rem;
+
+  --mask-chev: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='m9.5 6 6 6-6 6' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  --mask-info: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='3.5' y='3.5' width='17' height='17' rx='4' fill='none' stroke='black' stroke-width='2.2'/%3E%3Cpath d='M12 11v5M12 7.6v.2' stroke='black' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E");
+  --mask-ok: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='9' fill='none' stroke='black' stroke-width='2.2'/%3E%3Cpath d='m7.8 12.3 3 3 5.4-6' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  --mask-warn: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 3.8 21.2 19.5H2.8z' fill='none' stroke='black' stroke-width='2.2' stroke-linejoin='round'/%3E%3Cpath d='M12 10v4.5M12 17v.2' stroke='black' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E");
+  --mask-problem: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2.8 21.2 12 12 21.2 2.8 12z' fill='none' stroke='black' stroke-width='2.2' stroke-linejoin='round'/%3E%3Cpath d='m9 9 6 6M15 9l-6 6' stroke='black' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+
+/* 1c. LOCKED status colours. Frozen at Aengus's original values.
+   Literal values only: no var(), no primitives, no roles. A palette change in 1a or 1b cannot reach them.
+   Do not edit, override or redefine these anywhere else. Every status also has its own icon shape and a word. */
+:root {
+  --ok-ink:      light-dark(#064e3f, #8fe0c0); --ok-mark:      light-dark(#0b7a56, #4fcf9f); --ok-tint:      light-dark(#e0f3ec, #12302a);
+  --warn-ink:    light-dark(#5a3d00, #f2cf85); --warn-mark:    light-dark(#a85f00, #e8a23a); --warn-tint:    light-dark(#fbf0d6, #33280f);
+  --problem-ink: light-dark(#7a0f1f, #ffb3bb); --problem-mark: light-dark(#c0262d, #ff6f78); --problem-tint: light-dark(#fbe4e7, #38161b);
+  --info-ink:    light-dark(#0f3f7a, #a9cdf5); --info-mark:    light-dark(#1f66b0, #6fb0f0); --info-tint:    light-dark(#e1ecf8, #14283f);
+}
+
+/* 2. Base */
+*, *::before, *::after { box-sizing: border-box; }
+html { font-size: 100%; -webkit-text-size-adjust: 100%; scroll-padding-block-start: var(--s-6); }
+body {
+  margin: 0; min-block-size: 100vb; display: flex; flex-direction: column;
+  background: var(--paper); color: var(--ink);
+  font-family: var(--font-body); font-size: var(--t-base); line-height: 1.6;
+}
+h1, h2, h3, h4, h5 { font-family: var(--font-head); font-weight: 600; line-height: 1.2; margin: 0; color: var(--ink); text-wrap: balance; }
+h1 { font-size: var(--t-xl); }
+h2 { font-size: var(--t-lg); }
+h3 { font-size: var(--t-md); }
+h4, h5 { font-family: var(--font-body); font-weight: 700; line-height: 1.3; }
+h4 { font-size: var(--t-base); }
+h5 { font-size: var(--t-sm); }
+p, ul, ol, dl { margin: 0; }
+p + p { margin-block-start: var(--s-3); }
+a { color: var(--link); text-decoration-thickness: 0.09em; text-underline-offset: 0.18em; }
+a:hover { text-decoration-thickness: 0.18em; }
+code { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: 0.9em; background: var(--surface-2); padding: 0 0.25em; border-radius: var(--r-1); }
+img, svg { max-inline-size: 100%; }
+[hidden] { display: none !important; }
+
+:focus-visible { outline: 0.25rem solid var(--focus); outline-offset: 0.125rem; border-radius: var(--r-1); }
+h1:focus, h2:focus, main:focus { outline: none; }
+h1:focus-visible, h2:focus-visible { outline: 0.25rem solid var(--focus); outline-offset: 0.25rem; }
+
+.vh, .visually-hidden { position: absolute; inline-size: 1px; block-size: 1px; margin: -1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+.skip-link { position: absolute; inset-inline-start: var(--s-3); inset-block-start: -10rem; z-index: 10; padding: var(--s-2) var(--s-4); background: var(--brand); color: var(--on-brand); border-radius: var(--r-2); font-weight: 700; }
+.skip-link:focus { inset-block-start: var(--s-3); }
+
+.icon { inline-size: 1.25em; block-size: 1.25em; flex: none; vertical-align: -0.2em; }
+
+/* 3. Layout */
+.wrap { inline-size: 100%; max-inline-size: var(--measure); margin-inline: auto; padding-inline: var(--s-4); }
+main { flex: 1 0 auto; inline-size: 100%; max-inline-size: var(--measure); margin-inline: auto; padding: var(--s-5) var(--s-4) var(--s-7); }
+.stack > * + * { margin-block-start: var(--s-4); }
+.stack-lg > * + * { margin-block-start: var(--s-6); }
+.row { display: flex; flex-wrap: wrap; gap: var(--s-3); align-items: center; }
+.split { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s-5); align-items: start; }
+.split > * { min-inline-size: 0; }
+@media (width >= 56rem) { .split { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); } }
+
+/* 4. Components */
+/* Page header */
+.site-header { display: grid; gap: var(--s-3); padding-block-end: var(--s-5); }
+.site-header .lede { font-size: var(--t-md); max-inline-size: var(--text-measure); color: var(--ink-soft); }
+
+/* Buttons. Plain buttons are the main action. */
+button, .btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--s-2);
+  min-block-size: var(--target); min-inline-size: var(--target); padding: var(--s-2) var(--s-4);
+  font: inherit; font-weight: 700; line-height: 1.3; text-align: center; text-decoration: none; cursor: pointer;
+  color: var(--on-action); background: var(--action); border: var(--rule) solid var(--action); border-radius: var(--r-2);
+}
+button:hover, .btn:hover { background: var(--action-hover); border-color: var(--action-hover); text-decoration: none; }
+button:disabled, button[aria-disabled="true"] { cursor: not-allowed; color: var(--ink-soft); background: var(--surface-2); border-color: var(--line); border-style: dashed; }
+button.secondary, .btn--secondary { color: var(--ink); background: var(--surface); border-color: var(--line); }
+button.secondary:hover, .btn--secondary:hover { background: var(--surface-2); border-color: var(--ink); }
+button.small { padding: var(--s-1) var(--s-3); font-size: var(--t-sm); }
+.linklike { min-block-size: var(--target); padding: 0 var(--s-1); color: var(--link); background: none; border: 0; text-decoration: underline; text-underline-offset: 0.18em; font-weight: 400; }
+.linklike:hover { background: none; text-decoration-thickness: 0.18em; }
+
+/* Forms */
+.field { display: grid; gap: var(--s-1); }
+.field > label, legend { font-weight: 700; }
+fieldset { margin: 0; padding: 0; border: 0; min-inline-size: 0; }
+input[type="text"], input[type="search"], input[type="number"], input[type="email"], input[type="url"], select, textarea {
+  inline-size: 100%; min-block-size: var(--target); padding: var(--s-2) var(--s-3);
+  font: inherit; color: var(--ink); background: var(--surface); border: var(--rule) solid var(--line); border-radius: var(--r-2);
+}
+textarea { min-block-size: 10rem; resize: vertical; font-size: var(--t-sm); line-height: 1.5; }
+input[type="file"] { max-inline-size: 100%; min-block-size: var(--target); font: inherit; }
+.hint { color: var(--ink-soft); font-size: var(--t-sm); }
+.field .hint { margin: 0; }
+.checkline { display: flex; align-items: center; gap: var(--s-3); min-block-size: var(--target); }
+.checkline input { inline-size: 1.5rem; block-size: 1.5rem; margin: 0; flex: none; accent-color: var(--action); }
+
+/* Panels, notes and live regions */
+.panel { background: var(--surface); border: var(--rule) solid var(--line-soft); border-radius: var(--r-3); padding: var(--s-5); }
+.panel > * + * { margin-block-start: var(--s-4); }
+.panel > h2 + *, .panel > h3 + * { margin-block-start: var(--s-3); }
+.note, [role="alert"]:not([hidden]) {
+  display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--s-3); align-items: start;
+  padding: var(--s-3) var(--s-4); color: var(--info-ink); background: var(--info-tint);
+  border: var(--rule) solid var(--info-mark); border-inline-start-width: 0.5rem; border-radius: var(--r-2);
+}
+.note::before, [role="alert"]:not([hidden])::before {
+  content: ""; inline-size: 1.5rem; block-size: 1.5rem; margin-block-start: 0.1rem; background: currentColor;
+  mask: var(--mask-info) center / contain no-repeat; -webkit-mask: var(--mask-info) center / contain no-repeat;
+}
+.note > * { min-inline-size: 0; }
+.note p + p { margin-block-start: var(--s-2); }
+.note--ok { color: var(--ok-ink); background: var(--ok-tint); border-color: var(--ok-mark); }
+.note--ok::before { mask-image: var(--mask-ok); -webkit-mask-image: var(--mask-ok); }
+.note--warn { color: var(--warn-ink); background: var(--warn-tint); border-color: var(--warn-mark); }
+.note--warn::before { mask-image: var(--mask-warn); -webkit-mask-image: var(--mask-warn); }
+.note--problem, [role="alert"]:not([hidden]) { color: var(--problem-ink); background: var(--problem-tint); border-color: var(--problem-mark); }
+.note--problem::before, [role="alert"]:not([hidden])::before { mask-image: var(--mask-problem); -webkit-mask-image: var(--mask-problem); }
+[role="status"] { color: var(--ink-soft); font-size: var(--t-sm); }
+[role="status"]:empty { display: none; }
+
+/* Status badge: word plus shape plus colour */
+.badge { display: inline-flex; align-items: center; gap: var(--s-1); padding: 0 var(--s-2); min-block-size: 1.75rem; border: var(--rule) solid currentColor; border-radius: var(--r-2); font-size: var(--t-sm); font-weight: 700; color: var(--ink); background: var(--surface); }
+.badge::before { content: ""; inline-size: 1rem; block-size: 1rem; flex: none; background: currentColor; mask: var(--mask-info) center / contain no-repeat; -webkit-mask: var(--mask-info) center / contain no-repeat; }
+.badge--ok { color: var(--ok-ink); background: var(--ok-tint); }
+.badge--ok::before { mask-image: var(--mask-ok); -webkit-mask-image: var(--mask-ok); }
+.badge--warn { color: var(--warn-ink); background: var(--warn-tint); }
+.badge--warn::before { mask-image: var(--mask-warn); -webkit-mask-image: var(--mask-warn); }
+.badge--problem { color: var(--problem-ink); background: var(--problem-tint); }
+.badge--problem::before { mask-image: var(--mask-problem); -webkit-mask-image: var(--mask-problem); }
+.badge--info { color: var(--info-ink); background: var(--info-tint); }
+
+/* Disclosure */
+details { border-block-start: var(--rule) solid var(--line-soft); padding-block-start: var(--s-2); }
+summary { display: flex; align-items: center; gap: var(--s-2); min-block-size: var(--target); cursor: pointer; font-weight: 700; list-style: none; }
+summary::-webkit-details-marker { display: none; }
+summary::before { content: ""; inline-size: 1.25rem; block-size: 1.25rem; flex: none; background: currentColor; mask: var(--mask-chev) center / contain no-repeat; -webkit-mask: var(--mask-chev) center / contain no-repeat; }
+details[open] > summary::before { transform: rotate(90deg); }
+summary h2, summary h3, summary h4 { display: inline; font-size: inherit; font-family: var(--font-body); font-weight: 700; margin: 0; }
+details > :not(summary) { margin-block-start: var(--s-3); }
+
+/* Tables */
+.table-scroll { overflow-x: auto; max-inline-size: 100%; border: var(--rule) solid var(--line-soft); border-radius: var(--r-2); background: var(--surface); }
+.table-scroll:focus-visible { outline-offset: 0; }
+table { inline-size: 100%; border-collapse: collapse; font-size: var(--t-sm); font-variant-numeric: tabular-nums; }
+caption { text-align: start; font-weight: 700; padding: var(--s-2) var(--s-3); }
+th, td { text-align: start; padding: var(--s-2) var(--s-3); vertical-align: top; }
+thead th { background: var(--surface-2); border-block-end: var(--rule) solid var(--line); white-space: nowrap; }
+tbody th, tbody td { border-block-end: 1px solid var(--line-soft); }
+td.num { text-align: end; }
+
+/* Numbered result cards, stat tiles, fact lists, chips */
+.cards { display: grid; gap: var(--s-5); counter-reset: card; }
+.card { counter-increment: card; display: grid; gap: var(--s-4); align-content: start; padding: var(--pad-card); background: var(--surface); border: var(--rule) solid var(--line-soft); border-radius: var(--r-3); }
+.card > * { min-inline-size: 0; margin: 0; }
+.card > h3 { display: flex; align-items: center; gap: var(--s-3); }
+.card > h3::before { content: counter(card); display: inline-grid; place-items: center; flex: none; min-inline-size: 2rem; block-size: 2rem; border-radius: var(--r-2); background: var(--brand); color: var(--on-brand); font: 700 var(--t-base) / 1 var(--font-body); }
+.card p, .facts li { max-inline-size: var(--text-measure); }
+.stats { display: grid; gap: var(--s-3); grid-template-columns: repeat(auto-fit, minmax(min(100%, 9.5rem), 1fr)); }
+.stat { display: grid; gap: var(--s-1); align-content: start; padding: var(--s-3) var(--s-4); background: var(--surface-2); border: var(--rule) solid var(--line-soft); border-radius: var(--r-2); }
+.stat__label { color: var(--ink-soft); font-size: var(--t-sm); line-height: 1.3; }
+.stat__value { margin: 0; font: 600 var(--t-lg) / 1.1 var(--font-head); font-variant-numeric: tabular-nums; }
+.facts, .chips { list-style: none; padding: 0; }
+.facts { display: grid; gap: var(--s-2); }
+.facts li { padding-inline-start: var(--s-3); border-inline-start: 0.25rem solid var(--line-soft); }
+.chips { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 1fr)); gap: var(--s-2); }
+.chip { display: flex; align-items: center; min-inline-size: 0; min-block-size: 1.75rem; padding: var(--s-1) var(--s-3); background: var(--surface); border: var(--rule) solid var(--line); border-radius: var(--r-2); font-size: var(--t-sm); overflow-wrap: anywhere; }
+
+/* Meter and bar chart (draw with inline SVG or HTML and these tokens) */
+.meter { inline-size: 100%; max-inline-size: var(--text-measure); block-size: 1rem; accent-color: var(--chart); }
+.chart text { fill: var(--ink); font-family: var(--font-body); font-size: 0.75rem; }
+.chart__axis { stroke: var(--line); stroke-width: 1; }
+.chart__bar { fill: var(--chart); stroke: var(--chart-line); stroke-width: 1; }
+
+/* Footer */
+.site-footer { background: var(--brand); color: var(--on-brand); padding-block: var(--s-5); }
+.site-footer a { color: var(--on-brand); }
+.site-footer .hint { color: var(--on-brand-soft); }
+
+/* 5. Your page */
+
+/* Main navigation: tabs. The current tab has a fill, a bar and aria-current, so colour is never the only cue. */
+.tabs { display: flex; flex-wrap: wrap; gap: var(--s-2); list-style: none; padding: 0; }
+.tabs a { display: inline-flex; align-items: center; min-block-size: var(--target); padding: var(--s-2) var(--s-4); font-weight: 700; line-height: 1.3; text-decoration: none; color: var(--ink); background: var(--surface); border: var(--rule) solid var(--line); border-radius: var(--r-2); }
+.tabs a:hover { background: var(--surface-2); border-color: var(--ink); }
+.tabs a[aria-current="page"] { color: var(--on-action); background: var(--action); border-color: var(--action); box-shadow: inset 0 -0.3rem 0 var(--on-action); }
+
+/* Panels and forms */
+.panel > p, .panel .field { max-inline-size: var(--text-measure); }
+.panel > .sub { padding-block-start: var(--s-5); border-block-start: var(--rule) solid var(--line-soft); }
+.panel ul:empty, .panel ol:empty { display: none; }
+ul.cards, ol.cards { list-style: none; padding: 0; }
+.panel nav .row { gap: var(--s-3) var(--s-4); }
+
+/* Books: cover plus details */
+.book { display: flex; align-items: flex-start; gap: var(--s-3); }
+.book__body { flex: 1; min-inline-size: 0; display: grid; gap: var(--s-3); justify-items: start; }
+.book__body > * { margin: 0; max-inline-size: 100%; }
+.book__body .row, .book__body .chips { inline-size: 100%; }
+.book__title { display: block; font: 600 var(--t-md) / 1.25 var(--font-head); }
+.book__body .chips { grid-template-columns: repeat(auto-fill, minmax(min(100%, 10rem), 1fr)); margin-block-start: var(--s-2); }
+.cv { inline-size: 4.5rem; flex: none; }
+img.cv { block-size: auto; border: var(--rule) solid var(--line-soft); border-radius: var(--r-1); }
+/* Cover grid shown while a search runs */
+.cgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 5.25rem), 1fr)); gap: var(--s-3); list-style: none; padding: 0; }
+.cgrid__item { position: relative; min-inline-size: 0; }
+.cgrid__item .cvg { display: block; inline-size: 100%; aspect-ratio: 2 / 3; object-fit: cover; }
+.cgrid__item .nocv.cvg { display: grid; place-items: center; min-block-size: 0; padding: var(--s-2) var(--s-2) var(--s-2) var(--s-3); overflow-wrap: anywhere; font: 600 var(--t-sm) / 1.25 var(--font-head); color: var(--ink); background: var(--surface-2); border: var(--rule) solid var(--line-soft); border-inline-start: 0.5rem solid var(--chart); border-radius: var(--r-1); }
+.cgrid__item .badge { position: absolute; inset-block-start: var(--s-1); inset-inline-start: var(--s-1); min-block-size: 1.5rem; padding: 0 var(--s-1); }
+@media (prefers-reduced-motion: no-preference) { .cgrid__item--new { animation: cgin 0.4s ease-out; } }
+@keyframes cgin { from { opacity: 0; transform: scale(0.92); } to { opacity: 1; transform: none; } }
+.nocv { min-block-size: 6rem; display: grid; place-items: center; padding: var(--s-1); text-align: center; font-size: var(--t-sm); color: var(--ink-soft); border: var(--rule) dashed var(--line); border-radius: var(--r-1); }
+
+/* Tags */
+.tags { display: grid; gap: var(--s-3); list-style: none; padding: 0; }
+.tagrow { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-3) var(--s-4); padding: var(--s-3) var(--s-4); background: var(--surface-2); border: var(--rule) solid var(--line-soft); border-radius: var(--r-2); }
+.tagrow__name { flex: 1 1 10rem; min-inline-size: 0; font: 600 var(--t-md) / 1.2 var(--font-head); }
+.tagrow .field { grid-auto-flow: column; align-items: center; gap: var(--s-2); inline-size: auto; }
+.tagrow select { inline-size: auto; }
+
+/* Result cards: tap anywhere on a card to open its matched-tags popover */
+#results .card { cursor: pointer; }
+.card > h3 .linklike { font: inherit; color: var(--link); text-align: start; padding-inline: 0; }
+.pop, .card > .pop { margin: auto; inline-size: min(92vw, 28rem); max-block-size: 80vh; overflow: auto; padding: var(--s-5); color: var(--ink); background: var(--surface); border: var(--rule) solid var(--line); border-radius: var(--r-3); }
+.pop::backdrop { background: rgba(17, 18, 19, 0.6); }
+.pop > * { margin: 0; }
+.pop > * + * { margin-block-start: var(--s-3); }
+@supports not selector(:popover-open) {
+  .pop { display: none; }
+  .pop.is-open { display: block; position: fixed; inset: 0; block-size: fit-content; z-index: 20; }
+}
+
+/* Book preview dialog */
+dialog { inline-size: min(95vw, 50rem); max-block-size: 92vh; overflow: auto; padding: var(--s-5); color: var(--ink); background: var(--surface); border: var(--rule) solid var(--line); border-radius: var(--r-3); }
+dialog::backdrop { background: rgba(17, 18, 19, 0.75); }
+#viewer { inline-size: 100%; block-size: min(60vh, 30rem); }
+
+@media (forced-colors: active) {
+  .tabs a, .tagrow, dialog, .pop, .nocv, img.cv { border-color: CanvasText; }
+  .tabs a[aria-current="page"] { border-block-end-width: 0.375rem; text-decoration: underline; }
+}
+
+
+/* 6. User preferences and assistive modes */
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+@media (forced-colors: active) {
+  /* Mask icons are painted with background-color, which forced colours overrides: pin them to system ink. */
+  .note::before, [role="alert"]:not([hidden])::before, .badge::before, summary::before { forced-color-adjust: none; background-color: CanvasText; }
+  .card > h3::before { border: var(--rule) solid CanvasText; }
+  .card, .stat, .chip, .panel { border-color: CanvasText; }
+  .chart text { fill: CanvasText; }
+  .chart__axis, .chart__bar { stroke: CanvasText; }
+  .chart__bar { forced-color-adjust: none; fill: Highlight; }
+  .note { border-inline-start-width: 0.5rem; }
+}
+@media print {
+  :root { color-scheme: light; }
+  .site-footer, .skip-link, .no-print { display: none; }
+  body { background: #fff; }
+}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to main content</a>
+
+<main id="main" tabindex="-1">
+<header class="site-header">
+<h1>Skathach book finder</h1>
+<p class="lede">Build a library of books you know. Tag it. Then find more books to read. Add books by title, author, series or International Standard Book Number (ISBN).</p>
+<nav aria-label="Main">
+<ul class="tabs">
+<li><a href="#library" data-v="library">Library</a></li>
+<li><a href="#add" data-v="add">Add books</a></li>
+<li><a href="#tags" data-v="tags">Tags</a></li>
+<li><a href="#blacklist" data-v="blacklist">Blacklist</a></li>
+<li><a href="#find" data-v="find">Find books</a></li>
+</ul>
+</nav>
+</header>
+
+<noscript><p role="alert">Skathach needs JavaScript. Enable it and reload.</p></noscript>
+
+<section id="v-library" class="panel" aria-labelledby="h-shelf" hidden>
+<h2 id="h-shelf" tabindex="-1">Library</h2>
+<p id="lcount"></p>
+<ul id="shelf" class="cards"></ul>
+<nav id="lpager" aria-label="Library pages" hidden></nav>
+</section>
+
+<section id="v-add" class="panel" aria-labelledby="h-add" hidden>
+<h2 id="h-add" tabindex="-1">Add books</h2>
+<section class="stack" aria-labelledby="h-search">
+<h3 id="h-search">Search by title, author or series</h3>
+<form id="sform" class="stack">
+<div class="field"><label for="stype">Search by</label>
+<select id="stype"><option value="title">Title</option><option value="author">Author</option><option value="both">Title and author</option><option value="series">Series</option></select></div>
+<div class="field"><label for="q1" id="l1">Title</label><input id="q1" type="text" autocomplete="off"></div>
+<div id="w2" class="field" hidden><label for="q2">Author name</label><input id="q2" type="text" autocomplete="off"></div>
+<div class="row"><button type="submit">Search books</button></div>
+</form>
+<p id="sstatus" role="status" tabindex="-1"></p>
+<ul id="sres" class="cards"></ul>
+<nav id="spager" aria-label="Search result pages" hidden></nav>
+</section>
+<section class="stack sub" aria-labelledby="h-isbn">
+<h3 id="h-isbn">Add by ISBN</h3>
+<div class="field"><label for="isbns">ISBNs, one per line or split by commas (10 or 13 digits)</label>
+<textarea id="isbns" autocomplete="off" spellcheck="false"></textarea></div>
+<div class="row"><button id="add" type="button">Add ISBNs</button></div>
+<p id="status" role="status"></p>
+</section>
+</section>
+
+<section id="v-tags" class="panel" aria-labelledby="h-tags" hidden>
+<h2 id="h-tags" tabindex="-1">Tags</h2>
+<p>Weight 5 matters most. Tags with weight 4 or 5 search for an exact subject. Tags with weight 1 to 3 search for a similar subject. Tick Exclude to lower the score of books that have that tag.</p>
+<form id="tagform" class="stack">
+<div class="field"><label for="newtag">New tag</label><input id="newtag" type="text" autocomplete="off"></div>
+<div class="row"><button type="submit">Add tag</button></div>
+</form>
+<ul id="tags" class="tags"></ul>
+</section>
+
+<section id="v-blacklist" class="panel" aria-labelledby="h-black" hidden>
+<h2 id="h-black" tabindex="-1">Blacklist</h2>
+<p>Type a word or a sentence to blacklist. Find books never searches a tag that contains it. It also hides any book whose title, author or subjects contain it. Matching ignores capital letters and punctuation, and looks for whole words.</p>
+<form id="bform" class="stack">
+<div class="field"><label for="newblack">Word or sentence to blacklist</label><input id="newblack" type="text" autocomplete="off"></div>
+<div class="row"><button type="submit">Add to blacklist</button></div>
+</form>
+<p id="bstatus" role="status"></p>
+<ul id="blist" class="tags"></ul>
+</section>
+
+<section id="v-find" class="panel" aria-labelledby="h-find" hidden>
+<h2 id="h-find" tabindex="-1">Find books</h2>
+<p>This searches every tag that is not excluded, heaviest first. Heavier tags return more books. It then searches pairs of your five heaviest tags, which finds books that match several tags at once. Tags and books that match the blacklist are skipped. Only books that match at least two of the remaining tags are shown. Each book is scored in three steps. First it is compared with a profile built from your tag weights, and tags from books you added recently count a little more. The score also uses the community rating, which counts for less when there are few votes. Next the score is adjusted. Newer books are favoured very slightly, a likely sequel to the book you added last gets a large lift, and authors you already own are favoured. Very widely read books are scored down so that they do not crowd out lesser known ones. Last the best 50 books are grouped by subject and cut to a shelf of 20. Variety is sought inside each group, so a book from a different corner is never forced in. No author appears more than twice and no more than three books are series sequels. Tick Did not finish on a library book to switch off the series boost for its sequels and to count its tags for less. A small library gets a small boost for well-known books. The search runs one request every two and a half seconds to stay well inside the Open Library limit, so many tags take time. You can stop it at any point. Tap a book in the results to see which tags it matched. You can also use the other tabs while it runs, and it keeps going if the tab is in the background or the window is minimised. Some phones still pause background pages, so keep the screen on for long searches. While the search runs you see only a grid of covers. It fills as books are found, books that come in are marked New, and books that drop out disappear. Open Changes while searching to see their names. When the search ends the grid is replaced by the full list. Books and tags you add or change during a search apply to the next search, not this one. The results of your last search are saved in this browser, so a reload does not lose them.</p>
+<div class="field"><label for="fmode">Shelf style</label>
+<select id="fmode"><option value="dpp">Discover: wide variety across the whole shelf</option><option value="mmr">Continue: close to what you read, with some variety</option></select>
+<p class="hint">You can change the style after a search. The shelf is re-ordered without a new search.</p></div>
+<div class="row"><button id="find" type="button">Find books</button><button id="stop" type="button" class="secondary" hidden>Stop search</button></div>
+<p id="fstatus" role="status" tabindex="-1"></p>
+<ul id="cgrid" class="cgrid" aria-label="Covers of the books found so far" hidden></ul>
+<details id="flogbox" hidden><summary>Changes while searching</summary><ul id="flog" class="facts"></ul></details>
+<ol id="results" class="cards"></ol>
+<nav id="rpager" aria-label="Recommended book pages" hidden></nav>
+</section>
+</main>
+
+<footer class="site-footer">
+<div class="wrap">
+<p>Skathach by <a href="https://nuadyr.github.io/">Nuadyr</a>. © 2026.</p>
+<p class="hint">Your library and your last search results stay in this browser. Searches go to Open Library, and previews load from Google Books. Built on the Aengus design system.</p>
+</div>
+</footer>
+
+<dialog id="pv" class="stack" aria-labelledby="pvt">
+<h2 id="pvt"></h2>
+<p id="pvm" role="status"></p>
+<div id="viewer"></div>
+<button id="pvc" type="button" class="secondary">Close preview</button>
+</dialog>
+
+<script>
+'use strict';
+/* ---------- Skathach ---------- */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let S={books:[],tags:[],black:[]};
+try{S=JSON.parse(localStorage.getItem('skathach'))||S}catch(e){console.warn('Skathach: saved shelf could not be read. Starting empty.',e)}
+if(!Array.isArray(S.black))S.black=[];
+if(S.mode!=='mmr')S.mode='dpp';
+const save=()=>{try{localStorage.setItem('skathach',JSON.stringify(S))}catch(e){console.warn('Skathach: the shelf could not be saved in this browser. It lasts until you close the page.',e)}};
+const say=t=>{$('#status').textContent=t};
+/* Waits run in a Web Worker. Browsers slow page timers in background tabs (to one a minute after a few minutes),
+   but worker timers keep their pace, so a minimised window does not stretch the paced search. */
+let tickWorker;const tickWaits=new Map();let tickN=0;
+try{
+ tickWorker=new Worker(URL.createObjectURL(new Blob(['onmessage=e=>setTimeout(()=>postMessage(e.data.id),e.data.ms)'],{type:'text/javascript'})));
+ tickWorker.onmessage=e=>{const r=tickWaits.get(e.data);if(r){tickWaits.delete(e.data);r()}};
+ tickWorker.onerror=()=>{tickWorker=null;tickWaits.forEach(r=>r());tickWaits.clear()};
+}catch{tickWorker=null}
+const sleep=ms=>tickWorker?new Promise(r=>{const id=++tickN;tickWaits.set(id,r);tickWorker.postMessage({id,ms})}):new Promise(r=>setTimeout(r,ms));
+let LP=1;
+/* Cover addresses that failed, kept for ten minutes, so a redraw does not ask the cover server for them again. */
+const BAD=new Map(),isBad=u=>{const t=BAD.get(u);if(t===undefined)return false;if(Date.now()-t<6e5)return true;BAD.delete(u);return false};
+const coverUrl=id=>'https://covers.openlibrary.org/b/id/'+id+'-M.jpg?default=false';
+const olCover=(kind,k)=>'https://covers.openlibrary.org/b/'+kind+'/'+k+'-M.jpg?default=false';
+/* Every cover source we know for a book, best first. */
+const coverList=d=>{const l=[];if(d.cover_i>0)l.push(coverUrl(d.cover_i));if(d.cover_edition_key)l.push(olCover('olid',d.cover_edition_key));const i=(d.isbn||[]).map(x=>isbn13(x)).find(Boolean);if(i)l.push(olCover('isbn',i));return l.filter(u=>!isBad(u))};
+const cov=(c,t)=>{const l=(Array.isArray(c)?c:[c]).filter(u=>u&&!isBad(u));return l.length?`<img class="cv" src="${esc(l[0])}" data-alt="${esc(JSON.stringify(l.slice(1)))}" alt="Cover of ${esc(t)}" width="72" referrerpolicy="no-referrer" decoding="async">`:'<span class="cv nocv">No cover</span>'};
+/* When a cover fails: retry the first source once (the cover server sometimes refuses a burst), then try the other sources, then show "No cover". */
+document.addEventListener('error',e=>{
+ const im=e.target;if(!(im instanceof HTMLImageElement)||!im.classList.contains('cv'))return;
+ let alt=[];try{alt=JSON.parse(im.dataset.alt||'[]')}catch{/* no alternatives */}
+ if(!im.dataset.retried){im.dataset.retried='1';const u=im.getAttribute('src');setTimeout(()=>{im.src=u+(u.includes('?')?'&':'?')+'r=1'},1500);return}
+ BAD.set(im.getAttribute('src').replace(/&r=1$/,''),Date.now());
+ const n=alt.shift();
+ if(n){im.dataset.alt=JSON.stringify(alt);im.src=n;return}
+ const sp=document.createElement('span');sp.className='cv nocv'+(im.classList.contains('cvg')?' cvg':'');sp.textContent=im.dataset.title||'No cover';im.replaceWith(sp);
+},true);
+
+/* Check digit tests. Returns an ISBN-13 string or null. */
+function isbn13(raw){
+ const d=raw.replace(/[\s-]/g,'').toUpperCase();
+ if(/^\d{9}[\dX]$/.test(d)){
+  let s=0;for(let i=0;i<10;i++)s+=(10-i)*(d[i]==='X'?10:+d[i]);
+  if(s%11)return null;
+  const b='978'+d.slice(0,9);let c=0;for(let i=0;i<12;i++)c+=+b[i]*(i%2?3:1);
+  return b+(10-c%10)%10;
+ }
+ if(/^\d{13}$/.test(d)){
+  let c=0;for(let i=0;i<12;i++)c+=+d[i]*(i%2?3:1);
+  return (10-c%10)%10===+d[12]?d:null;
+ }
+ return null;
+}
+/* One copy per book. A book is the same if the id matches, any ISBN-13 matches, or the title and an author match. */
+const norm=s=>String(s||'').toLowerCase().replace(/[^\p{L}\p{N}]+/gu,' ').trim();
+const hit=(text,terms)=>{const h=' '+norm(text)+' ';return terms.some(t=>h.includes(' '+t+' '))};
+const blackTerms=()=>S.black.map(norm).filter(Boolean);
+const candOf=d=>({id:d.key||'',isbns:(d.isbn||[]).map(x=>isbn13(x)).filter(Boolean),title:d.title,authors:d.author_name||[]});
+const inLib=x=>inList(S.books,x);
+function inList(list,x){
+ const t=norm(x.title),au=x.authors.map(norm).filter(Boolean);
+ return list.some(b=>{
+  if(x.id&&b.id&&x.id===b.id)return true;
+  if(b.isbn&&x.isbns.includes(b.isbn))return true;
+  if(!t||norm(b.title)!==t)return false;
+  const ba=(b.authors||[]).map(norm).filter(Boolean);
+  return !au.length||!ba.length||au.some(a=>ba.includes(a));
+ });
+}
+function addTag(n){n=String(n).trim().toLowerCase();if(n&&!S.tags.some(t=>t.name===n))S.tags.push({name:n,w:3,x:false})}
+
+function draw(){
+ const per=8,pages=Math.max(1,Math.ceil(S.books.length/per));
+ LP=Math.min(Math.max(1,LP),pages);
+ $('#lcount').textContent=S.books.length+(S.books.length===1?' book':' books')+' in your library. They are saved in this browser.';
+ $('#shelf').innerHTML=S.books.length?S.books.slice((LP-1)*per,LP*per).map(b=>`<li class="card"><div class="book">${cov(b.covers||b.cover,b.title)}<div class="book__body"><p><strong class="book__title">${esc(b.title)}</strong>${esc(b.authors.join(', ')||'Author unknown')}${b.isbn?'<br>ISBN-13: '+esc(b.isbn):''}</p><span class="checkline"><input type="checkbox" id="dnf-${esc(b.id||b.isbn)}" data-k="dnf" data-v="${esc(b.id||b.isbn)}"${b.dnf?' checked':''}> <label for="dnf-${esc(b.id||b.isbn)}">Did not finish ${esc(b.title)}</label></span><button class="secondary" type="button" data-a="rmb" data-v="${esc(b.id||b.isbn)}">Remove ${esc(b.title)}</button></div></div></li>`).join(''):'<li class="note"><span>Your library is empty. <a href="#add">Add books</a> to start.</span></li>';
+ pager('#lpager',LP,pages,'lpg');
+ const bt=blackTerms();
+ $('#tags').innerHTML=S.tags.length?S.tags.map(t=>`<li class="tagrow"><strong class="tagrow__name">${esc(t.name)}</strong> <span class="badge mode">${t.w>=4?'Exact search':'Fuzzy search'}</span>${hit(t.name,bt)?' <span class="badge badge--warn">Blacklisted</span>':''}
+ <span class="field"><label for="w-${esc(t.name)}">Weight of ${esc(t.name)}</label> <select id="w-${esc(t.name)}" data-t="${esc(t.name)}" data-k="w">${[1,2,3,4,5].map(n=>`<option${n===t.w?' selected':''}>${n}</option>`).join('')}</select></span>
+ <span class="checkline"><input type="checkbox" id="x-${esc(t.name)}" data-t="${esc(t.name)}" data-k="x"${t.x?' checked':''}> <label for="x-${esc(t.name)}">Exclude ${esc(t.name)}</label></span>
+ <button class="secondary small" type="button" data-a="rmt" data-v="${esc(t.name)}">Remove tag ${esc(t.name)}</button></li>`).join(''):'<li class="note"><span>No tags yet. They appear when you add books.</span></li>';
+ $('#blist').innerHTML=S.black.length?S.black.map(w=>`<li class="tagrow"><strong class="tagrow__name">${esc(w)}</strong><button class="secondary small" type="button" data-a="rmk" data-v="${esc(w)}">Remove ${esc(w)} from blacklist</button></li>`).join(''):'<li class="note"><span>The blacklist is empty.</span></li>';
+}
+
+$('#add').onclick=async()=>{
+ const raw=$('#isbns').value.split(/[\n,;]+/).map(x=>x.trim()).filter(Boolean);
+ const ok=[],bad=[];
+ raw.forEach(r=>{const n=isbn13(r);n?ok.push(n):bad.push(r)});
+ const fresh=[...new Set(ok)].filter(n=>!S.books.some(b=>b.isbn===n));
+ if(!fresh.length){say(bad.length?'Not valid: '+bad.join(', ')+'.':'Nothing new to add.');return}
+ say('Looking up '+fresh.length+' book(s).');
+ try{
+  const r=await fetch('https://openlibrary.org/api/books?format=json&jscmd=data&bibkeys='+fresh.map(n=>'ISBN:'+n).join(','));
+  const j=await r.json();let found=0;
+  fresh.forEach(n=>{
+   const d=j['ISBN:'+n];
+   if(!d){bad.push(n+' (not found)');return}
+   if(inLib({id:'',isbns:[n],title:d.title||n,authors:(d.authors||[]).map(a=>a.name)})){bad.push((d.title||n)+' (already in your library)');return}
+   const subs=(d.subjects||[]).map(s=>s.name);
+   S.books.push({isbn:n,title:d.title||n,authors:(d.authors||[]).map(a=>a.name),subjects:subs,cover:(d.cover&&d.cover.medium)||olCover('isbn',n),covers:[d.cover&&d.cover.medium,d.cover&&d.cover.large,olCover('isbn',n)].filter(Boolean)});
+   subs.slice(0,10).forEach(addTag);found++;
+  });
+  save();draw();$('#isbns').value='';
+  say('Added '+found+'.'+(bad.length?' Not added: '+bad.join(', ')+'.':''));
+ }catch{say('The lookup failed. Check your connection. Open Library may also refuse requests from this page.')}
+};
+
+/* Search by title, author, title and author, or series. */
+let SR=[];
+function syncType(){const t=$('#stype').value;$('#l1').textContent={title:'Title',author:'Author name',both:'Title',series:'Series name'}[t];$('#w2').hidden=t!=='both'}
+$('#stype').onchange=syncType;
+$('#sform').onsubmit=async e=>{
+ e.preventDefault();
+ const t=$('#stype').value,a=$('#q1').value.trim(),b=$('#q2').value.trim(),st=$('#sstatus');
+ if(!a||(t==='both'&&!b)){st.textContent=t==='both'?'Type a title and an author.':'Type something to search for.';return}
+ const P=new URLSearchParams({limit:10,fields:'key,title,author_name,first_publish_year,subject,isbn,ebook_access,cover_i,cover_edition_key'});
+ if(t==='title')P.set('title',a);
+ else if(t==='author')P.set('author',a);
+ else if(t==='both'){P.set('title',a);P.set('author',b)}
+ else P.set('q','"'+a+'"');
+ SQ=P;runSearch(1,false);
+};
+let SQ=null;
+function pager(id,page,pages,act){
+ const n=$(id);n.hidden=pages<2;
+ n.innerHTML=pages<2?'':`<div class="row"><button class="secondary" type="button" data-a="${act}" data-v="${page-1}"${page<2?' disabled':''}>Previous page</button><span>Page ${page} of ${pages}</span><button class="secondary" type="button" data-a="${act}" data-v="${page+1}"${page>=pages?' disabled':''}>Next page</button></div>`;
+}
+function renderSearch(){
+ const rows=SR.map((d,i)=>[d,i]).filter(([d])=>!inLib(candOf(d)));
+ $('#sres').innerHTML=rows.map(([d,i])=>`<li class="card"><div class="book">${cov(coverList(d),d.title)}<div class="book__body"><p><strong class="book__title">${esc(d.title)}</strong>${esc((d.author_name||[]).join(', ')||'Author unknown')}${d.first_publish_year?', first published in '+d.first_publish_year:''}</p><button type="button" data-a="addr" data-v="${i}">Add ${esc(d.title)} to library</button></div></div></li>`).join('');
+ return rows.length;
+}
+async function runSearch(page,focus){
+ const st=$('#sstatus');
+ SQ.set('page',page);
+ st.textContent='Searching.';
+ try{
+  const j=await(await fetch('https://openlibrary.org/search.json?'+SQ)).json();
+  SR=j.docs||[];
+  const total=j.numFound??j.num_found??SR.length,pages=Math.max(1,Math.ceil(total/10));
+  st.textContent=SR.length?'Found '+total+' books. Page '+page+' of '+pages+'. Add the ones you know.':'No books found. Try fewer words.';
+  const shown=renderSearch(),hidden=SR.length-shown;
+  if(SR.length)st.textContent='Found '+total+' books. Page '+page+' of '+pages+'. '+(shown?'Add the ones you know.':'All books on this page are already in your library.')+(shown&&hidden?' '+hidden+' already in your library '+(hidden===1?'is':'are')+' hidden.':'');
+  pager('#spager',page,pages,'spg');
+  if(focus)st.focus();
+ }catch{st.textContent='The search failed. Check your connection. Open Library may also refuse requests from this page.'}
+}
+
+function addResult(i){
+ const d=SR[i],st=$('#sstatus');if(!d)return;
+ if(inLib(candOf(d))){const n=renderSearch();st.textContent=d.title+' is already in your library.'+(n?'':' No other books are left on this page.');st.focus();return}
+ const subs=(d.subject||[]).slice(0,10);
+ S.books.push({id:d.key,isbn:(d.isbn||[]).map(x=>isbn13(x)).find(Boolean)||'',title:d.title,authors:d.author_name||[],subjects:subs,cover:coverList(d)[0]||'',covers:coverList(d)});
+ subs.forEach(addTag);
+ save();draw();
+ const left=renderSearch();
+ st.textContent='Added '+d.title+' to your library. '+(left?left+(left===1?' book is':' books are')+' left on this page.':'No other books are left on this page. Use the next page or search again.');
+ st.focus();
+}
+
+$('#bform').onsubmit=e=>{
+ e.preventDefault();
+ const v=$('#newblack').value.trim().replace(/\s+/g,' '),st=$('#bstatus');
+ if(!norm(v)){st.textContent='Type a word or sentence first.';return}
+ if(S.black.some(x=>norm(x)===norm(v))){st.textContent=v+' is already on the blacklist.';return}
+ S.black.push(v);$('#newblack').value='';save();draw();st.textContent='Added '+v+' to the blacklist.';
+};
+$('#tagform').onsubmit=e=>{e.preventDefault();addTag($('#newtag').value);$('#newtag').value='';save();draw()};
+
+const POP='popover' in HTMLElement.prototype;
+function onShelfClick(e){
+ const pt=e.target.closest('[popovertarget]');
+ if(pt&&!POP){const el=document.getElementById(pt.getAttribute('popovertarget'));if(el)el.classList.toggle('is-open',pt.getAttribute('popovertargetaction')!=='hide');return}
+ const card=e.target.closest('#results .card');
+ if(card&&!e.target.closest('a,button,input,select,textarea,[popover]')){
+  const p=card.querySelector('[popover]');
+  if(p){if(POP){try{p.showPopover()}catch{/* already open */}}else p.classList.add('is-open')}
+  return;
+ }
+ const b=e.target.closest('button[data-a]');if(!b)return;
+ const a=b.dataset.a,v=b.dataset.v;
+ if(a==='rmb'){S.books=S.books.filter(x=>(x.id||x.isbn)!==v);save();draw();$('#h-shelf').focus()}
+ if(a==='rmk'){S.black=S.black.filter(x=>x!==v);save();draw();$('#bstatus').textContent='Removed '+v+' from the blacklist.';$('#h-black').focus()}
+ if(a==='rmt'){S.tags=S.tags.filter(x=>x.name!==v);save();draw();$('#h-tags').focus()}
+ if(a==='pv')preview(v,b.dataset.t);
+ if(a==='addr')addResult(+v);
+ if(a==='lpg'){LP=+v;draw();$('#h-shelf').focus()}
+ if(a==='spg')runSearch(+v,true);
+ if(a==='rpg')showRanked(+v,true);
+}
+function onShelfChange(e){
+ if(e.target.dataset.k==='dnf'){const b=S.books.find(x=>(x.id||x.isbn)===e.target.dataset.v);if(b){b.dnf=e.target.checked;save()}return}
+ const t=S.tags.find(x=>x.name===e.target.dataset.t);if(!t)return;
+ if(e.target.dataset.k==='w'){t.w=+e.target.value;e.target.closest('li').querySelector('.mode').textContent=t.w>=4?'Exact search':'Fuzzy search'}else t.x=e.target.checked;
+ save();
+}
+function bindShelf(){document.addEventListener('click',onShelfClick);document.addEventListener('change',onShelfChange)}
+function unbindShelf(){document.removeEventListener('click',onShelfClick);document.removeEventListener('change',onShelfChange)}
+bindShelf();
+window.onpagehide=unbindShelf;
+window.onpageshow=bindShelf;
+
+/* Weight 4 or 5: exact subject key. Weight 1 to 3: fuzzy subject field. */
+let BUSY=false,STOP=false;
+const subjectQuery=t=>t.w>=4?'subject_key:"'+t.name.trim().replace(/\s+/g,'_')+'"':'subject:"'+t.name+'"';
+$('#stop').onclick=()=>{STOP=true};
+/* One search. Retries twice after a network error, a timeout, a 429 or a server error. */
+async function fetchQ(q,limit){
+ const url='https://openlibrary.org/search.json?limit='+limit+'&fields=key,title,author_name,first_publish_year,subject,isbn,ebook_access,cover_i,cover_edition_key,edition_count,ratings_average,ratings_count&q='+encodeURIComponent(q);
+ for(let a=0;a<3;a++){
+  try{
+   const r=await fetch(url,AbortSignal.timeout?{signal:AbortSignal.timeout(30000)}:{});
+   if(r.ok)return await r.json();
+  }catch{/* try again */}
+  if(a<2)await sleep(4000*(a+1));
+ }
+ throw new Error('Open Library did not answer.');
+}
+$('#find').onclick=async()=>{
+ if(BUSY)return;
+ /* Freeze the tags and library for this run. Changes made while it runs apply to the next run. */
+ const tags=S.tags.map(t=>({...t})),books=S.books.map(b=>({id:b.id,title:b.title,isbn:b.isbn,authors:[...(b.authors||[])],subjects:[...(b.subjects||[])],dnf:!!b.dnf}));
+ const black=blackTerms(),skipped=tags.filter(t=>!t.x&&hit(t.name,black)).length;
+ const use=tags.filter(t=>!t.x&&!hit(t.name,black)).sort((a,b)=>b.w-a.w),f=$('#fstatus');
+ if(!use.length){f.textContent='Add at least one tag that is not excluded or blacklisted.';return}
+ BUSY=true;STOP=false;$('#stop').hidden=false;
+ const run=async()=>{
+  const pool=new Map();let done=0,failed=0,summary='';
+  const keep={RK,LAST};
+  /* The results box starts empty and fills as each search comes back. */
+  RK=[];LAST=null;FRESH=new Set();LASTSIG=null;LIVE=true;
+  $('#results').innerHTML='';$('#results').hidden=true;$('#rpager').hidden=true;$('#cgrid').innerHTML='';GRID.clear();$('#cgrid').hidden=false;$('#flog').innerHTML='';$('#flogbox').hidden=false;
+  const names=l=>l.slice(0,3).map(t=>'\u201c'+t+'\u201d').join(', ')+(l.length>3?' and '+(l.length-3)+' more':'');
+  /* After each search: rank what has been found so far, work out which books came in and which dropped out, and redraw. */
+  const step=(label)=>{
+   const prev=new Map(RK.map(o=>[o.d.key,o.d.title]));
+   rank([...pool.values()].map(slim),tags,books,black,skipped,failed);
+   const cur=new Map(RK.map(o=>[o.d.key,o.d.title]));
+   const add=[...cur.keys()].filter(k=>!prev.has(k)),rem=[...prev.keys()].filter(k=>!cur.has(k));
+   if(add.length)FRESH=new Set(add);
+   if(add.length||rem.length){
+    const li=document.createElement('li');
+    li.textContent='After '+label+': '+(add.length?'added '+names(add.map(k=>cur.get(k))):'')+(add.length&&rem.length?'; ':'')+(rem.length?'removed '+names(rem.map(k=>prev.get(k))):'')+'.';
+    const lg=$('#flog');lg.prepend(li);while(lg.children.length>12)lg.lastChild.remove();
+   }
+   summary=' '+RK.length+(RK.length===1?' book':' books')+' so far. Last update added '+add.length+' and removed '+rem.length+'. Full cards appear when the search ends.';
+   showRanked(1,false);
+  };
+  /* One search per tag, then pairs of the five heaviest tags, which find books that match several tags at once. */
+  const jobs=use.map(t=>({label:t.name+' ('+(t.w>=4?'exact':'fuzzy')+')',q:subjectQuery(t),limit:10+t.w*6}));
+  const top=use.slice(0,5);
+  for(let a=0;a<top.length;a++)for(let b=a+1;b<top.length;b++)jobs.push({label:top[a].name+' and '+top[b].name+' together',q:'('+subjectQuery(top[a])+') AND ('+subjectQuery(top[b])+')',limit:30});
+  try{
+   for(let i=0;i<jobs.length&&!STOP;i++){
+    f.textContent='Searching '+(i+1)+' of '+jobs.length+': '+jobs[i].label+'.'+summary;
+    let got=false;
+    try{const j=await fetchQ(jobs[i].q,jobs[i].limit);(j.docs||[]).forEach(d=>pool.set(d.key,d));done++;got=true}catch{failed++}
+    if(got)step(jobs[i].label);
+    if(i<jobs.length-1&&!STOP)await sleep(PACE);
+   }
+   LIVE=false;FRESH=new Set();LASTSIG=null;
+   if(!done&&failed){RK=keep.RK;LAST=keep.LAST;showRanked(1,false);f.textContent='The search failed. Check your connection. Open Library may also refuse requests from this page.';return}
+   LAST=[[...pool.values()].map(slim),tags,books,black,skipped,failed];
+   saveLast();
+   rank(...LAST);
+   if(STOP)f.textContent+=' Search stopped after '+done+' of '+jobs.length+' searches.';
+  }catch{LIVE=false;showRanked(1,false);f.textContent='The search failed. Check your connection. Open Library may also refuse requests from this page.'}
+  finally{LIVE=false;BUSY=false;$('#stop').hidden=true;$('#flogbox').hidden=true;if(STOP)f.focus()}
+ };
+ /* Holding a Web Lock asks the browser not to freeze or suspend the page while the search runs. */
+ if(navigator.locks){try{await navigator.locks.request('skathach-find',run)}catch{if(BUSY)await run()}}else await run();
+};
+
+function rank(c,tags,books,black,skipped,failed){
+ tags=tags.filter(t=>!hit(t.name,black));
+ c=c.filter(d=>!inList(books,candOf(d)));
+ const before=c.length;
+ c=c.filter(d=>![d.title,...(d.author_name||[]),...(d.subject||[])].some(x=>x&&hit(x,black)));
+ const hid=before-c.length;
+ NOTE=(failed?failed+(failed===1?' search':' searches')+' could not be run. ':'')+(skipped?skipped+(skipped===1?' tag was':' tags were')+' skipped by the blacklist. ':'')+(hid?hid+(hid===1?' book was':' books were')+' hidden by the blacklist.':'');
+ const tn=tags.map(t=>({t,n:norm(t.name)})).filter(x=>x.n);
+ const has=(text,n)=>(' '+text+' ').includes(' '+n+' ');
+ /* How strongly a tag matches a book: 1 for an exact subject, 0.6 for whole words inside a subject, 0.35 for the title only. */
+ const matches=d=>{
+  const subs=(d.subject||[]).map(norm),ti=norm(d.title),r=[];
+  tn.forEach(({t,n})=>{
+   if(subs.includes(n))r.push({t,m:1,how:'exact'});
+   else if(subs.some(x=>has(x,n)))r.push({t,m:.6,how:'partial'});
+   else if(has(ti,n))r.push({t,m:.35,how:'title'});
+  });
+  return r;
+ };
+ const H=new Map(c.map(d=>[d,matches(d)])),df={},N=c.length||1;
+ H.forEach(a=>a.forEach(x=>{df[x.t.name]=(df[x.t.name]||0)+1}));
+ /* Rarity only nudges a tag (60 to 100 percent), so it can never override the weights you set. */
+ const rar=n=>.6+.4*Math.max(0,Math.log((N+1)/(df[n]+1))/Math.log(N+1));
+ const live=tags.filter(t=>!t.x);
+ MINT=Math.min(2,live.length||1);
+ /* ---- Stage 2: ranking (spec 3.5 and addendum 3.6) ----
+    R = ALPHA x collaborative + BETA x semantic similarity + GAMMA x tag coverage, with ALPHA + BETA + GAMMA = 1. */
+ const ALPHA=.15,BETA=.35,GAMMA=.5,DELTA=.5,ETA=.03,NU=.4,BPOP=.35;
+ const nb=books.length,cold=nb<5||live.length<4;
+ /* Sequence: books are in the order you added them. The influence of a book halves every nb/3 books back (at least 4). */
+ const decay=age=>Math.pow(.5,age/Math.max(4,nb/3));
+ const STOP=new Set(['the','and','for','book','volume','vol','part','with','from']);
+ const toks=s=>new Set(norm(s).split(' ').filter(w=>w.length>2&&!STOP.has(w)));
+ const rec=new Map(),own=new Map(),lib=[];
+ books.forEach((b,i)=>{
+  const r=decay(nb-1-i)*(b.dnf?.25:1),subs=(b.subjects||[]).map(norm),au=(b.authors||[]).map(norm).filter(Boolean);
+  tn.forEach(({t,n})=>{if(subs.some(x=>x===n||has(x,n)))rec.set(t.name,Math.max(rec.get(t.name)||0,r))});
+  /* A book you did not finish says little about your taste: its tags count a quarter as much, its author earns no bonus and its sequels get no series boost. */
+  if(!b.dnf)au.forEach(k=>{const o=own.get(k)||{n:0,title:'',r:-1};o.n++;if(r>=o.r){o.r=r;o.title=b.title}own.set(k,o)});
+  lib.push({title:b.title,au,tk:toks(b.title),r:decay(nb-1-i),dnf:!!b.dnf});
+ });
+ /* Tags that appear in books you added recently count up to 20 percent more. */
+ const we=t=>t.w*(1+.2*(rec.get(t.name)||0));
+ /* Coverage C: a book scores 1 when it matches your eight heaviest tags exactly, so a long tag list does not flatten every score. */
+ const ceil=live.map(we).sort((a,b)=>b-a).slice(0,8).reduce((a,b)=>a+b,0)||1;
+ /* Profile vector u: each tag has a confidence 1 + 0.5 x weight. */
+ const conf=t=>1+.5*we(t);
+ const unorm=Math.sqrt(live.map(conf).sort((a,b)=>b-a).slice(0,8).reduce((a,v)=>a+v*v,0))||1;
+ /* Collaborative score: the community rating, pulled towards 3.5 until it has many votes, scaled to 0 to 1. Open Library has no per-reader data, so this is the only crowd signal. */
+ const collab=d=>{const n=d.ratings_count||0,a=d.ratings_average||0;return((n>0&&a?(n*a+8*3.5)/(n+8):3.5)-1)/4};
+ /* Publication recency: a gentle decay (rate 1/15 per year) that never takes a book below 92 percent. Classics do not decay. */
+ const yearNow=new Date().getFullYear();
+ const recency=d=>{const y=d.first_publish_year;if(!y)return 1;const lam=(d.subject||[]).some(x=>hit(x,['classic','classics']))?0:1/15;return .92+.08*Math.exp(-lam*Math.max(0,yearNow-y))};
+ /* Exposure P(i): editions and ratings stand in for how often a book has been shown, scaled so the most exposed candidate is 1. */
+ const popOf=d=>Math.log10(2+(d.edition_count||0)+2*(d.ratings_count||0));
+ const pMax=Math.max(.5,...c.map(popOf));
+ const Pof=d=>Math.max(.01,popOf(d)/pMax);
+ const Ps=c.map(Pof).sort((a,b)=>a-b),Pmed=Ps.length?Ps[Ps.length>>1]:1;
+ const ipsW=P=>1/Math.max(P,NU);
+ /* Series: same author and a title that shares its key words with a book you own. Newer library books count more. */
+ const seriesOf=d=>{
+  const au=(d.author_name||[]).map(norm),tk=toks(d.title);let best=null;
+  if(!tk.size)return null;
+  lib.forEach(b=>{
+   if(b.dnf||!b.tk.size||!b.au.some(a=>au.includes(a)))return;
+   let k=0;tk.forEach(w=>{if(b.tk.has(w))k++});
+   const j=k/(tk.size+b.tk.size-k);
+   if(((k>=2&&j>=.4)||(k>=1&&j>=.5))&&(!best||b.r>best.r))best={title:b.title,r:b.r};
+  });
+  return best;
+ };
+ const nm=l=>l.length>1?l.slice(0,-1).join(', ')+' and '+l[l.length-1]:l[0];
+ const out=c.map(d=>{
+  const ms=H.get(d),pos=ms.filter(x=>!x.t.x),ex=ms.filter(x=>x.t.x);
+  /* C(u,i): how much of your weighted profile the book matches. */
+  const cov=Math.min(1,pos.reduce((a,x)=>a+we(x.t)*x.m*rar(x.t.name),0)/ceil);
+  /* S_content: cosine similarity between your profile and the book. Subjects of the book that match no tag add length to its vector, so a focused book beats a scattered one. */
+  const extra=Math.min(12,Math.max(0,(d.subject||[]).length-pos.filter(x=>x.how!=='title').length));
+  const dot=pos.reduce((a,x)=>a+conf(x.t)*x.m*rar(x.t.name),0);
+  const vn=Math.sqrt(pos.reduce((a,x)=>a+Math.pow(x.m*rar(x.t.name),2),0)+.0625*extra)||1;
+  const cos=Math.min(1,dot/(unorm*vn));
+  let s=ALPHA*collab(d)+BETA*cos+GAMMA*cov;
+  let off='Not online',f=1;
+  const acc=d.ebook_access;
+  if(acc==='borrowable'){off='Borrowable';f=1.15}else if(acc==='public'){off='Free to read';f=1.15}else if(acc==='printdisabled'){off='Preview only';f=1.05}
+  s*=f*recency(d);
+  /* Series continuity: a likely sequel to the newest book in your library gets x(1 + 0.5). A sequel to an older book gets a smaller step, never under 0.1. */
+  const se=seriesOf(d);
+  if(se)s*=1+Math.max(.1,DELTA*se.r);
+  /* Popularity debiasing. Truncated inverse propensity weight 1/max(P, 0.4), set against the median book and raised to the power BPOP = 0.35 (the steepness of the penalty), clipped to 85 to 120 percent. Then the log-Q term: s - ETA x ln P, which is largest for the least exposed books. Both are off for a small library. */
+  const P=Pof(d);
+  if(!cold){s*=Math.min(1.2,Math.max(.85,Math.pow(ipsW(P)/ipsW(Pmed),BPOP)));s-=ETA*Math.log(P)}
+  /* Authors you own more books by count for more. */
+  const au=(d.author_name||[]).map(a=>own.get(norm(a))).filter(Boolean).sort((a,b)=>b.n-a.n||b.r-a.r)[0];
+  if(au)s+=Math.min(.15,.06+.03*au.n);
+  /* Cold start: with a small library, a little weight goes to well-known books. */
+  if(cold)s+=.12*Math.min(1,popOf(d)/3);
+  /* Excluded tags lower the score by how strongly they match: exact x0.4, inside a subject x0.7, title only x0.85. */
+  if(ex.length)s*=Math.max(.15,ex.reduce((a,x)=>a*(x.m>=1?.4:x.m>=.6?.7:.85),1));
+  const top=pos.slice().sort((a,b)=>we(b.t)*b.m-we(a.t)*a.m).slice(0,3).map(x=>x.t.name);
+  const why=['it matches your '+(top.length>1?'tags ':'tag ')+nm(top)];
+  if(au)why.push('you own “'+au.title+'” by the same author');
+  if(se)why.push('it looks like it continues the series of “'+se.title+'”');
+  if(!cold&&P<.3)why.push('it is less widely read than most of the results');
+  return{d,ms,off,au:!!au,ex,n:pos.length,rel:s,P,se:!!se,pin:!!se&&se.r>=.999,sc:Math.round(Math.min(1,s)*100),why:'Recommended because '+why.join('; ')+'.'};
+ }).filter(o=>o.sc>0&&o.n>=MINT).sort((a,b)=>b.rel-a.rel||b.n-a.n);
+ /* One result per book: different works with the same title and author count once. The best 50 go on to Stage 3. */
+ const seen=new Set();
+ const pool=out.filter(o=>{const k=norm(o.d.title)+'|'+norm((o.d.author_name||[])[0]);if(seen.has(k))return false;seen.add(k);return true}).slice(0,50);
+ /* ---- Stage 3: shelf curation (spec 5.1 to 5.3) ----
+    1. Similarity: cosine similarity of subject vectors (1 if a subject is present, else 0).
+    2. Intent-bound clusters: average-linkage clustering of the 50 books, merging groups while their mean similarity is at least 0.3.
+       Books in the strongest half of the groups that are less exposed than the median get up to 10 percent more (intra-cluster exposure weighting).
+       Similarity between books in different groups is masked to 0, so variety is sought inside a group and never forces a jarring book in from another one.
+    3. Selection of 20 books. Discover uses a greedy determinantal point process on L = diag(q) S diag(q) with q = exp(a x R), a = LAM / (2 x (1 - LAM)), then orders the set by MMR.
+       Continue uses MMR alone: LAM x R - (1 - LAM) x (largest similarity to a book already chosen).
+    4. Rules: a likely sequel to your newest book goes in first, no author appears more than twice, and no more than three books are series sequels (series lock-in). */
+ const SHELF=20,LAM=.75,CAP=2,SCAP=3,CL_T=.3,n=pool.length,MODE=S.mode==='mmr'?'mmr':'dpp';
+ const sv=pool.map(o=>new Set((o.d.subject||[]).map(norm).filter(Boolean)));
+ const cosS=(i,j)=>{if(!sv[i].size||!sv[j].size)return 0;let k=0;sv[i].forEach(x=>{if(sv[j].has(x))k++});return k/Math.sqrt(sv[i].size*sv[j].size)};
+ const raw=Array.from({length:n},()=>new Float64Array(n));
+ for(let i=0;i<n;i++)for(let j=i+1;j<n;j++)raw[i][j]=raw[j][i]=cosS(i,j);
+ let groups=pool.map((o,i)=>[i]);
+ for(;;){
+  let bi=-1,bj=-1,bv=CL_T;
+  for(let a=0;a<groups.length;a++)for(let b=a+1;b<groups.length;b++){
+   let t=0;groups[a].forEach(x=>groups[b].forEach(y=>{t+=raw[x][y]}));
+   const v=t/(groups[a].length*groups[b].length);
+   if(v>bv){bv=v;bi=a;bj=b}
+  }
+  if(bi<0)break;
+  groups[bi]=groups[bi].concat(groups[bj]);groups.splice(bj,1);
+ }
+ const cl=new Array(n).fill(0),inPool=new Map(),label=new Map();
+ pool.forEach(o=>(o.d.subject||[]).forEach(x=>{const k=norm(x);if(k){inPool.set(k,(inPool.get(k)||0)+1);if(!label.has(k))label.set(k,x)}}));
+ groups.forEach((g,k)=>{
+  const c2=new Map();g.forEach(i=>{cl[i]=k;sv[i].forEach(x=>c2.set(x,(c2.get(x)||0)+1))});
+  let best='',bs=-9;c2.forEach((v,x)=>{const sc=v/g.length-.5*inPool.get(x)/n;if(sc>bs){bs=sc;best=x}});
+  g.forEach(i=>{pool[i].grp=label.get(best)||''});
+ });
+ if(!cold){
+  const strength=groups.map(g=>{const r=g.map(i=>pool[i].rel).sort((a,b)=>b-a).slice(0,3);return r.reduce((a,b)=>a+b,0)/r.length});
+  const med2=strength.slice().sort((a,b)=>a-b)[strength.length>>1];
+  pool.forEach((o,i)=>{if(strength[cl[i]]>=med2&&o.P<Pmed){o.rel*=1+.1*(1-o.P/Pmed);o.sc=Math.round(Math.min(1,o.rel)*100)}});
+ }
+ const Sm=Array.from({length:n},()=>new Float64Array(n));
+ for(let i=0;i<n;i++){Sm[i][i]=1;for(let j=i+1;j<n;j++)if(cl[i]===cl[j])Sm[i][j]=Sm[j][i]=.97*raw[i][j]}
+ const aa=pool.map(o=>(o.d.author_name||[]).map(norm).filter(Boolean));
+ const cnt=new Map(),sel=[],used=new Set(),forced=pool.map((o,i)=>i).filter(i=>pool[i].pin).slice(0,2);
+ let nser=0;
+ const ok=i=>!used.has(i)&&!aa[i].some(a=>(cnt.get(a)||0)>=CAP)&&!(pool[i].se&&nser>=SCAP);
+ const take=j=>{used.add(j);sel.push(j);aa[j].forEach(a=>cnt.set(a,(cnt.get(a)||0)+1));if(pool[j].se)nser++};
+ let order;
+ if(MODE==='mmr'){
+  const mx=new Float64Array(n);
+  while(sel.length<Math.min(SHELF,n)){
+   let j=forced.find(ok);
+   if(j===undefined){j=-1;let bv=-1e9;for(let i=0;i<n;i++)if(ok(i)){const v=LAM*pool[i].rel-(1-LAM)*mx[i];if(v>bv){bv=v;j=i}}}
+   if(j<0)break;
+   take(j);
+   for(let i=0;i<n;i++)if(!used.has(i))mx[i]=Math.max(mx[i],Sm[j][i]);
+  }
+  order=sel;
+ }else{
+  const qa=LAM/(2*(1-LAM)),qq=pool.map(o=>Math.exp(qa*o.rel));
+  const d2=qq.map(v=>v*v),cv=pool.map(()=>[]);
+  while(sel.length<Math.min(SHELF,n)){
+   let j=forced.find(ok);
+   if(j===undefined){j=-1;let bv=1e-12;for(let i=0;i<n;i++)if(ok(i)&&d2[i]>bv){bv=d2[i];j=i}}
+   if(j<0)break;
+   take(j);
+   const dj=Math.sqrt(Math.max(d2[j],1e-12));
+   for(let i=0;i<n;i++)if(!used.has(i)){
+    let dt=0;for(let k=0;k<cv[j].length;k++)dt+=cv[j][k]*cv[i][k];
+    const e=(qq[j]*qq[i]*Sm[j][i]-dt)/dj;cv[i].push(e);d2[i]-=e*e;
+   }
+  }
+  const rest=sel.slice(),mx=new Map(sel.map(i=>[i,0]));order=[];
+  while(rest.length){
+   let bk=0,bv=-1e9;
+   rest.forEach((i,k)=>{const v=LAM*pool[i].rel-(1-LAM)*mx.get(i);if(v>bv){bv=v;bk=k}});
+   const i=rest.splice(bk,1)[0];order.push(i);
+   rest.forEach(j=>mx.set(j,Math.max(mx.get(j),Sm[i][j])));
+  }
+ }
+ RK=order.map(i=>pool[i]);
+ if(cold)NOTE=(NOTE?NOTE.trim()+' ':'')+'Your library or tag list is small, so well-known books got a small boost.';
+ if(LIVE)return;
+ showRanked(1,false);
+}
+/* Milliseconds between searches. Slow on purpose, so the Open Library limit is never reached and the list has time to update. */
+const PACE=2500;
+const GRID=new Map();
+let RK=[],MINT=2,NOTE='',LAST=null,LIVE=false,FRESH=new Set(),LASTSIG=null;
+/* The last search is kept in this browser so that a reload does not lose a long search. Only the fields the ranking and the cards use are kept. */
+const slim=d=>({key:d.key,title:d.title,author_name:(d.author_name||[]).slice(0,4),first_publish_year:d.first_publish_year,subject:(d.subject||[]).slice(0,25),isbn:(d.isbn||[]).slice(0,6),ebook_access:d.ebook_access,cover_i:d.cover_i,cover_edition_key:d.cover_edition_key,edition_count:d.edition_count,ratings_average:d.ratings_average,ratings_count:d.ratings_count});
+function saveLast(){
+ if(!LAST)return;
+ try{localStorage.setItem('skathach-last',JSON.stringify({when:Date.now(),c:LAST[0],tags:LAST[1],books:LAST[2],black:LAST[3],skipped:LAST[4],failed:LAST[5]}))}
+ catch(e){console.warn('Skathach: the search results could not be saved in this browser.',e)}
+}
+const OFFC={'Free to read':'badge--ok','Borrowable':'badge--ok','Preview only':'badge--info'};
+function showRanked(page,focus){
+ const per=10,pages=Math.max(1,Math.ceil(RK.length/per)),f=$('#fstatus');
+ page=Math.min(Math.max(1,page),pages);
+ const out=RK.slice((page-1)*per,page*per);
+ /* While a search runs, the box is only redrawn when what it shows has changed. */
+ if(LIVE){
+  /* While a search runs, only a grid of covers is shown. The full cards come when it ends. */
+  $('#results').hidden=true;$('#rpager').hidden=true;$('#cgrid').hidden=false;
+  const sig=RK.map(o=>o.d.key+(FRESH.has(o.d.key)?'*':'')).join('|');
+  if(sig===LASTSIG)return;LASTSIG=sig;
+  /* Each book keeps its own tile, so a cover that has loaded is not fetched again when the grid changes. */
+  const tiles=RK.map(o=>{
+   const d=o.d,isNew=FRESH.has(d.key);
+   let li=GRID.get(d.key);
+   if(!li){
+    li=document.createElement('li');li.className='cgrid__item';
+    const l=coverList(d);
+    li.innerHTML=l.length?`<img class="cv cvg" src="${esc(l[0])}" data-alt="${esc(JSON.stringify(l.slice(1)))}" data-title="${esc(d.title)}" alt="Cover of ${esc(d.title)}" referrerpolicy="no-referrer" decoding="async">`:`<span class="cv nocv cvg">${esc(d.title)}</span>`;
+    GRID.set(d.key,li);
+   }
+   li.classList.toggle('cgrid__item--new',isNew);
+   const bd=li.querySelector('.badge');
+   if(isNew&&!bd)li.insertAdjacentHTML('beforeend','<span class="badge badge--info">New</span>');
+   if(!isNew&&bd)bd.remove();
+   return li;
+  });
+  $('#cgrid').replaceChildren(...tiles);
+  return;
+ }
+ $('#cgrid').hidden=true;$('#cgrid').innerHTML='';GRID.clear();$('#results').hidden=false;
+ if(!LIVE)f.textContent=RK.length?'Found '+RK.length+' books that match at least '+(MINT>1?'two tags':'one tag')+', ordered by match with some variety. Page '+page+' of '+pages+'.'+(NOTE?' '+NOTE.trim():''):'No books matched at least '+(MINT>1?'two':'one')+' of your tags. Try other tags.'+(NOTE?' '+NOTE.trim():'');
+ $('#results').setAttribute('start',(page-1)*per+1);
+ $('#results').style.counterReset='card '+((page-1)*per);
+ const how={exact:' (exact)',partial:' (partial)',title:' (title only)'};
+ $('#results').innerHTML=out.map((o,k)=>{
+  const d=o.d,id='pop-'+((page-1)*per+k),i=(d.isbn||[]).find(x=>x.length===13)||(d.isbn||[])[0];
+  return `<li class="card"><h3><button type="button" class="linklike" popovertarget="${id}">${esc(d.title)}</button>${FRESH.has(d.key)?' <span class="badge badge--info">New</span>':''}</h3><div class="book">${cov(coverList(d),d.title)}<div class="book__body">
+  <p>${esc((d.author_name||[]).join(', ')||'Author unknown')}${d.first_publish_year?', first published in '+d.first_publish_year:''}</p>
+  <p>Match score: <strong>${o.sc}</strong> out of 100</p>
+  <meter class="meter" min="0" max="100" value="${o.sc}" aria-hidden="true"></meter>
+  <p>${esc(o.why)}</p>
+  <p>Library offer: <span class="badge ${OFFC[o.off]||''}">${esc(o.off)}</span></p>
+  <div class="row">${i?`<button type="button" data-a="pv" data-v="${esc(i)}" data-t="${esc(d.title)}">Preview ${esc(d.title)}</button>`:''}
+  <a href="https://openlibrary.org${esc(d.key.startsWith('/')?d.key:'/works/'+d.key)}">Open Library page for ${esc(d.title)}</a></div></div></div>
+  <div popover id="${id}" class="pop" role="dialog" aria-labelledby="${id}-t"><h4 id="${id}-t">Matched tags for ${esc(d.title)}</h4>
+  <ul class="chips">${o.ms.map(x=>'<li class="chip">'+esc(x.t.name)+how[x.how]+(x.t.x?' (excluded)':'')+'</li>').join('')}</ul>
+  ${o.grp?'<p>Subject group: '+esc(o.grp)+'</p>':''}${o.au?'<p class="note"><span>Same author as a book in your library.</span></p>':''}${o.ex.length?'<p class="note note--warn"><span>Score lowered by an excluded tag.</span></p>':''}
+  <div class="row"><button type="button" class="secondary" popovertarget="${id}" popovertargetaction="hide" autofocus>Close</button></div></div></li>`;
+ }).join('');
+ pager('#rpager',page,pages,'rpg');
+ if(focus)f.focus();
+}
+
+/* Google Books embedded viewer, loaded only when asked. */
+let gReady=false;
+function preview(isbn,title){
+ const dlg=$('#pv'),m=$('#pvm');
+ $('#pvt').textContent='Preview of '+title;$('#viewer').textContent='';
+ m.textContent='Loading the preview.';dlg.showModal();
+ const fail=()=>{m.innerHTML='Google Books has no preview that can be shown here. <a href="https://books.google.com/books?vid=ISBN'+esc(isbn)+'">Open this book on Google Books</a>.'};
+ const go=()=>{
+  try{new google.books.DefaultViewer($('#viewer')).load('ISBN:'+isbn,fail,()=>{m.textContent=''})}catch{fail()}
+ };
+ if(gReady){go();return}
+ const s=document.createElement('script');
+ s.src='https://www.google.com/books/jsapi.js';
+ s.onload=()=>{google.books.load();google.books.setOnLoadCallback(()=>{gReady=true;go()})};
+ s.onerror=fail;
+ document.head.append(s);
+}
+$('#pvc').onclick=()=>$('#pv').close();
+const VIEWS={library:['h-shelf','Library'],add:['h-add','Add books'],tags:['h-tags','Tags'],blacklist:['h-black','Blacklist'],find:['h-find','Find books']};
+function show(focus){
+ let v=location.hash.slice(1);
+ if(!VIEWS[v])v=S.books.length?'library':'add';
+ Object.keys(VIEWS).forEach(k=>{$('#v-'+k).hidden=k!==v});
+ document.querySelectorAll('.tabs a').forEach(a=>{if(a.dataset.v===v)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current')});
+ document.title=VIEWS[v][1]+' | Skathach';
+ if(focus)$('#'+VIEWS[v][0]).focus();
+}
+$('#fmode').value=S.mode;
+$('#fmode').onchange=e=>{S.mode=e.target.value==='mmr'?'mmr':'dpp';save();if(LAST&&!BUSY)rank(...LAST)};
+window.onhashchange=()=>show(true);
+draw();
+show(false);
+try{
+ const r=JSON.parse(localStorage.getItem('skathach-last'));
+ if(r&&Array.isArray(r.c)&&r.c.length&&Array.isArray(r.tags)&&Array.isArray(r.books)){
+  LAST=[r.c,r.tags,r.books,r.black||[],r.skipped||0,r.failed||0];
+  rank(...LAST);
+  $('#fstatus').textContent+=' These results are saved from your search on '+new Date(r.when).toLocaleString('en-GB')+'.';
+ }
+}catch(e){console.warn('Skathach: the saved search results could not be read.',e)}
+</script>
+</body>
+</html>
