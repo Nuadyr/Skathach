@@ -341,7 +341,11 @@ ul.cards, ol.cards { list-style: none; padding: 0; }
 .book__title { display: block; font: 600 var(--t-md) / 1.25 var(--font-head); }
 .book__body .chips { grid-template-columns: repeat(auto-fill, minmax(min(100%, 10rem), 1fr)); margin-block-start: var(--s-2); }
 .cv { inline-size: 4.5rem; flex: none; }
-img.cv { block-size: auto; border: var(--rule) solid var(--line-soft); border-radius: var(--r-1); }
+/* A cover keeps its 2:3 box while it loads, retries or fails. The broken-image alt text is clipped, so it can never stretch the card. The alt text is still read by screen readers. */
+img.cv { block-size: auto; aspect-ratio: 2 / 3; object-fit: contain; overflow: hidden; font-size: 0; line-height: 0; color: transparent; background: var(--surface-2); border: var(--rule) solid var(--line-soft); border-radius: var(--r-1); }
+.cgrid__item img.cvg { aspect-ratio: 2 / 3; }
+.card > h3 { align-items: flex-start; }
+.card > h3 .linklike { line-height: 1.25; }
 /* Cover grid shown while a search runs */
 .cgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 5.25rem), 1fr)); gap: var(--s-3); list-style: none; padding: 0; }
 .cgrid__item { position: relative; min-inline-size: 0; }
@@ -569,7 +573,7 @@ const coverUrl=id=>'https://covers.openlibrary.org/b/id/'+id+'-M.jpg?default=fal
 const olCover=(kind,k)=>'https://covers.openlibrary.org/b/'+kind+'/'+k+'-M.jpg?default=false';
 /* Every cover source we know for a book, best first. */
 const coverList=d=>{const l=[];if(d.cover_i>0)l.push(coverUrl(d.cover_i));if(d.cover_edition_key)l.push(olCover('olid',d.cover_edition_key));const i=(d.isbn||[]).map(x=>isbn13(x)).find(Boolean);if(i)l.push(olCover('isbn',i));return l.filter(u=>!isBad(u))};
-const cov=(c,t,isbn='')=>{const l=(Array.isArray(c)?c:[c]).filter(u=>u&&!isBad(u));return l.length?`<img class="cv" src="${esc(l[0])}" data-alt="${esc(JSON.stringify(l.slice(1)))}" data-title="${esc(t)}" data-isbn="${esc(isbn)}" alt="Cover of ${esc(t)}" width="72" referrerpolicy="no-referrer" decoding="async">`:'<span class="cv nocv">No cover</span>'};
+const cov=(c,t,isbn='',work='')=>{const l=(Array.isArray(c)?c:[c]).filter(u=>u&&!isBad(u));return l.length?`<img class="cv" src="${esc(l[0])}" data-alt="${esc(JSON.stringify(l.slice(1)))}" data-title="${esc(t)}" data-isbn="${esc(isbn)}" data-work="${esc(work)}" alt="Cover of ${esc(t)}" width="72" referrerpolicy="no-referrer" decoding="async">`:`<span class="cv nocv" data-title="${esc(t)}" data-isbn="${esc(isbn)}" data-work="${esc(work)}">No cover</span>`};
 /* Cover fallback order: retry Open Library once, try its other identifiers, then use Google Books as an independent provider. */
 const GB_COVER_CACHE=new Map();
 async function googleCoverSources(im){
@@ -606,6 +610,33 @@ async function googleCoverSources(im){
   return found;
  },value=>Array.isArray(value)&&value.length>0);
 }
+/* Work and edition covers. The search result names one cover for the whole work. When that file is missing, the work record
+   and its editions usually list other cover ids. Cover ids are not rate limited the way ISBN and edition key lookups are. */
+const idsToUrls=(ids,max=6)=>[...new Set((ids||[]).filter(n=>Number.isInteger(n)&&n>0))].slice(0,max).map(coverUrl);
+const WK_CACHE=new Map(),ED_CACHE=new Map();
+function workData(path){
+ if(!/^\/(works|books)\/OL\w+$/.test(path))return Promise.resolve(null);
+ return cachedPromise(WK_CACHE,path,async()=>{
+  try{
+   const r=await fetch('https://openlibrary.org'+path+'.json',AbortSignal.timeout?{signal:AbortSignal.timeout(15000)}:{});
+   if(!r.ok)return null;
+   const j=await r.json();
+   return{description:j.description,covers:Array.isArray(j.covers)?j.covers:[]};
+  }catch{return null}
+ },v=>!!v);
+}
+async function workCovers(path){const j=await workData(path);return j?idsToUrls(j.covers):[]}
+function editionCovers(path){
+ if(!/^\/works\/OL\w+$/.test(path))return Promise.resolve([]);
+ return cachedPromise(ED_CACHE,path,async()=>{
+  try{
+   const r=await fetch('https://openlibrary.org'+path+'/editions.json?limit=50',AbortSignal.timeout?{signal:AbortSignal.timeout(15000)}:{});
+   if(!r.ok)return[];
+   const j=await r.json();
+   return idsToUrls((j.entries||[]).flatMap(e=>e.covers||[]),8);
+  }catch{return[]}
+ },v=>v.length>0);
+}
 document.addEventListener('error',async e=>{
  const im=e.target;if(!(im instanceof HTMLImageElement)||!im.classList.contains('cv'))return;
  let alt=[];try{alt=JSON.parse(im.dataset.alt||'[]')}catch{/* no alternatives */}
@@ -613,6 +644,9 @@ document.addEventListener('error',async e=>{
  BAD.set(im.getAttribute('src').replace(/&r=1$/,''),Date.now());
  const n=alt.shift();
  if(n){im.dataset.alt=JSON.stringify(alt);im.dataset.retried='';im.src=n;return}
+ const wk=im.dataset.work;
+ if(wk&&!im.dataset.workTried){im.dataset.workTried='1';const l=(await workCovers(wk)).filter(u=>!isBad(u));if(!im.isConnected)return;if(l.length){im.dataset.alt=JSON.stringify(l.slice(1));im.dataset.retried='';im.src=l[0];return}}
+ if(wk&&!im.dataset.edTried){im.dataset.edTried='1';const l=(await editionCovers(wk)).filter(u=>!isBad(u));if(!im.isConnected)return;if(l.length){im.dataset.alt=JSON.stringify(l.slice(1));im.dataset.retried='';im.src=l[0];return}}
  if(!im.dataset.googleTried){im.dataset.googleTried='1';const covers=await googleCoverSources(im);if(!im.isConnected)return;const next=covers.find(u=>!isBad(u));if(next){im.dataset.alt=JSON.stringify(covers.filter(u=>u!==next));im.dataset.retried='';im.src=next;return}}
  const sp=document.createElement('span');sp.className='cv nocv'+(im.classList.contains('cvg')?' cvg':'');sp.textContent=im.dataset.title||'No cover';im.replaceWith(sp);
 },true);
@@ -654,7 +688,7 @@ function draw(){
  const per=8,pages=Math.max(1,Math.ceil(S.books.length/per));
  LP=Math.min(Math.max(1,LP),pages);
  $('#lcount').textContent=S.books.length+(S.books.length===1?' book':' books')+' in your library. They are saved in this browser.';
- $('#shelf').innerHTML=S.books.length?S.books.slice((LP-1)*per,LP*per).map(b=>`<li class="card"><div class="book">${cov(b.covers||b.cover,b.title,b.isbn||'')}<div class="book__body"><p><strong class="book__title">${esc(b.title)}</strong>${esc(b.authors.join(', ')||'Author unknown')}${b.isbn?'<br>ISBN-13: '+esc(b.isbn):''}</p><span class="checkline"><input type="checkbox" id="dnf-${esc(b.id||b.isbn)}" data-k="dnf" data-v="${esc(b.id||b.isbn)}"${b.dnf?' checked':''}> <label for="dnf-${esc(b.id||b.isbn)}">Did not finish ${esc(b.title)}</label></span><button class="secondary" type="button" data-a="rmb" data-v="${esc(b.id||b.isbn)}">Remove ${esc(b.title)}</button></div></div></li>`).join(''):'<li class="note"><span>Your library is empty. <a href="#add">Add books</a> to start.</span></li>';
+ $('#shelf').innerHTML=S.books.length?S.books.slice((LP-1)*per,LP*per).map(b=>`<li class="card"><div class="book">${cov(b.covers||b.cover,b.title,b.isbn||'',/^\/works\/OL\w+$/.test(b.id||'')?b.id:'')}<div class="book__body"><p><strong class="book__title">${esc(b.title)}</strong>${esc(b.authors.join(', ')||'Author unknown')}${b.isbn?'<br>ISBN-13: '+esc(b.isbn):''}</p><span class="checkline"><input type="checkbox" id="dnf-${esc(b.id||b.isbn)}" data-k="dnf" data-v="${esc(b.id||b.isbn)}"${b.dnf?' checked':''}> <label for="dnf-${esc(b.id||b.isbn)}">Did not finish ${esc(b.title)}</label></span><button class="secondary" type="button" data-a="rmb" data-v="${esc(b.id||b.isbn)}">Remove ${esc(b.title)}</button></div></div></li>`).join(''):'<li class="note"><span>Your library is empty. <a href="#add">Add books</a> to start.</span></li>';
  pager('#lpager',LP,pages,'lpg');
  const bt=blackTerms();
  $('#tags').innerHTML=S.tags.length?S.tags.map((t,ti)=>`<li class="tagrow"><strong class="tagrow__name">${esc(t.name)}</strong> <span class="badge mode">${t.w>=4?'Exact search':'Fuzzy search'}</span>${hit(t.name,bt)?' <span class="badge badge--warn">Blacklisted</span>':''}
@@ -709,7 +743,7 @@ function pager(id,page,pages,act){
 }
 function renderSearch(){
  const rows=SR.map((d,i)=>[d,i]).filter(([d])=>!inLib(candOf(d)));
- $('#sres').innerHTML=rows.map(([d,i])=>`<li class="card"><div class="book">${cov(coverList(d),d.title,(d.isbn||[]).map(x=>isbn13(x)).find(Boolean)||'')}<div class="book__body"><p><strong class="book__title">${esc(d.title)}</strong>${esc((d.author_name||[]).join(', ')||'Author unknown')}${d.first_publish_year?', first published in '+d.first_publish_year:''}</p><button type="button" data-a="addr" data-v="${i}">Add ${esc(d.title)} to library</button></div></div></li>`).join('');
+ $('#sres').innerHTML=rows.map(([d,i])=>`<li class="card"><div class="book">${cov(coverList(d),d.title,(d.isbn||[]).map(x=>isbn13(x)).find(Boolean)||'',d.key)}<div class="book__body"><p><strong class="book__title">${esc(d.title)}</strong>${esc((d.author_name||[]).join(', ')||'Author unknown')}${d.first_publish_year?', first published in '+d.first_publish_year:''}</p><button type="button" data-a="addr" data-v="${i}">Add ${esc(d.title)} to library</button></div></div></li>`).join('');
  return rows.length;
 }
 async function runSearch(page,focus){
@@ -1075,7 +1109,7 @@ function showRanked(page,focus){
    if(!li){
     li=document.createElement('li');li.className='cgrid__item';
     const l=coverList(d);
-    li.innerHTML=l.length?`<img class="cv cvg" src="${esc(l[0])}" data-alt="${esc(JSON.stringify(l.slice(1)))}" data-title="${esc(d.title)}" data-isbn="${esc((d.isbn||[]).map(x=>isbn13(x)).find(Boolean)||'')}" alt="Cover of ${esc(d.title)}" referrerpolicy="no-referrer" decoding="async">`:`<span class="cv nocv cvg">${esc(d.title)}</span>`;
+    li.innerHTML=l.length?`<img class="cv cvg" src="${esc(l[0])}" data-alt="${esc(JSON.stringify(l.slice(1)))}" data-title="${esc(d.title)}" data-isbn="${esc((d.isbn||[]).map(x=>isbn13(x)).find(Boolean)||'')}" data-work="${esc(d.key)}" alt="Cover of ${esc(d.title)}" referrerpolicy="no-referrer" decoding="async">`:`<span class="cv nocv cvg">${esc(d.title)}</span>`;
     GRID.set(d.key,li);
    }
    li.classList.toggle('cgrid__item--new',isNew);
@@ -1094,7 +1128,7 @@ function showRanked(page,focus){
  const how={exact:' (exact)',partial:' (partial)',title:' (title only)'};
  $('#results').innerHTML=out.map((o,k)=>{
   const d=o.d,id='pop-'+((page-1)*per+k),i=(d.isbn||[]).find(x=>x.length===13)||(d.isbn||[])[0],wk=d.key.startsWith('/')?d.key:'/works/'+d.key;
-  return `<li class="card"><h3><button type="button" class="linklike" popovertarget="${id}">${esc(d.title)}</button>${FRESH.has(d.key)?' <span class="badge badge--info">New</span>':''}</h3><div class="book">${cov(coverList(d),d.title,(d.isbn||[]).map(x=>isbn13(x)).find(Boolean)||'')}<div class="book__body">
+  return `<li class="card"><h3><button type="button" class="linklike" popovertarget="${id}">${esc(d.title)}</button>${FRESH.has(d.key)?' <span class="badge badge--info">New</span>':''}</h3><div class="book">${cov(coverList(d),d.title,(d.isbn||[]).map(x=>isbn13(x)).find(Boolean)||'',wk)}<div class="book__body">
   <p>${esc((d.author_name||[]).join(', ')||'Author unknown')}${d.first_publish_year?', first published in '+d.first_publish_year:''}</p>
   <p>Match score: <strong>${o.sc}</strong> out of 100</p>
   <meter class="meter" min="0" max="100" value="${o.sc}" aria-hidden="true"></meter></div></div>
@@ -1143,7 +1177,7 @@ async function addPreviewButton(slot,isbn,title){
 }
 /* Blurbs. The work description from Open Library replaces the "Recommended because" line when there is one.
    The card shows at most 255 characters. Tapping the blurb, or the button under it, opens the whole text in a dialog. */
-const BL_CACHE=new Map(),BLURBS=new Map(),BLURB_CAP=255;
+const BLURBS=new Map(),BLURB_CAP=255;
 /* A description is plain text or an object with a value. Tidy markdown links, and drop the list of contents that often follows a row of dashes. */
 function blurbText(desc){
  let t=typeof desc==='string'?desc:(desc&&typeof desc.value==='string'?desc.value:'');
@@ -1166,22 +1200,17 @@ function capBlurb(t){
  s=s.replace(/[\ud800-\udbff]$/,'').replace(/[\s,;:.\-]+$/,'');
  return{short:s+'\u2026',cut:true};
 }
-function workBlurb(path){
- if(!/^\/(works|books)\/OL\w+$/.test(path))return Promise.resolve(null);
- return cachedPromise(BL_CACHE,path,async()=>{
-  try{
-   const r=await fetch('https://openlibrary.org'+path+'.json',AbortSignal.timeout?{signal:AbortSignal.timeout(15000)}:{});
-   if(!r.ok)return null;
-   return blurbText((await r.json()).description)||null;
-  }catch{return null}
- },v=>!!v);
-}
 /* One book at a time, so ten cards do not send ten requests at once. A book with no blurb keeps its "Recommended because" line. */
 async function loadBlurbs(){
  for(const p of $('#results').querySelectorAll('p[data-work]')){
   if(!p.isConnected)break;
-  const text=await workBlurb(p.dataset.work);
-  if(!text||!p.isConnected)continue;
+  const wd=await workData(p.dataset.work);
+  if(!p.isConnected)continue;
+  /* A card that started with no usable cover URL gets the work's own covers. Earlier failures are forgotten so they are tried again. */
+  const sp=p.closest('.card')?.querySelector('.book span.cv.nocv[data-work]');
+  if(sp&&wd){const l=idsToUrls(wd.covers);if(l.length){l.forEach(u=>BAD.delete(u));sp.outerHTML=cov(l,sp.dataset.title,sp.dataset.isbn,sp.dataset.work)}}
+  const text=wd?blurbText(wd.description):'';
+  if(!text)continue;
   const{short,cut}=capBlurb(text);
   p.textContent=short;
   if(!cut)continue;
