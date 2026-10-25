@@ -32,7 +32,7 @@ It is one file. Download `index.html` and open it in a browser.
 
 ## Built with
 
-Plain HTML, CSS and JavaScript. Accessible by design (WCAG 2.2 AA), built on the Aengus design system.
+Plain HTML, CSS and JavaScript. Accessible by design (WCAG 2.2 AA), built on the Aengus design system (In-house by myself) 
 
 ## Licence
 
