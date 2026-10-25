@@ -25,7 +25,7 @@
 <meta name="theme-color" content="#f5f6f7" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#111213" media="(prefers-color-scheme: dark)">
 <link rel="canonical" href="https://nuadyr.github.io/Skathach/">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231b1d1f'/%3E%3Cpath d='M9 24V9M16 24V7M23 24V11' fill='none' stroke='%23a0cde4' stroke-width='3.5' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231a1a1d'/%3E%3Cpath d='M9 24V9M16 24V7M23 24V11' fill='none' stroke='%239999cc' stroke-width='3.5' stroke-linecap='round'/%3E%3C/svg%3E">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <meta property="og:type" content="website">
@@ -62,34 +62,37 @@ try { [['arshelf', 'skathach'], ['arshelf-last', 'skathach-last']].forEach(([o, 
    Layers: 1 tokens, 2 base, 3 layout, 4 components, 5 your page, 6 user preferences and assistive modes. */
 
 /* 1. Tokens. light-dark(light value, dark value) follows the system setting.
-   1a primitives (Nuadyr Black Steel and Ice), 1b semantic roles, 1c LOCKED status colours.
+   1a primitives (Nuadyr Black Steel and Periwinkle), 1b semantic roles, 1c LOCKED status colours.
    The UI is monochrome on purpose: the only strong colours on a page are the status messages. */
 
 /* 1a. Primitives. Reference only: components never use these directly, they use the roles in 1b. */
 :root {
-  /* Black Steel: cool charcoal greys with a faint steel tint. Every neutral in the UI comes from here. */
+  /* Black Steel: cool charcoal greys with a faint blue tint. Every neutral in the UI comes from here. */
   --Nuadyr-color-steel-100: rgba(245, 246, 247, 1);
   --Nuadyr-color-steel-200: rgba(233, 234, 236, 1);
   --Nuadyr-color-steel-300: rgba(209, 211, 215, 1);
-  --Nuadyr-color-steel-400: rgba(173, 178, 184, 1);
-  --Nuadyr-color-steel-500: rgba(135, 141, 151, 1);
-  --Nuadyr-color-steel-600: rgba(100, 106, 115, 1);
-  --Nuadyr-color-steel-700: rgba(66, 71, 76, 1);
-  --Nuadyr-color-steel-800: rgba(43, 45, 49, 1);
-  --Nuadyr-color-steel-900: rgba(27, 29, 31, 1);
+  --Nuadyr-color-steel-400: rgba(173, 176, 184, 1);
+  --Nuadyr-color-steel-500: rgba(136, 138, 150, 1);
+  --Nuadyr-color-steel-600: rgba(101, 102, 114, 1);
+  --Nuadyr-color-steel-700: rgba(67, 68, 75, 1);
+  --Nuadyr-color-steel-800: rgba(44, 44, 48, 1);
+  --Nuadyr-color-steel-900: rgba(26, 26, 29, 1);
   --Nuadyr-color-steel-950: rgba(17, 18, 19, 1);
 
-  /* Ice: the one accent hue, a muted steel cyan. Used only for actions, links, focus and chart marks. */
-  --Nuadyr-color-ice-100: rgba(233, 242, 247, 1);
-  --Nuadyr-color-ice-200: rgba(203, 224, 235, 1);
-  --Nuadyr-color-ice-300: rgba(166, 201, 221, 1);
-  --Nuadyr-color-ice-400: rgba(129, 179, 207, 1);
-  --Nuadyr-color-ice-500: rgba(89, 154, 192, 1);
-  --Nuadyr-color-ice-600: rgba(63, 129, 166, 1);
-  --Nuadyr-color-ice-700: rgba(49, 100, 129, 1);
-  --Nuadyr-color-ice-800: rgba(36, 74, 96, 1);
-  --Nuadyr-color-ice-900: rgba(27, 54, 70, 1);
-  --Nuadyr-color-ice-950: rgba(18, 37, 48, 1);
+  /* Periwinkle: the one accent hue, a muted blue-violet that deepens to a steel blue in the darkest steps. Used only for actions, links, focus and chart marks.
+     25 and 50 are lighter tints of 100 (same hue and saturation) for dark-mode text: 100 alone only reaches about 6.9:1 on steel-950. */
+  --Nuadyr-color-periwinkle-25: rgba(207, 207, 231, 1);
+  --Nuadyr-color-periwinkle-50: rgba(187, 187, 221, 1);
+  --Nuadyr-color-periwinkle-100: rgb(153, 153, 204);
+  --Nuadyr-color-periwinkle-200: rgba(142, 144, 199, 1);
+  --Nuadyr-color-periwinkle-300: rgba(131, 135, 195, 1);
+  --Nuadyr-color-periwinkle-400: rgba(101, 114, 183, 1);
+  --Nuadyr-color-periwinkle-500: rgba(74, 97, 166, 1);
+  --Nuadyr-color-periwinkle-600: rgba(59, 87, 138, 1);
+  --Nuadyr-color-periwinkle-700: rgba(46, 74, 111, 1);
+  --Nuadyr-color-periwinkle-800: rgba(34, 61, 85, 1);
+  --Nuadyr-color-periwinkle-900: rgba(25, 49, 66, 1);
+  --Nuadyr-color-periwinkle-950: rgba(18, 37, 48, 1);
 
   --Nuadyr-color-white: rgba(255, 255, 255, 1);
 }
@@ -114,18 +117,18 @@ try { [['arshelf', 'skathach'], ['arshelf-last', 'skathach-last']].forEach(([o, 
   --on-brand:   var(--Nuadyr-color-steel-100);
   --on-brand-soft: var(--Nuadyr-color-steel-300);
 
-  --action:        light-dark(var(--Nuadyr-color-ice-800), var(--Nuadyr-color-ice-300));
-  --action-hover:  light-dark(var(--Nuadyr-color-ice-900), var(--Nuadyr-color-ice-200));
+  --action:        light-dark(var(--Nuadyr-color-periwinkle-800), var(--Nuadyr-color-periwinkle-50));
+  --action-hover:  light-dark(var(--Nuadyr-color-periwinkle-900), var(--Nuadyr-color-periwinkle-25));
   --on-action:     light-dark(var(--Nuadyr-color-white), var(--Nuadyr-color-steel-950));
-  --link:          light-dark(var(--Nuadyr-color-ice-800), var(--Nuadyr-color-ice-300));
-  --focus:         light-dark(var(--Nuadyr-color-steel-950), var(--Nuadyr-color-ice-300));
+  --link:          light-dark(var(--Nuadyr-color-periwinkle-800), var(--Nuadyr-color-periwinkle-50));
+  --focus:         light-dark(var(--Nuadyr-color-steel-950), var(--Nuadyr-color-periwinkle-300));
 
   /* Secondary emphasis stays monochrome: an inverted steel button. Never use it for status. */
   --accent-2:      light-dark(var(--Nuadyr-color-steel-800), var(--Nuadyr-color-steel-200));
   --accent-2-hover: light-dark(var(--Nuadyr-color-steel-950), var(--Nuadyr-color-steel-100));
   --on-accent-2:   light-dark(var(--Nuadyr-color-white), var(--Nuadyr-color-steel-950));
 
-  --chart:         light-dark(var(--Nuadyr-color-ice-700), var(--Nuadyr-color-ice-400));
+  --chart:         light-dark(var(--Nuadyr-color-periwinkle-700), var(--Nuadyr-color-periwinkle-400));
   --chart-line: var(--ink);
 
   --s-1: 0.25rem; --s-2: 0.5rem; --s-3: 0.75rem; --s-4: 1rem; --s-5: 1.5rem; --s-6: 2rem; --s-7: 3rem; --s-8: 4rem;
@@ -320,11 +323,35 @@ td.num { text-align: end; }
 
 /* 5. Your page */
 
-/* Main navigation: tabs. The current tab has a fill, a bar and aria-current, so colour is never the only cue. */
-.tabs { display: flex; flex-wrap: wrap; gap: var(--s-2); list-style: none; padding: 0; }
-.tabs a { display: inline-flex; align-items: center; min-block-size: var(--target); padding: var(--s-2) var(--s-4); font-weight: 700; line-height: 1.3; text-decoration: none; color: var(--ink); background: var(--surface); border: var(--rule) solid var(--line); border-radius: var(--r-2); }
-.tabs a:hover { background: var(--surface-2); border-color: var(--ink); }
-.tabs a[aria-current="page"] { color: var(--on-action); background: var(--action); border-color: var(--action); box-shadow: inset 0 -0.3rem 0 var(--on-action); }
+/* Main navigation: a rounded track of pills. Each pill has an icon and a word. The current pill is filled, underlined and marked with aria-current,
+   so colour is never the only cue. Narrow screens show three pills per row with the icon above the word; wide screens show one row. */
+:root {
+  --mask-nav-library: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2.8' y='4' width='3.8' height='16' rx='1'/%3E%3Crect x='8.6' y='4' width='3.8' height='16' rx='1'/%3E%3Cpath d='M14.8 6.4l3.4-.9 3.9 14.3-3.4.9z'/%3E%3C/svg%3E");
+  --mask-nav-reading: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 3.8h10v16.4l-5-3.6-5 3.6z'/%3E%3C/svg%3E");
+  --mask-nav-add: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 5v14M5 12h14'/%3E%3C/svg%3E");
+  --mask-nav-tags: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3.8 12.4V4.8h7.6l8.8 8.8-7.6 7.6z'/%3E%3Cpath d='M8 8.4v.2'/%3E%3C/svg%3E");
+  --mask-nav-blacklist: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='8.2'/%3E%3Cpath d='M6.2 6.2l11.6 11.6'/%3E%3C/svg%3E");
+  --mask-nav-find: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='10.5' cy='10.5' r='6.2'/%3E%3Cpath d='m15.2 15.2 5 5'/%3E%3C/svg%3E");
+}
+.tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--s-1); list-style: none; margin: 0; padding: var(--s-1); background: var(--surface-2); border: var(--rule) solid var(--line-soft); border-radius: 1.5rem; }
+.tabs li { display: flex; min-inline-size: 0; }
+.tabs a { display: flex; flex: 1; flex-direction: column; align-items: center; justify-content: center; gap: 0.125rem; min-block-size: 3.5rem; padding: var(--s-2); font-size: var(--t-sm); font-weight: 700; line-height: 1.2; text-align: center; text-decoration: none; color: var(--ink-soft); background: transparent; border: var(--rule) solid transparent; border-radius: 1.25rem; }
+.tabs a::before { content: ""; inline-size: 1.5rem; block-size: 1.5rem; flex: none; background: currentColor; mask: var(--nav-icon) center / contain no-repeat; -webkit-mask: var(--nav-icon) center / contain no-repeat; }
+.tabs a[data-v="library"] { --nav-icon: var(--mask-nav-library); }
+.tabs a[data-v="reading"] { --nav-icon: var(--mask-nav-reading); }
+.tabs a[data-v="add"] { --nav-icon: var(--mask-nav-add); }
+.tabs a[data-v="tags"] { --nav-icon: var(--mask-nav-tags); }
+.tabs a[data-v="blacklist"] { --nav-icon: var(--mask-nav-blacklist); }
+.tabs a[data-v="find"] { --nav-icon: var(--mask-nav-find); }
+.tabs a[data-v="library"] { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+.tabs a:hover { color: var(--ink); background: var(--surface); }
+.tabs a[aria-current="page"] { color: var(--on-action); background: var(--action); text-decoration: underline; text-decoration-thickness: 0.125rem; text-underline-offset: 0.25em; }
+.tabs a[aria-current="page"]:hover { background: var(--action-hover); }
+@media (prefers-reduced-motion: no-preference) { .tabs a { transition: background-color 0.18s ease, color 0.18s ease; } }
+@media (width >= 56rem) {
+  .tabs { grid-template-columns: repeat(6, auto); inline-size: fit-content; }
+  .tabs a { flex-direction: row; gap: var(--s-2); min-block-size: var(--target); padding-inline: var(--s-4); font-size: var(--t-base); }
+}
 
 /* Panels and forms */
 .panel > p, .panel .field { max-inline-size: var(--text-measure); }
@@ -355,6 +382,11 @@ img.cv { block-size: auto; aspect-ratio: 2 / 3; object-fit: contain; overflow: h
 @media (prefers-reduced-motion: no-preference) { .cgrid__item--new { animation: cgin 0.4s ease-out; } }
 @keyframes cgin { from { opacity: 0; transform: scale(0.92); } to { opacity: 1; transform: none; } }
 .nocv { min-block-size: 6rem; display: grid; place-items: center; padding: var(--s-1); text-align: center; font-size: var(--t-sm); color: var(--ink-soft); border: var(--rule) dashed var(--line); border-radius: var(--r-1); }
+
+/* Result card actions: three equal buttons share one row where they fit, and wrap together where they do not. */
+.acts { display: grid; grid-template-columns: repeat(auto-fit, minmax(5.5rem, 1fr)); gap: var(--s-2); inline-size: 100%; }
+.acts button { inline-size: 100%; padding: var(--s-2); font-size: var(--t-sm); line-height: 1.25; }
+.acts .badge { grid-column: 1 / -1; justify-self: start; }
 
 /* Tags */
 .tags { display: grid; gap: var(--s-3); list-style: none; padding: 0; }
@@ -397,9 +429,19 @@ dialog { inline-size: min(95vw, 50rem); max-block-size: 92vh; overflow: auto; pa
 dialog::backdrop { background: rgba(17, 18, 19, 0.75); }
 #viewer { inline-size: 100%; block-size: min(60vh, 30rem); }
 
+/* Scroll lock. While a dialog or the matched-tags popover is open, the page behind it cannot scroll.
+   The scrollbar space stays reserved so the layout does not jump, and scrolling inside the dialog never carries on to the page.
+   Each selector has its own rule so a browser that lacks one of them still applies the others. */
+html:has(dialog[open]) { overflow: hidden; scrollbar-gutter: stable; }
+html:has(.pop.is-open) { overflow: hidden; scrollbar-gutter: stable; }
+html:has(.pop:popover-open) { overflow: hidden; scrollbar-gutter: stable; }
+dialog, .pop { overscroll-behavior: contain; }
+
 @media (forced-colors: active) {
   .tabs a, .tagrow, dialog, .pop, .nocv, img.cv { border-color: CanvasText; }
-  .tabs a[aria-current="page"] { border-block-end-width: 0.375rem; text-decoration: underline; }
+  .tabs { border-color: CanvasText; }
+  .tabs a::before { forced-color-adjust: none; background-color: CanvasText; }
+  .tabs a[aria-current="page"] { border-color: Highlight; text-decoration: underline; }
 }
 
 
@@ -432,6 +474,7 @@ dialog::backdrop { background: rgba(17, 18, 19, 0.75); }
 <nav aria-label="Main">
 <ul class="tabs">
 <li><a href="#library" data-v="library">Library</a></li>
+<li><a href="#reading" data-v="reading">Reading list</a></li>
 <li><a href="#add" data-v="add">Add books</a></li>
 <li><a href="#tags" data-v="tags">Tags</a></li>
 <li><a href="#blacklist" data-v="blacklist">Blacklist</a></li>
@@ -445,8 +488,17 @@ dialog::backdrop { background: rgba(17, 18, 19, 0.75); }
 <section id="v-library" class="panel" aria-labelledby="h-shelf" hidden>
 <h2 id="h-shelf" tabindex="-1">Library</h2>
 <p id="lcount"></p>
+<p class="hint">To import or export your library, press and hold the Library tab. With a keyboard, focus the tab and press the Menu key or Shift and F10.</p>
 <ul id="shelf" class="cards"></ul>
 <nav id="lpager" aria-label="Library pages" hidden></nav>
+</section>
+
+<section id="v-reading" class="panel" aria-labelledby="h-reading" hidden>
+<h2 id="h-reading" tabindex="-1">Reading list</h2>
+<p id="rcount"></p>
+<p id="rstatus" role="status"></p>
+<ul id="rlist" class="cards"></ul>
+<nav id="rlpager" aria-label="Reading list pages" hidden></nav>
 </section>
 
 <section id="v-add" class="panel" aria-labelledby="h-add" hidden>
@@ -492,16 +544,22 @@ dialog::backdrop { background: rgba(17, 18, 19, 0.75); }
 </form>
 <p id="bstatus" role="status"></p>
 <ul id="blist" class="tags"></ul>
+<section class="stack sub" aria-labelledby="h-bbooks">
+<h3 id="h-bbooks">Blacklisted books</h3>
+<p>Books you blacklist from Find books are listed here. A blacklisted book is never recommended. Remove it from this list to allow it again.</p>
+<ul id="bbooks" class="tags"></ul>
+</section>
 </section>
 
 <section id="v-find" class="panel" aria-labelledby="h-find" hidden>
 <h2 id="h-find" tabindex="-1">Find books</h2>
-<p>This searches every tag that is not excluded, heaviest first. Heavier tags return more books. It then searches pairs of your five heaviest tags, which finds books that match several tags at once. Tags and books that match the blacklist are skipped. Only books that match at least two of the remaining tags are shown. Each book is scored in three steps. First it is compared with a profile built from your tag weights, and tags from books you added recently count a little more. The score also uses the community rating, which counts for less when there are few votes. Next the score is adjusted. Newer books are favoured very slightly, a likely sequel to the book you added last gets a large lift, and authors you already own are favoured. Very widely read books are scored down so that they do not crowd out lesser known ones. Last the best 50 books are grouped by subject and cut to a shelf of 20. Variety is sought inside each group, so a book from a different corner is never forced in. No author appears more than twice and no more than three books are series sequels. Tick Did not finish on a library book to switch off the series boost for its sequels and to count its tags for less. A small library gets a small boost for well-known books. The search runs one request every two and a half seconds to stay well inside the Open Library limit, so many tags take time. You can stop it at any point. Tap a book in the results to see which tags it matched. You can also use the other tabs while it runs, and it keeps going if the tab is in the background or the window is minimised. Some phones still pause background pages, so keep the screen on for long searches. While the search runs you see only a grid of covers. It fills as books are found, books that come in are marked New, and books that drop out disappear. Open Changes while searching to see their names. When the search ends the grid is replaced by the full list. Books and tags you add or change during a search apply to the next search, not this one. The results of your last search are saved in this browser, so a reload does not lose them.</p>
+<p>This searches every tag that is not excluded, heaviest first. Heavier tags return more books. It then searches pairs of your five heaviest tags, which finds books that match several tags at once. Tags and books that match the blacklist are skipped. Only books that match at least two of the remaining tags are shown. Each book is scored in three steps. First it is compared with a profile built from your tag weights, and tags from books you added recently count a little more. The score also uses the community rating, which counts for less when there are few votes. Next the score is adjusted. Newer books are favoured very slightly, a likely sequel to the book you added last gets a large lift, and authors you already own are favoured. Very widely read books are scored down so that they do not crowd out lesser known ones. Last the best 50 books are grouped by subject and cut to a shelf of 20. Variety is sought inside each group, so a book from a different corner is never forced in. No author appears more than twice and no more than three books are series sequels. Tick Did not finish on a library book to switch off the series boost for its sequels and to count its tags for less. A small library gets a small boost for well-known books. The search runs one request every two and a half seconds to stay well inside the Open Library limit, so many tags take time. You can stop it at any point. Tap a book in the results to see which tags it matched. You can also use the other tabs while it runs, and it keeps going if the tab is in the background or the window is minimised. Some phones still pause background pages, so keep the screen on for long searches. While the search runs you see only a grid of covers. It fills as books are found, books that come in are marked New, and books that drop out disappear. Open Changes while searching to see their names. When the search ends the grid is replaced by the full list. Books and tags you add or change during a search apply to the next search, not this one. Each result has buttons to add it to your reading list, to add it to your library if you have already read it, or to blacklist that one book. The results of your last search are saved in this browser, so a reload does not lose them.</p>
 <div class="field"><label for="fmode">Shelf style</label>
 <select id="fmode"><option value="dpp">Discover: wide variety across the whole shelf</option><option value="mmr">Continue: close to what you read, with some variety</option></select>
 <p class="hint">You can change the style after a search. The shelf is re-ordered without a new search.</p></div>
 <div class="row"><button id="find" type="button">Find books</button><button id="stop" type="button" class="secondary" hidden>Stop search</button></div>
 <p id="fstatus" role="status" tabindex="-1"></p>
+<p id="astatus" role="status" tabindex="-1"></p>
 <ul id="cgrid" class="cgrid" aria-label="Covers of the books found so far" hidden></ul>
 <details id="flogbox" hidden><summary>Changes while searching</summary><ul id="flog" class="facts"></ul></details>
 <ol id="results" class="cards"></ol>
@@ -529,6 +587,15 @@ dialog::backdrop { background: rgba(17, 18, 19, 0.75); }
 <p class="hint">Blurb from Open Library.</p>
 </dialog>
 
+<dialog id="lm" class="stack" aria-labelledby="lmt">
+<div class="dlg-head"><h2 id="lmt">Import or export library</h2><button id="lmc" type="button" class="secondary" autofocus>Close</button></div>
+<p>Export saves the books in your library as a file you can keep or move to another browser. Import adds books from such a file. Books already in your library are skipped, and nothing is removed.</p>
+<div class="row"><button id="lmx" type="button">Export library</button><button id="lmi" type="button" class="secondary">Import library</button></div>
+<input id="lmf" type="file" accept=".json,application/json" hidden>
+<p id="lms" role="status"></p>
+<p id="lme" role="alert" hidden></p>
+</dialog>
+
 <script>
 'use strict';
 /* ---------- Skathach ---------- */
@@ -537,6 +604,8 @@ const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'
 let S={books:[],tags:[],black:[]};
 try{S=JSON.parse(localStorage.getItem('skathach'))||S}catch(e){console.warn('Skathach: saved shelf could not be read. Starting empty.',e)}
 if(!Array.isArray(S.black))S.black=[];
+if(!Array.isArray(S.reading))S.reading=[];
+if(!Array.isArray(S.blackBooks))S.blackBooks=[];
 if(S.mode!=='mmr')S.mode='dpp';
 const save=()=>{try{localStorage.setItem('skathach',JSON.stringify(S))}catch(e){console.warn('Skathach: the shelf could not be saved in this browser. It lasts until you close the page.',e)}};
 const say=t=>{$('#status').textContent=t};
@@ -544,12 +613,13 @@ const say=t=>{$('#status').textContent=t};
    but worker timers keep their pace, so a minimised window does not stretch the paced search. */
 let tickWorker;const tickWaits=new Map();let tickN=0;
 try{
- tickWorker=new Worker(URL.createObjectURL(new Blob(['onmessage=e=>setTimeout(()=>postMessage(e.data.id),e.data.ms)'],{type:'text/javascript'})));
+ const tickUrl=URL.createObjectURL(new Blob(['onmessage=e=>setTimeout(()=>postMessage(e.data.id),e.data.ms)'],{type:'text/javascript'}));
+ try{tickWorker=new Worker(tickUrl)}finally{URL.revokeObjectURL(tickUrl)}
  tickWorker.onmessage=e=>{const r=tickWaits.get(e.data);if(r){tickWaits.delete(e.data);r()}};
  tickWorker.onerror=()=>{tickWorker=null;tickWaits.forEach(r=>r());tickWaits.clear()};
 }catch{tickWorker=null}
 const sleep=ms=>tickWorker?new Promise(r=>{const id=++tickN;tickWaits.set(id,r);tickWorker.postMessage({id,ms})}):new Promise(r=>setTimeout(r,ms));
-let LP=1;
+let LP=1,RLP=1;
 /* Failed image URLs are suppressed briefly, not for the whole session. */
 const BAD=new Map(),isBad=u=>{const t=BAD.get(u);if(t===undefined)return false;if(Date.now()-t<3e5)return true;BAD.delete(u);return false};
 const CACHE_OK=30*60*1000, CACHE_MISS=2*60*1000;
@@ -572,8 +642,8 @@ function cachedPromise(map,key,loader,hasValue){
 const coverUrl=id=>'https://covers.openlibrary.org/b/id/'+id+'-M.jpg?default=false';
 const olCover=(kind,k)=>'https://covers.openlibrary.org/b/'+kind+'/'+k+'-M.jpg?default=false';
 /* Every cover source we know for a book, best first. */
-const coverList=d=>{const l=[];if(d.cover_i>0)l.push(coverUrl(d.cover_i));if(d.cover_edition_key)l.push(olCover('olid',d.cover_edition_key));const i=(d.isbn||[]).map(x=>isbn13(x)).find(Boolean);if(i)l.push(olCover('isbn',i));return l.filter(u=>!isBad(u))};
-const cov=(c,t,isbn='',work='')=>{const l=(Array.isArray(c)?c:[c]).filter(u=>u&&!isBad(u));return l.length?`<img class="cv" src="${esc(l[0])}" data-alt="${esc(JSON.stringify(l.slice(1)))}" data-title="${esc(t)}" data-isbn="${esc(isbn)}" data-work="${esc(work)}" alt="Cover of ${esc(t)}" width="72" referrerpolicy="no-referrer" decoding="async">`:`<span class="cv nocv" data-title="${esc(t)}" data-isbn="${esc(isbn)}" data-work="${esc(work)}">No cover</span>`};
+const coverList=d=>{const l=[];if(d.cover_i>0)l.push(coverUrl(d.cover_i));if(d.cover_edition_key)l.push(olCover('olid',d.cover_edition_key));const i=(d.isbn||[]).map(x=>isbn13(x)).find(Boolean);if(i)l.push(olCover('isbn',i));return l.filter(u=>!isBad(u)&&!cooling(u))};
+const cov=(c,t,isbn='',work='')=>{const l=(Array.isArray(c)?c:[c]).filter(u=>u&&!isBad(u));return l.length?`<img class="cv" src="${esc(l[0])}" data-alt="${esc(JSON.stringify(l.slice(1)))}" data-title="${esc(t)}" data-isbn="${esc(isbn)}" data-work="${esc(work)}" alt="Cover of ${esc(t)}" width="72" loading="lazy" referrerpolicy="no-referrer" decoding="async">`:`<span class="cv nocv" data-title="${esc(t)}" data-isbn="${esc(isbn)}" data-work="${esc(work)}">No cover</span>`};
 /* Cover fallback order: retry Open Library once, try its other identifiers, then use Google Books as an independent provider. */
 const GB_COVER_CACHE=new Map();
 async function googleCoverSources(im){
@@ -589,7 +659,7 @@ async function googleCoverSources(im){
   for(const q of queries){
    try{
     const url='https://www.googleapis.com/books/v1/volumes?q='+encodeURIComponent(q)+'&maxResults=10';
-    const r=await fetch(url);if(!r.ok)continue;
+    await gate('google');const r=await fetch(url);if(!r.ok){if(r.status===429)GATES.google.at=Date.now()+6e4;continue}
     const j=await r.json(),items=Array.isArray(j.items)?j.items:[];
     let ordered=items;
     if(isbn){
@@ -610,6 +680,16 @@ async function googleCoverSources(im){
   return found;
  },value=>Array.isArray(value)&&value.length>0);
 }
+/* Rate limiting. Every follow-up request (cover retries and fallbacks, work and edition lookups, Google Books) goes through a gate
+   that spaces requests of one kind apart, so a page of failing covers cannot flood a host.
+   A second guard stops using the per-key Open Library cover addresses (edition key and ISBN) for five minutes after ten of them fail,
+   because those are the addresses Open Library limits per IP. Cover ids are not affected. */
+const GATES={cover:{gap:400,at:0},api:{gap:1000,at:0},google:{gap:1200,at:0}};
+function gate(kind){const g=GATES[kind],now=Date.now(),t=Math.max(now,g.at);g.at=t+g.gap;return t>now?sleep(t-now):Promise.resolve()}
+const KEYED=u=>/\/b\/(olid|isbn)\//.test(u);
+let KF=[],COOL=0;
+const cooling=u=>KEYED(u)&&Date.now()<COOL;
+function noteFail(u){if(!KEYED(u))return;const n=Date.now();KF=KF.filter(t=>n-t<3e5);KF.push(n);if(KF.length>=10){COOL=n+3e5;KF=[]}}
 /* Work and edition covers. The search result names one cover for the whole work. When that file is missing, the work record
    and its editions usually list other cover ids. Cover ids are not rate limited the way ISBN and edition key lookups are. */
 const idsToUrls=(ids,max=6)=>[...new Set((ids||[]).filter(n=>Number.isInteger(n)&&n>0))].slice(0,max).map(coverUrl);
@@ -618,7 +698,7 @@ function workData(path){
  if(!/^\/(works|books)\/OL\w+$/.test(path))return Promise.resolve(null);
  return cachedPromise(WK_CACHE,path,async()=>{
   try{
-   const r=await fetch('https://openlibrary.org'+path+'.json',AbortSignal.timeout?{signal:AbortSignal.timeout(15000)}:{});
+   await gate('api');const r=await fetch('https://openlibrary.org'+path+'.json',AbortSignal.timeout?{signal:AbortSignal.timeout(15000)}:{});
    if(!r.ok)return null;
    const j=await r.json();
    return{description:j.description,covers:Array.isArray(j.covers)?j.covers:[]};
@@ -630,7 +710,7 @@ function editionCovers(path){
  if(!/^\/works\/OL\w+$/.test(path))return Promise.resolve([]);
  return cachedPromise(ED_CACHE,path,async()=>{
   try{
-   const r=await fetch('https://openlibrary.org'+path+'/editions.json?limit=50',AbortSignal.timeout?{signal:AbortSignal.timeout(15000)}:{});
+   await gate('api');const r=await fetch('https://openlibrary.org'+path+'/editions.json?limit=50',AbortSignal.timeout?{signal:AbortSignal.timeout(15000)}:{});
    if(!r.ok)return[];
    const j=await r.json();
    return idsToUrls((j.entries||[]).flatMap(e=>e.covers||[]),8);
@@ -640,14 +720,14 @@ function editionCovers(path){
 document.addEventListener('error',async e=>{
  const im=e.target;if(!(im instanceof HTMLImageElement)||!im.classList.contains('cv'))return;
  let alt=[];try{alt=JSON.parse(im.dataset.alt||'[]')}catch{/* no alternatives */}
- if(!im.dataset.retried){im.dataset.retried='1';const u=im.getAttribute('src');setTimeout(()=>{if(im.isConnected)im.src=u+(u.includes('?')?'&':'?')+'r=1'},1500);return}
- BAD.set(im.getAttribute('src').replace(/&r=1$/,''),Date.now());
- const n=alt.shift();
- if(n){im.dataset.alt=JSON.stringify(alt);im.dataset.retried='';im.src=n;return}
+ if(!im.dataset.retried){im.dataset.retried='1';const u=im.getAttribute('src');setTimeout(async()=>{await gate('cover');if(im.isConnected)im.src=u+(u.includes('?')?'&':'?')+'r=1'},1500);return}
+ BAD.set(im.getAttribute('src').replace(/&r=1$/,''),Date.now());noteFail(im.getAttribute('src'));
+ let n;while((n=alt.shift())&&cooling(n));
+ if(n){await gate('cover');if(!im.isConnected)return;im.dataset.alt=JSON.stringify(alt);im.dataset.retried='';im.src=n;return}
  const wk=im.dataset.work;
- if(wk&&!im.dataset.workTried){im.dataset.workTried='1';const l=(await workCovers(wk)).filter(u=>!isBad(u));if(!im.isConnected)return;if(l.length){im.dataset.alt=JSON.stringify(l.slice(1));im.dataset.retried='';im.src=l[0];return}}
- if(wk&&!im.dataset.edTried){im.dataset.edTried='1';const l=(await editionCovers(wk)).filter(u=>!isBad(u));if(!im.isConnected)return;if(l.length){im.dataset.alt=JSON.stringify(l.slice(1));im.dataset.retried='';im.src=l[0];return}}
- if(!im.dataset.googleTried){im.dataset.googleTried='1';const covers=await googleCoverSources(im);if(!im.isConnected)return;const next=covers.find(u=>!isBad(u));if(next){im.dataset.alt=JSON.stringify(covers.filter(u=>u!==next));im.dataset.retried='';im.src=next;return}}
+ if(wk&&!im.dataset.workTried){im.dataset.workTried='1';const l=(await workCovers(wk)).filter(u=>!isBad(u));if(!im.isConnected)return;if(l.length){await gate('cover');if(!im.isConnected)return;im.dataset.alt=JSON.stringify(l.slice(1));im.dataset.retried='';im.src=l[0];return}}
+ if(wk&&!im.dataset.edTried){im.dataset.edTried='1';const l=(await editionCovers(wk)).filter(u=>!isBad(u));if(!im.isConnected)return;if(l.length){await gate('cover');if(!im.isConnected)return;im.dataset.alt=JSON.stringify(l.slice(1));im.dataset.retried='';im.src=l[0];return}}
+ if(!im.dataset.googleTried){im.dataset.googleTried='1';const covers=await googleCoverSources(im);if(!im.isConnected)return;const next=covers.find(u=>!isBad(u));if(next){await gate('cover');if(!im.isConnected)return;im.dataset.alt=JSON.stringify(covers.filter(u=>u!==next));im.dataset.retried='';im.src=next;return}}
  const sp=document.createElement('span');sp.className='cv nocv'+(im.classList.contains('cvg')?' cvg':'');sp.textContent=im.dataset.title||'No cover';im.replaceWith(sp);
 },true);
 
@@ -690,6 +770,15 @@ function draw(){
  $('#lcount').textContent=S.books.length+(S.books.length===1?' book':' books')+' in your library. They are saved in this browser.';
  $('#shelf').innerHTML=S.books.length?S.books.slice((LP-1)*per,LP*per).map(b=>`<li class="card"><div class="book">${cov(b.covers||b.cover,b.title,b.isbn||'',/^\/works\/OL\w+$/.test(b.id||'')?b.id:'')}<div class="book__body"><p><strong class="book__title">${esc(b.title)}</strong>${esc(b.authors.join(', ')||'Author unknown')}${b.isbn?'<br>ISBN-13: '+esc(b.isbn):''}</p><span class="checkline"><input type="checkbox" id="dnf-${esc(b.id||b.isbn)}" data-k="dnf" data-v="${esc(b.id||b.isbn)}"${b.dnf?' checked':''}> <label for="dnf-${esc(b.id||b.isbn)}">Did not finish ${esc(b.title)}</label></span><button class="secondary" type="button" data-a="rmb" data-v="${esc(b.id||b.isbn)}">Remove ${esc(b.title)}</button></div></div></li>`).join(''):'<li class="note"><span>Your library is empty. <a href="#add">Add books</a> to start.</span></li>';
  pager('#lpager',LP,pages,'lpg');
+ const rp=Math.max(1,Math.ceil(S.reading.length/per));
+ RLP=Math.min(Math.max(1,RLP),rp);
+ $('#rcount').textContent=S.reading.length+(S.reading.length===1?' book':' books')+' on your reading list. They are saved in this browser.';
+ $('#rlist').innerHTML=S.reading.length?S.reading.slice((RLP-1)*per,RLP*per).map(b=>{
+  const t=esc(b.title),rid=esc(b.id||b.isbn),wk=/^\/works\/OL\w+$/.test(b.id||'')?b.id:'';
+  return `<li class="card"><div class="book">${cov(b.covers||b.cover,b.title,b.isbn||'',wk)}<div class="book__body"><p><strong class="book__title">${t}</strong>${esc((b.authors||[]).join(', ')||'Author unknown')}${b.year?', first published in '+esc(b.year):''}</p><div class="row"><button type="button" data-a="rl2lib" data-v="${rid}" aria-label="Add to library: ${t}">Add to library</button><button class="secondary" type="button" data-a="rmrl" data-v="${rid}" aria-label="Remove from reading list: ${t}">Remove</button></div>${wk?`<a href="https://openlibrary.org${esc(wk)}" target="_blank" rel="noopener noreferrer">Open Library page for ${t} (opens in a new tab)</a>`:''}</div></div></li>`;
+ }).join(''):'<li class="note"><span>Your reading list is empty. Add books to it from <a href="#find">Find books</a>.</span></li>';
+ pager('#rlpager',RLP,rp,'rlpg');
+ $('#bbooks').innerHTML=S.blackBooks.length?S.blackBooks.map((b,i)=>`<li class="tagrow"><strong class="tagrow__name">${esc(b.title)}</strong>${(b.authors||[]).length?` <span class="hint">${esc(b.authors.join(', '))}</span>`:''}<button class="secondary small" type="button" data-a="rmbb" data-v="${i}">Remove ${esc(b.title)} from blacklisted books</button></li>`).join(''):'<li class="note"><span>No books are blacklisted.</span></li>';
  const bt=blackTerms();
  $('#tags').innerHTML=S.tags.length?S.tags.map((t,ti)=>`<li class="tagrow"><strong class="tagrow__name">${esc(t.name)}</strong> <span class="badge mode">${t.w>=4?'Exact search':'Fuzzy search'}</span>${hit(t.name,bt)?' <span class="badge badge--warn">Blacklisted</span>':''}
  <span class="field"><label for="w-${ti}">Weight of ${esc(t.name)}</label> <select id="w-${ti}" data-t="${esc(t.name)}" data-k="w">${[1,2,3,4,5].map(n=>`<option${n===t.w?' selected':''}>${n}</option>`).join('')}</select></span>
@@ -774,6 +863,55 @@ function addResult(i){
  st.focus();
 }
 
+/* Actions on a Find books result: reading list, library, blacklist a single book. */
+const docByKey=k=>{const o=RK.find(x=>x.d.key===k);return o&&o.d};
+const bookFields=d=>({id:d.key,isbn:(d.isbn||[]).map(x=>isbn13(x)).find(Boolean)||'',title:d.title,authors:d.author_name||[],year:d.first_publish_year||'',subjects:(d.subject||[]).slice(0,10),cover:coverList(d)[0]||'',covers:coverList(d)});
+const onReading=d=>S.reading.findIndex(r=>inList([r],candOf(d)));
+function acts(d){
+ const t=esc(d.title),k=esc(d.key),lib=inLib(candOf(d)),rl=onReading(d)>=0,o=[];
+ /* Short visible text so three buttons share one row. The accessible name starts with the visible text and adds the book. */
+ const btn=(a,text,name)=>`<button type="button" class="secondary small" data-a="${a}" data-v="${k}" aria-label="${name}: ${t}">${text}</button>`;
+ if(lib)o.push('<span class="badge badge--ok">In your library</span>');
+ else{
+  o.push(btn('rl',rl?'Remove from list':'Reading list',rl?'Remove from list, your reading list':'Reading list, add to your reading list'));
+  if(rl)o.unshift('<span class="badge badge--info">On your reading list</span>');
+  o.push(btn('lib','Add to library','Add to library, I have read it'));
+ }
+ o.push(btn('bkb','Blacklist','Blacklist, never recommend this book'));
+ return o.join('');
+}
+function refreshActs(k,focusA){
+ const d=docByKey(k);if(!d)return;
+ const row=document.querySelector('[data-acts="'+CSS.escape(k)+'"]');if(!row)return;
+ row.innerHTML=acts(d);
+ const f=row.querySelector('[data-a="'+focusA+'"]')||row.querySelector('button')||row.closest('.card').querySelector('h3 button');
+ if(f)f.focus();
+}
+function toggleReading(k){
+ const d=docByKey(k);if(!d)return;
+ const i=onReading(d),st=$('#astatus');
+ if(i>=0){S.reading.splice(i,1);st.textContent='Removed '+d.title+' from your reading list.'}
+ else{S.reading.push(bookFields(d));st.textContent='Added '+d.title+' to your reading list.'}
+ save();draw();refreshActs(k,'rl');
+}
+function addFromFind(k){
+ const d=docByKey(k);if(!d)return;
+ const st=$('#astatus');
+ if(!inLib(candOf(d))){
+  const nb=bookFields(d);S.books.push(nb);nb.subjects.forEach(addTag);
+  const i=onReading(d);if(i>=0)S.reading.splice(i,1);
+  save();draw();
+  st.textContent='Added '+d.title+' to your library. Its subjects were added as tags. Check your tag weights on the Tags tab.';
+ }else st.textContent=d.title+' is already in your library.';
+ refreshActs(k,'bkb');
+}
+function blockBook(k){
+ const d=docByKey(k);if(!d)return;
+ if(!inList(S.blackBooks,candOf(d)))S.blackBooks.push({id:d.key,title:d.title,authors:d.author_name||[]});
+ RK=RK.filter(o=>o.d.key!==k);
+ save();draw();showRanked(RPAGE,false);
+ const st=$('#astatus');st.textContent='Blacklisted '+d.title+'. It will not be recommended again. You can allow it again on the Blacklist tab.';st.focus();
+}
 $('#bform').onsubmit=e=>{
  e.preventDefault();
  const v=$('#newblack').value.trim().replace(/\s+/g,' '),st=$('#bstatus');
@@ -806,6 +944,21 @@ function onShelfClick(e){
  if(a==='lpg'){LP=+v;draw();$('#h-shelf').focus()}
  if(a==='spg')runSearch(+v,true);
  if(a==='rpg')showRanked(+v,true);
+ if(a==='rl')toggleReading(v);
+ if(a==='lib')addFromFind(v);
+ if(a==='bkb')blockBook(v);
+ if(a==='rlpg'){RLP=+v;draw();$('#h-reading').focus()}
+ if(a==='rmrl'){const r=S.reading.find(x=>(x.id||x.isbn)===v);S.reading=S.reading.filter(x=>(x.id||x.isbn)!==v);save();draw();$('#rstatus').textContent=r?'Removed '+r.title+' from your reading list.':'';$('#h-reading').focus()}
+ if(a==='rl2lib'){
+  const i=S.reading.findIndex(x=>(x.id||x.isbn)===v);
+  if(i>=0){
+   const r=S.reading.splice(i,1)[0];
+   if(!inLib({id:r.id||'',isbns:r.isbn?[r.isbn]:[],title:r.title,authors:r.authors||[]})){S.books.push({id:r.id||'',isbn:r.isbn||'',title:r.title,authors:r.authors||[],subjects:r.subjects||[],cover:r.cover||'',covers:r.covers||[]});(r.subjects||[]).forEach(addTag)}
+   save();draw();$('#rstatus').textContent='Added '+r.title+' to your library and removed it from your reading list.';
+  }
+  $('#h-reading').focus();
+ }
+ if(a==='rmbb'){const b=S.blackBooks[+v];if(b){S.blackBooks.splice(+v,1);save();draw();$('#bstatus').textContent='Removed '+b.title+' from blacklisted books. It can be recommended again.'}$('#h-black').focus()}
 }
 function onShelfChange(e){
  if(e.target.dataset.k==='dnf'){const b=S.books.find(x=>(x.id||x.isbn)===e.target.dataset.v);if(b){b.dnf=e.target.checked;save()}return}
@@ -892,7 +1045,7 @@ $('#find').onclick=async()=>{
 
 function rank(c,tags,books,black,skipped,failed){
  tags=tags.filter(t=>!hit(t.name,black));
- c=c.filter(d=>!inList(books,candOf(d)));
+ c=c.filter(d=>!inList(books,candOf(d))&&!inList(S.blackBooks,candOf(d)));
  const before=c.length;
  c=c.filter(d=>![d.title,...(d.author_name||[]),...(d.subject||[])].some(x=>x&&hit(x,black)));
  const hid=before-c.length;
@@ -1083,7 +1236,7 @@ function rank(c,tags,books,black,skipped,failed){
 /* Milliseconds between searches. Slow on purpose, so the Open Library limit is never reached and the list has time to update. */
 const PACE=2500;
 const GRID=new Map();
-let RK=[],MINT=2,NOTE='',LAST=null,LIVE=false,FRESH=new Set(),LASTSIG=null;
+let RPAGE=1,RK=[],MINT=2,NOTE='',LAST=null,LIVE=false,FRESH=new Set(),LASTSIG=null;
 /* The last search is kept in this browser so that a reload does not lose a long search. Only the fields the ranking and the cards use are kept. */
 const slim=d=>({key:d.key,title:d.title,author_name:(d.author_name||[]).slice(0,4),first_publish_year:d.first_publish_year,subject:(d.subject||[]).slice(0,25),isbn:(d.isbn||[]).slice(0,6),ebook_access:d.ebook_access,cover_i:d.cover_i,cover_edition_key:d.cover_edition_key,edition_count:d.edition_count,ratings_average:d.ratings_average,ratings_count:d.ratings_count});
 function saveLast(){
@@ -1094,7 +1247,7 @@ function saveLast(){
 const OFFC={'Free to read':'badge--ok','Borrowable':'badge--ok','Preview only':'badge--info'};
 function showRanked(page,focus){
  const per=10,pages=Math.max(1,Math.ceil(RK.length/per)),f=$('#fstatus');
- page=Math.min(Math.max(1,page),pages);
+ page=Math.min(Math.max(1,page),pages);RPAGE=page;
  const out=RK.slice((page-1)*per,page*per);
  /* While a search runs, the box is only redrawn when what it shows has changed. */
  if(LIVE){
@@ -1109,7 +1262,7 @@ function showRanked(page,focus){
    if(!li){
     li=document.createElement('li');li.className='cgrid__item';
     const l=coverList(d);
-    li.innerHTML=l.length?`<img class="cv cvg" src="${esc(l[0])}" data-alt="${esc(JSON.stringify(l.slice(1)))}" data-title="${esc(d.title)}" data-isbn="${esc((d.isbn||[]).map(x=>isbn13(x)).find(Boolean)||'')}" data-work="${esc(d.key)}" alt="Cover of ${esc(d.title)}" referrerpolicy="no-referrer" decoding="async">`:`<span class="cv nocv cvg">${esc(d.title)}</span>`;
+    li.innerHTML=l.length?`<img class="cv cvg" src="${esc(l[0])}" data-alt="${esc(JSON.stringify(l.slice(1)))}" data-title="${esc(d.title)}" data-isbn="${esc((d.isbn||[]).map(x=>isbn13(x)).find(Boolean)||'')}" data-work="${esc(d.key)}" alt="Cover of ${esc(d.title)}" loading="lazy" referrerpolicy="no-referrer" decoding="async">`:`<span class="cv nocv cvg">${esc(d.title)}</span>`;
     GRID.set(d.key,li);
    }
    li.classList.toggle('cgrid__item--new',isNew);
@@ -1136,7 +1289,8 @@ function showRanked(page,focus){
   <p class="why" data-work="${esc(wk)}" data-title="${esc(d.title)}">${esc(o.why)}</p>
   <p>Library offer: <span class="badge ${OFFC[o.off]||''}">${esc(o.off)}</span></p>
   <div class="row">${i?`<span data-preview-slot="${esc(i)}" data-title="${esc(d.title)}" aria-live="polite"></span>`:''}
-  <a href="https://openlibrary.org${esc(wk)}" target="_blank" rel="noopener noreferrer">Open Library page for ${esc(d.title)} (opens in a new tab)</a></div></div>
+  <a href="https://openlibrary.org${esc(wk)}" target="_blank" rel="noopener noreferrer">Open Library page for ${esc(d.title)} (opens in a new tab)</a></div>
+  <div class="acts" data-acts="${esc(d.key)}">${acts(d)}</div></div>
   <div popover id="${id}" class="pop" role="dialog" aria-labelledby="${id}-t"><h4 id="${id}-t">Matched tags for ${esc(d.title)}</h4>
   <ul class="chips">${o.ms.map(x=>'<li class="chip">'+esc(x.t.name)+how[x.how]+(x.t.x?' (excluded)':'')+'</li>').join('')}</ul>
   ${o.grp?'<p>Subject group: '+esc(o.grp)+'</p>':''}${o.au?'<p class="note"><span>Same author as a book in your library.</span></p>':''}${o.ex.length?'<p class="note note--warn"><span>Score lowered by an excluded tag.</span></p>':''}
@@ -1156,8 +1310,8 @@ async function googleBookInfo(isbn){
  if(!key)return null;
  return cachedPromise(GB_CACHE,key,async()=>{
   try{
-   const r=await fetch('https://www.googleapis.com/books/v1/volumes?q='+encodeURIComponent('isbn:'+key)+'&maxResults=10');
-   if(!r.ok)return null;
+   await gate('google');const r=await fetch('https://www.googleapis.com/books/v1/volumes?q='+encodeURIComponent('isbn:'+key)+'&maxResults=10');
+   if(!r.ok){if(r.status===429)GATES.google.at=Date.now()+6e4;return null}
    const j=await r.json(),items=Array.isArray(j.items)?j.items:[];
    /* Search results are not guaranteed to put the exact matching volume first. */
    const item=items.find(v=>(v.volumeInfo?.industryIdentifiers||[]).some(id=>normalizeISBN(id.identifier)===key));
@@ -1240,6 +1394,84 @@ $('#bl').addEventListener('click',e=>{
  const r=e.currentTarget.getBoundingClientRect();
  if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)e.currentTarget.close();
 });
+/* ---------- Library import and export: opened by pressing and holding the Library tab ---------- */
+const LM=$('#lm'),LMS=$('#lms'),LME=$('#lme');
+const lmSay=t=>{LME.textContent='';LME.hidden=true;LMS.textContent=t};
+const lmFail=t=>{LMS.textContent='';LME.textContent=t;LME.hidden=false};
+let holdFired=false;
+function openLibMenu(opener){
+ if(LM.open)return;
+ lmSay('');
+ LM.addEventListener('close',()=>{holdFired=false;if(opener&&opener.isConnected)opener.focus()},{once:true});
+ LM.showModal();
+}
+(function(){
+ const tab=document.querySelector('.tabs a[data-v="library"]');
+ let timer=null,sx=0,sy=0;
+ const cancel=()=>{clearTimeout(timer);timer=null};
+ tab.addEventListener('pointerdown',e=>{
+  if(e.pointerType==='mouse'&&e.button!==0)return;
+  holdFired=false;cancel();sx=e.clientX;sy=e.clientY;
+  timer=setTimeout(()=>{timer=null;holdFired=true;openLibMenu(tab)},550);
+ });
+ tab.addEventListener('pointermove',e=>{if(timer&&Math.hypot(e.clientX-sx,e.clientY-sy)>10)cancel()});
+ ['pointerup','pointercancel','pointerleave'].forEach(t=>tab.addEventListener(t,cancel));
+ /* A press that opened the menu must not also open the Library view. */
+ tab.addEventListener('click',e=>{if(holdFired){e.preventDefault();holdFired=false}});
+ /* Long press on many phones, right click and the Menu key all send contextmenu. */
+ tab.addEventListener('contextmenu',e=>{e.preventDefault();cancel();holdFired=true;openLibMenu(tab)});
+ tab.addEventListener('dragstart',e=>e.preventDefault());
+})();
+$('#lmc').onclick=()=>LM.close();
+LM.addEventListener('click',e=>{
+ if(e.target!==e.currentTarget)return;
+ const r=e.currentTarget.getBoundingClientRect();
+ if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)e.currentTarget.close();
+});
+function exportLibrary(){
+ if(!S.books.length){lmFail('Your library is empty, so there is nothing to export.');return}
+ const data={app:'skathach',kind:'library',version:1,exported:new Date().toISOString(),books:S.books};
+ const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,1)],{type:'application/json'}));
+ const a=document.createElement('a');a.href=url;a.download='skathach-library-'+new Date().toISOString().slice(0,10)+'.json';
+ document.body.appendChild(a);a.click();a.remove();
+ setTimeout(()=>URL.revokeObjectURL(url),10000);
+ lmSay('Exported '+S.books.length+(S.books.length===1?' book':' books')+'. The file is in your downloads.');
+}
+/* Imported files are untrusted: every field is checked, cut to a sensible length and rebuilt. */
+const lmStr=(v,max)=>typeof v==='string'?v.trim().slice(0,max):'';
+const lmUrl=v=>{v=lmStr(v,500);return /^https:\/\//i.test(v)?v:''};
+const lmList=(v,n,max)=>Array.isArray(v)?v.map(x=>lmStr(x,max)).filter(Boolean).slice(0,n):[];
+function cleanBook(b){
+ if(!b||typeof b!=='object')return null;
+ const title=lmStr(b.title,300);if(!title)return null;
+ const covers=(Array.isArray(b.covers)?b.covers:[]).map(lmUrl).filter(Boolean).slice(0,6);
+ const cover=lmUrl(b.cover)||covers[0]||'';
+ return {id:/^\/works\/OL\w+$/.test(lmStr(b.id,40))?lmStr(b.id,40):'',isbn:isbn13(lmStr(b.isbn,20))||'',title,authors:lmList(b.authors,20,200),subjects:lmList(b.subjects,50,100),cover,covers};
+}
+async function importLibrary(file){
+ if(!file)return;
+ if(file.size>5*1024*1024){lmFail('That file is larger than 5 megabytes, so it was not read.');return}
+ let data;
+ try{data=JSON.parse(await file.text())}catch{lmFail('That file could not be read as a library file.');return}
+ const list=Array.isArray(data)?data:(data&&data.app==='skathach'&&Array.isArray(data.books)?data.books:null);
+ if(!list){lmFail('That file is not a Skathach library file.');return}
+ let added=0,dupes=0,bad=0;
+ list.slice(0,5000).forEach(raw=>{
+  const b=cleanBook(raw);
+  if(!b){bad++;return}
+  if(inLib({id:b.id,isbns:b.isbn?[b.isbn]:[],title:b.title,authors:b.authors})){dupes++;return}
+  S.books.push(b);b.subjects.forEach(addTag);added++;
+ });
+ if(added){save();draw()}
+ const parts=['Imported '+added+(added===1?' book':' books')+'.'];
+ if(dupes)parts.push(dupes+(dupes===1?' was':' were')+' already in your library.');
+ if(bad)parts.push(bad+(bad===1?' entry':' entries')+' could not be used.');
+ if(list.length>5000)parts.push('Only the first 5000 entries were read.');
+ lmSay(parts.join(' '));
+}
+$('#lmx').onclick=exportLibrary;
+$('#lmi').onclick=()=>$('#lmf').click();
+$('#lmf').onchange=e=>{const f=e.target.files[0];e.target.value='';importLibrary(f)};
 let gReady=false,gScriptPromise=null,previewTimer=null;
 const BOOKS_JS='https://www.google.com/books/jsapi.js';
 /* Google's guide adds jsapi.js in the page head, so setOnLoadCallback runs when the page finishes loading.
@@ -1287,7 +1519,7 @@ function preview(isbn,title){
  loadBooksApi().then(go).catch(fallback);
 }
 $('#pvc').onclick=()=>$('#pv').close();
-const VIEWS={library:['h-shelf','Library'],add:['h-add','Add books'],tags:['h-tags','Tags'],blacklist:['h-black','Blacklist'],find:['h-find','Find books']};
+const VIEWS={library:['h-shelf','Library'],reading:['h-reading','Reading list'],add:['h-add','Add books'],tags:['h-tags','Tags'],blacklist:['h-black','Blacklist'],find:['h-find','Find books']};
 function show(focus){
  let v=location.hash.slice(1);
  if(!VIEWS[v])v=S.books.length?'library':'add';
