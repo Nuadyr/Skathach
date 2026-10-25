@@ -371,6 +371,23 @@ img.cv { block-size: auto; border: var(--rule) solid var(--line-soft); border-ra
   .pop.is-open { display: block; position: fixed; inset: 0; block-size: fit-content; z-index: 20; }
 }
 
+/* Result cards. The cover, author and score sit side by side. The blurb, library offer and links use the full card width below them. */
+.book__more { display: grid; gap: var(--s-3); justify-items: start; }
+.book__more > * { margin: 0; max-inline-size: 100%; }
+.book__more .row { inline-size: 100%; }
+/* The number badge uses the same colour as the card in dark mode, so it gets an edge to stay visible. */
+.card > h3::before { border: var(--rule) solid var(--line); }
+.card > h3 .linklike { min-inline-size: 0; overflow-wrap: anywhere; }
+/* Recommendation blurb: the capped text opens the full blurb in a dialog */
+.why--more { cursor: pointer; }
+/* Sits flush with the blurb above it. The negative margin cancels the grid gap and the button keeps its full touch target. */
+.book__more .linklike { padding-inline: 0; margin-block-start: calc(var(--s-2) * -1); }
+.dlg-head { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: var(--s-3); }
+.dlg-head > h2 { flex: 1 1 12rem; min-inline-size: 0; margin: 0; }
+#bl { inline-size: min(95vw, 36rem); }
+#blb > * { margin: 0; max-inline-size: var(--text-measure); white-space: pre-line; }
+#blb > * + * { margin-block-start: var(--s-3); }
+
 /* Book preview dialog */
 dialog { inline-size: min(95vw, 50rem); max-block-size: 92vh; overflow: auto; padding: var(--s-5); color: var(--ink); background: var(--surface); border: var(--rule) solid var(--line); border-radius: var(--r-3); }
 dialog::backdrop { background: rgba(17, 18, 19, 0.75); }
@@ -475,7 +492,7 @@ dialog::backdrop { background: rgba(17, 18, 19, 0.75); }
 
 <section id="v-find" class="panel" aria-labelledby="h-find" hidden>
 <h2 id="h-find" tabindex="-1">Find books</h2>
-<p>Find your next book</p>
+<p>This searches every tag that is not excluded, heaviest first. Heavier tags return more books. It then searches pairs of your five heaviest tags, which finds books that match several tags at once. Tags and books that match the blacklist are skipped. Only books that match at least two of the remaining tags are shown. Each book is scored in three steps. First it is compared with a profile built from your tag weights, and tags from books you added recently count a little more. The score also uses the community rating, which counts for less when there are few votes. Next the score is adjusted. Newer books are favoured very slightly, a likely sequel to the book you added last gets a large lift, and authors you already own are favoured. Very widely read books are scored down so that they do not crowd out lesser known ones. Last the best 50 books are grouped by subject and cut to a shelf of 20. Variety is sought inside each group, so a book from a different corner is never forced in. No author appears more than twice and no more than three books are series sequels. Tick Did not finish on a library book to switch off the series boost for its sequels and to count its tags for less. A small library gets a small boost for well-known books. The search runs one request every two and a half seconds to stay well inside the Open Library limit, so many tags take time. You can stop it at any point. Tap a book in the results to see which tags it matched. You can also use the other tabs while it runs, and it keeps going if the tab is in the background or the window is minimised. Some phones still pause background pages, so keep the screen on for long searches. While the search runs you see only a grid of covers. It fills as books are found, books that come in are marked New, and books that drop out disappear. Open Changes while searching to see their names. When the search ends the grid is replaced by the full list. Books and tags you add or change during a search apply to the next search, not this one. The results of your last search are saved in this browser, so a reload does not lose them.</p>
 <div class="field"><label for="fmode">Shelf style</label>
 <select id="fmode"><option value="dpp">Discover: wide variety across the whole shelf</option><option value="mmr">Continue: close to what you read, with some variety</option></select>
 <p class="hint">You can change the style after a search. The shelf is re-ordered without a new search.</p></div>
@@ -500,6 +517,12 @@ dialog::backdrop { background: rgba(17, 18, 19, 0.75); }
 <p id="pvm" role="status"></p>
 <div id="viewer"></div>
 <button id="pvc" type="button" class="secondary">Close preview</button>
+</dialog>
+
+<dialog id="bl" class="stack" aria-labelledby="blt">
+<div class="dlg-head"><h2 id="blt"></h2><button id="blc" type="button" class="secondary" autofocus>Close blurb</button></div>
+<div id="blb"></div>
+<p class="hint">Blurb from Open Library.</p>
 </dialog>
 
 <script>
@@ -730,6 +753,8 @@ const POP='popover' in HTMLElement.prototype;
 function onShelfClick(e){
  const pt=e.target.closest('[popovertarget]');
  if(pt&&!POP){const el=document.getElementById(pt.getAttribute('popovertarget'));if(el)el.classList.toggle('is-open',pt.getAttribute('popovertargetaction')!=='hide');return}
+ const bp=e.target.closest('#results p[data-blurb]');
+ if(bp){if(!String(getSelection()))openBlurb(bp.dataset.blurb,bp.parentElement.querySelector('button[data-a="blurb"]'));return}
  const card=e.target.closest('#results .card');
  if(card&&!e.target.closest('a,button,input,select,textarea,[popover]')){
   const p=card.querySelector('[popover]');
@@ -742,6 +767,7 @@ function onShelfClick(e){
  if(a==='rmk'){S.black=S.black.filter(x=>x!==v);save();draw();$('#bstatus').textContent='Removed '+v+' from the blacklist.';$('#h-black').focus()}
  if(a==='rmt'){S.tags=S.tags.filter(x=>x.name!==v);save();draw();$('#h-tags').focus()}
  if(a==='pv')preview(v,b.dataset.t);
+ if(a==='blurb')openBlurb(v,b);
  if(a==='addr')addResult(+v);
  if(a==='lpg'){LP=+v;draw();$('#h-shelf').focus()}
  if(a==='spg')runSearch(+v,true);
@@ -1067,21 +1093,23 @@ function showRanked(page,focus){
  $('#results').style.counterReset='card '+((page-1)*per);
  const how={exact:' (exact)',partial:' (partial)',title:' (title only)'};
  $('#results').innerHTML=out.map((o,k)=>{
-  const d=o.d,id='pop-'+((page-1)*per+k),i=(d.isbn||[]).find(x=>x.length===13)||(d.isbn||[])[0];
+  const d=o.d,id='pop-'+((page-1)*per+k),i=(d.isbn||[]).find(x=>x.length===13)||(d.isbn||[])[0],wk=d.key.startsWith('/')?d.key:'/works/'+d.key;
   return `<li class="card"><h3><button type="button" class="linklike" popovertarget="${id}">${esc(d.title)}</button>${FRESH.has(d.key)?' <span class="badge badge--info">New</span>':''}</h3><div class="book">${cov(coverList(d),d.title,(d.isbn||[]).map(x=>isbn13(x)).find(Boolean)||'')}<div class="book__body">
   <p>${esc((d.author_name||[]).join(', ')||'Author unknown')}${d.first_publish_year?', first published in '+d.first_publish_year:''}</p>
   <p>Match score: <strong>${o.sc}</strong> out of 100</p>
-  <meter class="meter" min="0" max="100" value="${o.sc}" aria-hidden="true"></meter>
-  <p>${esc(o.why)}</p>
+  <meter class="meter" min="0" max="100" value="${o.sc}" aria-hidden="true"></meter></div></div>
+  <div class="book__more">
+  <p class="why" data-work="${esc(wk)}" data-title="${esc(d.title)}">${esc(o.why)}</p>
   <p>Library offer: <span class="badge ${OFFC[o.off]||''}">${esc(o.off)}</span></p>
   <div class="row">${i?`<span data-preview-slot="${esc(i)}" data-title="${esc(d.title)}" aria-live="polite"></span>`:''}
-  <a href="https://openlibrary.org${esc(d.key.startsWith('/')?d.key:'/works/'+d.key)}">Open Library page for ${esc(d.title)}</a></div></div></div>
+  <a href="https://openlibrary.org${esc(wk)}" target="_blank" rel="noopener noreferrer">Open Library page for ${esc(d.title)} (opens in a new tab)</a></div></div>
   <div popover id="${id}" class="pop" role="dialog" aria-labelledby="${id}-t"><h4 id="${id}-t">Matched tags for ${esc(d.title)}</h4>
   <ul class="chips">${o.ms.map(x=>'<li class="chip">'+esc(x.t.name)+how[x.how]+(x.t.x?' (excluded)':'')+'</li>').join('')}</ul>
   ${o.grp?'<p>Subject group: '+esc(o.grp)+'</p>':''}${o.au?'<p class="note"><span>Same author as a book in your library.</span></p>':''}${o.ex.length?'<p class="note note--warn"><span>Score lowered by an excluded tag.</span></p>':''}
   <div class="row"><button type="button" class="secondary" popovertarget="${id}" popovertargetaction="hide" autofocus>Close</button></div></div></li>`;
  }).join('');
  $('#results').querySelectorAll('[data-preview-slot]').forEach(slot=>addPreviewButton(slot,slot.dataset.previewSlot,slot.dataset.title));
+ loadBlurbs();
  pager('#rpager',page,pages,'rpg');
  if(focus)f.focus();
 }
@@ -1113,7 +1141,102 @@ async function addPreviewButton(slot,isbn,title){
  const b=document.createElement('button');b.type='button';b.dataset.a='pv';b.dataset.v=isbn;b.dataset.t=title;b.textContent='Preview '+title;
  slot.replaceWith(b);
 }
+/* Blurbs. The work description from Open Library replaces the "Recommended because" line when there is one.
+   The card shows at most 255 characters. Tapping the blurb, or the button under it, opens the whole text in a dialog. */
+const BL_CACHE=new Map(),BLURBS=new Map(),BLURB_CAP=255;
+/* A description is plain text or an object with a value. Tidy markdown links, and drop the list of contents that often follows a row of dashes. */
+function blurbText(desc){
+ let t=typeof desc==='string'?desc:(desc&&typeof desc.value==='string'?desc.value:'');
+ t=t.replace(/\r\n?/g,'\n');
+ const dash=t.search(/^[ \t]*-{5,}[ \t]*$/m);
+ if(dash>0)t=t.slice(0,dash);
+ return t.replace(/\(\s*\[source\]\s*(?:\[\d*\]|\([^)]*\))\s*\)/gi,'')
+  .replace(/^[ \t]*\[\d+\]:.*$/gm,'')
+  .replace(/\[([^\]]+)\](?:\[\d*\]|\([^)]*\))/g,'$1')
+  .replace(/(\*\*|__)(.+?)\1/g,'$2')
+  .replace(/[ \t]+$/gm,'').replace(/\n{3,}/g,'\n\n').trim();
+}
+/* The capped text is 255 characters or fewer, including the ellipsis, and ends on a whole word where it can. */
+function capBlurb(t){
+ const flat=t.replace(/\s+/g,' ').trim();
+ if(flat.length<=BLURB_CAP)return{short:flat,cut:false};
+ let s=flat.slice(0,BLURB_CAP-1);
+ const sp=s.lastIndexOf(' ');
+ if(sp>BLURB_CAP*.6)s=s.slice(0,sp);
+ s=s.replace(/[\ud800-\udbff]$/,'').replace(/[\s,;:.\-]+$/,'');
+ return{short:s+'\u2026',cut:true};
+}
+function workBlurb(path){
+ if(!/^\/(works|books)\/OL\w+$/.test(path))return Promise.resolve(null);
+ return cachedPromise(BL_CACHE,path,async()=>{
+  try{
+   const r=await fetch('https://openlibrary.org'+path+'.json',AbortSignal.timeout?{signal:AbortSignal.timeout(15000)}:{});
+   if(!r.ok)return null;
+   return blurbText((await r.json()).description)||null;
+  }catch{return null}
+ },v=>!!v);
+}
+/* One book at a time, so ten cards do not send ten requests at once. A book with no blurb keeps its "Recommended because" line. */
+async function loadBlurbs(){
+ for(const p of $('#results').querySelectorAll('p[data-work]')){
+  if(!p.isConnected)break;
+  const text=await workBlurb(p.dataset.work);
+  if(!text||!p.isConnected)continue;
+  const{short,cut}=capBlurb(text);
+  p.textContent=short;
+  if(!cut)continue;
+  const key=p.dataset.work;
+  BLURBS.set(key,{title:p.dataset.title,text});
+  p.dataset.blurb=key;p.classList.add('why--more');
+  const b=document.createElement('button');
+  b.type='button';b.className='linklike';b.dataset.a='blurb';b.dataset.v=key;
+  b.textContent='Read full blurb';b.setAttribute('aria-label','Read full blurb for '+p.dataset.title);
+  p.after(b);
+ }
+}
+function openBlurb(key,opener){
+ const b=BLURBS.get(key),dlg=$('#bl');
+ if(!b||dlg.open)return;
+ $('#blt').textContent='Blurb for '+b.title;
+ $('#blb').replaceChildren(...b.text.split(/\n{2,}/).map(x=>x.trim()).filter(Boolean).map(x=>{const q=document.createElement('p');q.textContent=x;return q}));
+ /* Focus goes back to the button that opened the dialog, if it is still on the page. */
+ dlg.addEventListener('close',()=>{if(opener&&opener.isConnected)opener.focus()},{once:true});
+ dlg.showModal();
+ dlg.scrollTop=0;
+}
+$('#blc').onclick=()=>$('#bl').close();
+/* A tap or click on the backdrop closes the dialog. Escape and the Close blurb button also work. */
+$('#bl').addEventListener('click',e=>{
+ if(e.target!==e.currentTarget)return;
+ const r=e.currentTarget.getBoundingClientRect();
+ if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)e.currentTarget.close();
+});
 let gReady=false,gScriptPromise=null,previewTimer=null;
+const BOOKS_JS='https://www.google.com/books/jsapi.js';
+/* Google's guide adds jsapi.js in the page head, so setOnLoadCallback runs when the page finishes loading.
+   Here the script is added later, on the first click, after the page has already loaded, so that callback may never run.
+   The loader's own callback option and a short check for the viewer class are backups. Whichever answers first wins. */
+function loadBooksApi(){
+ if(gReady)return Promise.resolve();
+ if(gScriptPromise)return gScriptPromise;
+ gScriptPromise=new Promise((resolve,reject)=>{
+  let done=false,poll=null,wait=null;
+  const stop=()=>{done=true;clearInterval(poll);clearTimeout(wait)};
+  const ok=()=>{if(done)return;stop();gReady=true;resolve()};
+  const bad=e=>{if(done)return;stop();reject(e)};
+  const s=document.createElement('script');
+  s.src=BOOKS_JS;
+  s.onload=()=>{
+   try{google.books.load({callback:ok});google.books.setOnLoadCallback(ok)}catch(e){bad(e);return}
+   wait=setTimeout(()=>{let n=0;poll=setInterval(()=>{if(window.google&&google.books&&typeof google.books.DefaultViewer==='function')ok();else if(++n>40)bad(new Error('The Google Books viewer did not start.'))},250)},1500);
+  };
+  s.onerror=()=>bad(new Error('The Google Books script did not load.'));
+  document.head.append(s);
+ });
+ /* After a failure, forget it so the next click tries again. */
+ gScriptPromise.catch(()=>{gScriptPromise=null;document.querySelectorAll('script[src="'+BOOKS_JS+'"]').forEach(x=>x.remove())});
+ return gScriptPromise;
+}
 function preview(isbn,title){
  const dlg=$('#pv'),m=$('#pvm'),viewer=$('#viewer');
  $('#pvt').textContent='Preview of '+title;viewer.textContent='';
@@ -1127,19 +1250,12 @@ function preview(isbn,title){
  };
  const success=()=>{if(settled)return;settled=true;clearTimeout(previewTimer);m.textContent=''};
  clearTimeout(previewTimer);
- previewTimer=setTimeout(fallback,10000);
+ previewTimer=setTimeout(fallback,20000);
+ /* As in the guide: make the viewer, then load the book with a not found callback and a success callback. */
  const go=()=>{
   try{new google.books.DefaultViewer(viewer).load('ISBN:'+isbn,fallback,success)}catch{fallback()}
  };
- if(gReady){go();return}
- if(!gScriptPromise){
-  gScriptPromise=new Promise((resolve,reject)=>{
-   const s=document.createElement('script');s.src='https://www.google.com/books/jsapi.js';
-   s.onload=()=>{try{google.books.load();google.books.setOnLoadCallback(()=>{gReady=true;resolve()})}catch(e){reject(e)}};
-   s.onerror=reject;document.head.append(s);
-  });
- }
- gScriptPromise.then(go).catch(fallback);
+ loadBooksApi().then(go).catch(fallback);
 }
 $('#pvc').onclick=()=>$('#pv').close();
 const VIEWS={library:['h-shelf','Library'],add:['h-add','Add books'],tags:['h-tags','Tags'],blacklist:['h-black','Blacklist'],find:['h-find','Find books']};
