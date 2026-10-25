@@ -523,21 +523,74 @@ try{
 }catch{tickWorker=null}
 const sleep=ms=>tickWorker?new Promise(r=>{const id=++tickN;tickWaits.set(id,r);tickWorker.postMessage({id,ms})}):new Promise(r=>setTimeout(r,ms));
 let LP=1;
-/* Cover addresses that failed, kept for ten minutes, so a redraw does not ask the cover server for them again. */
-const BAD=new Map(),isBad=u=>{const t=BAD.get(u);if(t===undefined)return false;if(Date.now()-t<6e5)return true;BAD.delete(u);return false};
+/* Failed image URLs are suppressed briefly, not for the whole session. */
+const BAD=new Map(),isBad=u=>{const t=BAD.get(u);if(t===undefined)return false;if(Date.now()-t<3e5)return true;BAD.delete(u);return false};
+const CACHE_OK=30*60*1000, CACHE_MISS=2*60*1000;
+function cachedPromise(map,key,loader,hasValue){
+ const now=Date.now(),old=map.get(key);
+ if(old&&old.expiresAt>now)return old.promise;
+ if(old)map.delete(key);
+ const entry={expiresAt:now+CACHE_MISS,promise:null};
+ entry.promise=Promise.resolve().then(loader).then(value=>{
+  entry.expiresAt=Date.now()+(hasValue(value)?CACHE_OK:CACHE_MISS);
+  return value;
+ },error=>{
+  map.delete(key);throw error;
+ });
+ map.set(key,entry);
+ /* Bound memory if a long session searches many different books. */
+ if(map.size>250){for(const [k,v] of map){if(v.expiresAt<=Date.now())map.delete(k);if(map.size<=200)break;}if(map.size>250)map.delete(map.keys().next().value)}
+ return entry.promise;
+}
 const coverUrl=id=>'https://covers.openlibrary.org/b/id/'+id+'-M.jpg?default=false';
 const olCover=(kind,k)=>'https://covers.openlibrary.org/b/'+kind+'/'+k+'-M.jpg?default=false';
 /* Every cover source we know for a book, best first. */
 const coverList=d=>{const l=[];if(d.cover_i>0)l.push(coverUrl(d.cover_i));if(d.cover_edition_key)l.push(olCover('olid',d.cover_edition_key));const i=(d.isbn||[]).map(x=>isbn13(x)).find(Boolean);if(i)l.push(olCover('isbn',i));return l.filter(u=>!isBad(u))};
-const cov=(c,t)=>{const l=(Array.isArray(c)?c:[c]).filter(u=>u&&!isBad(u));return l.length?`<img class="cv" src="${esc(l[0])}" data-alt="${esc(JSON.stringify(l.slice(1)))}" alt="Cover of ${esc(t)}" width="72" referrerpolicy="no-referrer" decoding="async">`:'<span class="cv nocv">No cover</span>'};
-/* When a cover fails: retry the first source once (the cover server sometimes refuses a burst), then try the other sources, then show "No cover". */
-document.addEventListener('error',e=>{
+const cov=(c,t,isbn='')=>{const l=(Array.isArray(c)?c:[c]).filter(u=>u&&!isBad(u));return l.length?`<img class="cv" src="${esc(l[0])}" data-alt="${esc(JSON.stringify(l.slice(1)))}" data-title="${esc(t)}" data-isbn="${esc(isbn)}" alt="Cover of ${esc(t)}" width="72" referrerpolicy="no-referrer" decoding="async">`:'<span class="cv nocv">No cover</span>'};
+/* Cover fallback order: retry Open Library once, try its other identifiers, then use Google Books as an independent provider. */
+const GB_COVER_CACHE=new Map();
+async function googleCoverSources(im){
+ const isbn=normalizeISBN(im.dataset.isbn||'');
+ const title=(im.dataset.title||'').trim();
+ const key=(isbn?'isbn:'+isbn+'|':'')+'title:'+title.toLowerCase();
+ return cachedPromise(GB_COVER_CACHE,key,async()=>{
+  const found=[];
+  const queries=[];
+  if(isbn)queries.push('isbn:'+isbn);
+  if(title)queries.push('intitle:'+title);
+  /* Some editions are indexed by title rather than ISBN, so always try both. */
+  for(const q of queries){
+   try{
+    const url='https://www.googleapis.com/books/v1/volumes?q='+encodeURIComponent(q)+'&maxResults=10';
+    const r=await fetch(url);if(!r.ok)continue;
+    const j=await r.json(),items=Array.isArray(j.items)?j.items:[];
+    let ordered=items;
+    if(isbn){
+     const exact=items.filter(v=>(v.volumeInfo?.industryIdentifiers||[]).some(id=>normalizeISBN(id.identifier)===isbn));
+     ordered=[...exact,...items.filter(v=>!exact.includes(v))];
+    }
+    for(const item of ordered){
+     const links=item.volumeInfo?.imageLinks||{};
+     for(const u of [links.extraLarge,links.large,links.medium,links.thumbnail,links.smallThumbnail]){
+      if(!u)continue;
+      const secure=u.replace(/^http:/i,'https:').replace(/&zoom=\d+/g,'').replace(/&edge=curl/g,'');
+      if(!found.includes(secure))found.push(secure);
+     }
+    }
+    if(found.length)break;
+   }catch{/* Try the next query/provider result. */}
+  }
+  return found;
+ },value=>Array.isArray(value)&&value.length>0);
+}
+document.addEventListener('error',async e=>{
  const im=e.target;if(!(im instanceof HTMLImageElement)||!im.classList.contains('cv'))return;
  let alt=[];try{alt=JSON.parse(im.dataset.alt||'[]')}catch{/* no alternatives */}
- if(!im.dataset.retried){im.dataset.retried='1';const u=im.getAttribute('src');setTimeout(()=>{im.src=u+(u.includes('?')?'&':'?')+'r=1'},1500);return}
+ if(!im.dataset.retried){im.dataset.retried='1';const u=im.getAttribute('src');setTimeout(()=>{if(im.isConnected)im.src=u+(u.includes('?')?'&':'?')+'r=1'},1500);return}
  BAD.set(im.getAttribute('src').replace(/&r=1$/,''),Date.now());
  const n=alt.shift();
- if(n){im.dataset.alt=JSON.stringify(alt);im.src=n;return}
+ if(n){im.dataset.alt=JSON.stringify(alt);im.dataset.retried='';im.src=n;return}
+ if(!im.dataset.googleTried){im.dataset.googleTried='1';const covers=await googleCoverSources(im);if(!im.isConnected)return;const next=covers.find(u=>!isBad(u));if(next){im.dataset.alt=JSON.stringify(covers.filter(u=>u!==next));im.dataset.retried='';im.src=next;return}}
  const sp=document.createElement('span');sp.className='cv nocv'+(im.classList.contains('cvg')?' cvg':'');sp.textContent=im.dataset.title||'No cover';im.replaceWith(sp);
 },true);
 
@@ -578,12 +631,12 @@ function draw(){
  const per=8,pages=Math.max(1,Math.ceil(S.books.length/per));
  LP=Math.min(Math.max(1,LP),pages);
  $('#lcount').textContent=S.books.length+(S.books.length===1?' book':' books')+' in your library. They are saved in this browser.';
- $('#shelf').innerHTML=S.books.length?S.books.slice((LP-1)*per,LP*per).map(b=>`<li class="card"><div class="book">${cov(b.covers||b.cover,b.title)}<div class="book__body"><p><strong class="book__title">${esc(b.title)}</strong>${esc(b.authors.join(', ')||'Author unknown')}${b.isbn?'<br>ISBN-13: '+esc(b.isbn):''}</p><span class="checkline"><input type="checkbox" id="dnf-${esc(b.id||b.isbn)}" data-k="dnf" data-v="${esc(b.id||b.isbn)}"${b.dnf?' checked':''}> <label for="dnf-${esc(b.id||b.isbn)}">Did not finish ${esc(b.title)}</label></span><button class="secondary" type="button" data-a="rmb" data-v="${esc(b.id||b.isbn)}">Remove ${esc(b.title)}</button></div></div></li>`).join(''):'<li class="note"><span>Your library is empty. <a href="#add">Add books</a> to start.</span></li>';
+ $('#shelf').innerHTML=S.books.length?S.books.slice((LP-1)*per,LP*per).map(b=>`<li class="card"><div class="book">${cov(b.covers||b.cover,b.title,b.isbn||'')}<div class="book__body"><p><strong class="book__title">${esc(b.title)}</strong>${esc(b.authors.join(', ')||'Author unknown')}${b.isbn?'<br>ISBN-13: '+esc(b.isbn):''}</p><span class="checkline"><input type="checkbox" id="dnf-${esc(b.id||b.isbn)}" data-k="dnf" data-v="${esc(b.id||b.isbn)}"${b.dnf?' checked':''}> <label for="dnf-${esc(b.id||b.isbn)}">Did not finish ${esc(b.title)}</label></span><button class="secondary" type="button" data-a="rmb" data-v="${esc(b.id||b.isbn)}">Remove ${esc(b.title)}</button></div></div></li>`).join(''):'<li class="note"><span>Your library is empty. <a href="#add">Add books</a> to start.</span></li>';
  pager('#lpager',LP,pages,'lpg');
  const bt=blackTerms();
- $('#tags').innerHTML=S.tags.length?S.tags.map(t=>`<li class="tagrow"><strong class="tagrow__name">${esc(t.name)}</strong> <span class="badge mode">${t.w>=4?'Exact search':'Fuzzy search'}</span>${hit(t.name,bt)?' <span class="badge badge--warn">Blacklisted</span>':''}
- <span class="field"><label for="w-${esc(t.name)}">Weight of ${esc(t.name)}</label> <select id="w-${esc(t.name)}" data-t="${esc(t.name)}" data-k="w">${[1,2,3,4,5].map(n=>`<option${n===t.w?' selected':''}>${n}</option>`).join('')}</select></span>
- <span class="checkline"><input type="checkbox" id="x-${esc(t.name)}" data-t="${esc(t.name)}" data-k="x"${t.x?' checked':''}> <label for="x-${esc(t.name)}">Exclude ${esc(t.name)}</label></span>
+ $('#tags').innerHTML=S.tags.length?S.tags.map((t,ti)=>`<li class="tagrow"><strong class="tagrow__name">${esc(t.name)}</strong> <span class="badge mode">${t.w>=4?'Exact search':'Fuzzy search'}</span>${hit(t.name,bt)?' <span class="badge badge--warn">Blacklisted</span>':''}
+ <span class="field"><label for="w-${ti}">Weight of ${esc(t.name)}</label> <select id="w-${ti}" data-t="${esc(t.name)}" data-k="w">${[1,2,3,4,5].map(n=>`<option${n===t.w?' selected':''}>${n}</option>`).join('')}</select></span>
+ <span class="checkline"><input type="checkbox" id="x-${ti}" data-t="${esc(t.name)}" data-k="x"${t.x?' checked':''}> <label for="x-${ti}">Exclude ${esc(t.name)}</label></span>
  <button class="secondary small" type="button" data-a="rmt" data-v="${esc(t.name)}">Remove tag ${esc(t.name)}</button></li>`).join(''):'<li class="note"><span>No tags yet. They appear when you add books.</span></li>';
  $('#blist').innerHTML=S.black.length?S.black.map(w=>`<li class="tagrow"><strong class="tagrow__name">${esc(w)}</strong><button class="secondary small" type="button" data-a="rmk" data-v="${esc(w)}">Remove ${esc(w)} from blacklist</button></li>`).join(''):'<li class="note"><span>The blacklist is empty.</span></li>';
 }
@@ -633,7 +686,7 @@ function pager(id,page,pages,act){
 }
 function renderSearch(){
  const rows=SR.map((d,i)=>[d,i]).filter(([d])=>!inLib(candOf(d)));
- $('#sres').innerHTML=rows.map(([d,i])=>`<li class="card"><div class="book">${cov(coverList(d),d.title)}<div class="book__body"><p><strong class="book__title">${esc(d.title)}</strong>${esc((d.author_name||[]).join(', ')||'Author unknown')}${d.first_publish_year?', first published in '+d.first_publish_year:''}</p><button type="button" data-a="addr" data-v="${i}">Add ${esc(d.title)} to library</button></div></div></li>`).join('');
+ $('#sres').innerHTML=rows.map(([d,i])=>`<li class="card"><div class="book">${cov(coverList(d),d.title,(d.isbn||[]).map(x=>isbn13(x)).find(Boolean)||'')}<div class="book__body"><p><strong class="book__title">${esc(d.title)}</strong>${esc((d.author_name||[]).join(', ')||'Author unknown')}${d.first_publish_year?', first published in '+d.first_publish_year:''}</p><button type="button" data-a="addr" data-v="${i}">Add ${esc(d.title)} to library</button></div></div></li>`).join('');
  return rows.length;
 }
 async function runSearch(page,focus){
@@ -808,8 +861,8 @@ function rank(c,tags,books,black,skipped,failed){
  const nb=books.length,cold=nb<5||live.length<4;
  /* Sequence: books are in the order you added them. The influence of a book halves every nb/3 books back (at least 4). */
  const decay=age=>Math.pow(.5,age/Math.max(4,nb/3));
- const STOP=new Set(['the','and','for','book','volume','vol','part','with','from']);
- const toks=s=>new Set(norm(s).split(' ').filter(w=>w.length>2&&!STOP.has(w)));
+ const STOPWORDS=new Set(['the','and','for','book','volume','vol','part','with','from']);
+ const toks=s=>new Set(norm(s).split(' ').filter(w=>w.length>2&&!STOPWORDS.has(w)));
  const rec=new Map(),own=new Map(),lib=[];
  books.forEach((b,i)=>{
   const r=decay(nb-1-i)*(b.dnf?.25:1),subs=(b.subjects||[]).map(norm),au=(b.authors||[]).map(norm).filter(Boolean);
@@ -852,13 +905,13 @@ function rank(c,tags,books,black,skipped,failed){
  const out=c.map(d=>{
   const ms=H.get(d),pos=ms.filter(x=>!x.t.x),ex=ms.filter(x=>x.t.x);
   /* C(u,i): how much of your weighted profile the book matches. */
-  const cov=Math.min(1,pos.reduce((a,x)=>a+we(x.t)*x.m*rar(x.t.name),0)/ceil);
+  const coverage=Math.min(1,pos.reduce((a,x)=>a+we(x.t)*x.m*rar(x.t.name),0)/ceil);
   /* S_content: cosine similarity between your profile and the book. Subjects of the book that match no tag add length to its vector, so a focused book beats a scattered one. */
   const extra=Math.min(12,Math.max(0,(d.subject||[]).length-pos.filter(x=>x.how!=='title').length));
   const dot=pos.reduce((a,x)=>a+conf(x.t)*x.m*rar(x.t.name),0);
   const vn=Math.sqrt(pos.reduce((a,x)=>a+Math.pow(x.m*rar(x.t.name),2),0)+.0625*extra)||1;
   const cos=Math.min(1,dot/(unorm*vn));
-  let s=ALPHA*collab(d)+BETA*cos+GAMMA*cov;
+  let s=ALPHA*collab(d)+BETA*cos+GAMMA*coverage;
   let off='Not online',f=1;
   const acc=d.ebook_access;
   if(acc==='borrowable'){off='Borrowable';f=1.15}else if(acc==='public'){off='Free to read';f=1.15}else if(acc==='printdisabled'){off='Preview only';f=1.05}
@@ -996,7 +1049,7 @@ function showRanked(page,focus){
    if(!li){
     li=document.createElement('li');li.className='cgrid__item';
     const l=coverList(d);
-    li.innerHTML=l.length?`<img class="cv cvg" src="${esc(l[0])}" data-alt="${esc(JSON.stringify(l.slice(1)))}" data-title="${esc(d.title)}" alt="Cover of ${esc(d.title)}" referrerpolicy="no-referrer" decoding="async">`:`<span class="cv nocv cvg">${esc(d.title)}</span>`;
+    li.innerHTML=l.length?`<img class="cv cvg" src="${esc(l[0])}" data-alt="${esc(JSON.stringify(l.slice(1)))}" data-title="${esc(d.title)}" data-isbn="${esc((d.isbn||[]).map(x=>isbn13(x)).find(Boolean)||'')}" alt="Cover of ${esc(d.title)}" referrerpolicy="no-referrer" decoding="async">`:`<span class="cv nocv cvg">${esc(d.title)}</span>`;
     GRID.set(d.key,li);
    }
    li.classList.toggle('cgrid__item--new',isNew);
@@ -1015,39 +1068,78 @@ function showRanked(page,focus){
  const how={exact:' (exact)',partial:' (partial)',title:' (title only)'};
  $('#results').innerHTML=out.map((o,k)=>{
   const d=o.d,id='pop-'+((page-1)*per+k),i=(d.isbn||[]).find(x=>x.length===13)||(d.isbn||[])[0];
-  return `<li class="card"><h3><button type="button" class="linklike" popovertarget="${id}">${esc(d.title)}</button>${FRESH.has(d.key)?' <span class="badge badge--info">New</span>':''}</h3><div class="book">${cov(coverList(d),d.title)}<div class="book__body">
+  return `<li class="card"><h3><button type="button" class="linklike" popovertarget="${id}">${esc(d.title)}</button>${FRESH.has(d.key)?' <span class="badge badge--info">New</span>':''}</h3><div class="book">${cov(coverList(d),d.title,(d.isbn||[]).map(x=>isbn13(x)).find(Boolean)||'')}<div class="book__body">
   <p>${esc((d.author_name||[]).join(', ')||'Author unknown')}${d.first_publish_year?', first published in '+d.first_publish_year:''}</p>
   <p>Match score: <strong>${o.sc}</strong> out of 100</p>
   <meter class="meter" min="0" max="100" value="${o.sc}" aria-hidden="true"></meter>
   <p>${esc(o.why)}</p>
   <p>Library offer: <span class="badge ${OFFC[o.off]||''}">${esc(o.off)}</span></p>
-  <div class="row">${i?`<button type="button" data-a="pv" data-v="${esc(i)}" data-t="${esc(d.title)}">Preview ${esc(d.title)}</button>`:''}
+  <div class="row">${i?`<span data-preview-slot="${esc(i)}" data-title="${esc(d.title)}" aria-live="polite"></span>`:''}
   <a href="https://openlibrary.org${esc(d.key.startsWith('/')?d.key:'/works/'+d.key)}">Open Library page for ${esc(d.title)}</a></div></div></div>
   <div popover id="${id}" class="pop" role="dialog" aria-labelledby="${id}-t"><h4 id="${id}-t">Matched tags for ${esc(d.title)}</h4>
   <ul class="chips">${o.ms.map(x=>'<li class="chip">'+esc(x.t.name)+how[x.how]+(x.t.x?' (excluded)':'')+'</li>').join('')}</ul>
   ${o.grp?'<p>Subject group: '+esc(o.grp)+'</p>':''}${o.au?'<p class="note"><span>Same author as a book in your library.</span></p>':''}${o.ex.length?'<p class="note note--warn"><span>Score lowered by an excluded tag.</span></p>':''}
   <div class="row"><button type="button" class="secondary" popovertarget="${id}" popovertargetaction="hide" autofocus>Close</button></div></div></li>`;
  }).join('');
+ $('#results').querySelectorAll('[data-preview-slot]').forEach(slot=>addPreviewButton(slot,slot.dataset.previewSlot,slot.dataset.title));
  pager('#rpager',page,pages,'rpg');
  if(focus)f.focus();
 }
 
-/* Google Books embedded viewer, loaded only when asked. */
-let gReady=false;
+/* Confirm the exact ISBN against Google Books metadata before offering an embedded preview. */
+const GB_CACHE=new Map();
+function normalizeISBN(value){return String(value||'').replace(/[^0-9X]/gi,'').toUpperCase()}
+async function googleBookInfo(isbn){
+ const key=normalizeISBN(isbn);
+ if(!key)return null;
+ return cachedPromise(GB_CACHE,key,async()=>{
+  try{
+   const r=await fetch('https://www.googleapis.com/books/v1/volumes?q='+encodeURIComponent('isbn:'+key)+'&maxResults=10');
+   if(!r.ok)return null;
+   const j=await r.json(),items=Array.isArray(j.items)?j.items:[];
+   /* Search results are not guaranteed to put the exact matching volume first. */
+   const item=items.find(v=>(v.volumeInfo?.industryIdentifiers||[]).some(id=>normalizeISBN(id.identifier)===key));
+   if(!item)return null;
+   const access=item.accessInfo||{};
+   return {embeddable:access.embeddable===true};
+  }catch{return null}
+ },value=>!!value&&value.embeddable===true);
+}
+async function addPreviewButton(slot,isbn,title){
+ const info=await googleBookInfo(isbn);
+ if(!slot.isConnected)return;
+ /* Fail closed: never offer Preview unless Google's API explicitly confirms embeddability. */
+ if(!info||info.embeddable!==true)return;
+ const b=document.createElement('button');b.type='button';b.dataset.a='pv';b.dataset.v=isbn;b.dataset.t=title;b.textContent='Preview '+title;
+ slot.replaceWith(b);
+}
+let gReady=false,gScriptPromise=null,previewTimer=null;
 function preview(isbn,title){
- const dlg=$('#pv'),m=$('#pvm');
- $('#pvt').textContent='Preview of '+title;$('#viewer').textContent='';
+ const dlg=$('#pv'),m=$('#pvm'),viewer=$('#viewer');
+ $('#pvt').textContent='Preview of '+title;viewer.textContent='';
  m.textContent='Loading the preview.';dlg.showModal();
- const fail=()=>{m.innerHTML='Google Books has no preview that can be shown here. <a href="https://books.google.com/books?vid=ISBN'+esc(isbn)+'">Open this book on Google Books</a>.'};
+ const bookUrl='https://books.google.com/books?vid=ISBN'+encodeURIComponent(isbn);
+ let settled=false;
+ const fallback=()=>{
+  if(settled)return;settled=true;clearTimeout(previewTimer);viewer.textContent='';
+  m.replaceChildren(document.createTextNode('The embedded preview did not load. '));
+  const a=document.createElement('a');a.href=bookUrl;a.textContent='Open on Google Books';a.target='_blank';a.rel='noopener noreferrer';m.append(a);
+ };
+ const success=()=>{if(settled)return;settled=true;clearTimeout(previewTimer);m.textContent=''};
+ clearTimeout(previewTimer);
+ previewTimer=setTimeout(fallback,10000);
  const go=()=>{
-  try{new google.books.DefaultViewer($('#viewer')).load('ISBN:'+isbn,fail,()=>{m.textContent=''})}catch{fail()}
+  try{new google.books.DefaultViewer(viewer).load('ISBN:'+isbn,fallback,success)}catch{fallback()}
  };
  if(gReady){go();return}
- const s=document.createElement('script');
- s.src='https://www.google.com/books/jsapi.js';
- s.onload=()=>{google.books.load();google.books.setOnLoadCallback(()=>{gReady=true;go()})};
- s.onerror=fail;
- document.head.append(s);
+ if(!gScriptPromise){
+  gScriptPromise=new Promise((resolve,reject)=>{
+   const s=document.createElement('script');s.src='https://www.google.com/books/jsapi.js';
+   s.onload=()=>{try{google.books.load();google.books.setOnLoadCallback(()=>{gReady=true;resolve()})}catch(e){reject(e)}};
+   s.onerror=reject;document.head.append(s);
+  });
+ }
+ gScriptPromise.then(go).catch(fallback);
 }
 $('#pvc').onclick=()=>$('#pv').close();
 const VIEWS={library:['h-shelf','Library'],add:['h-add','Add books'],tags:['h-tags','Tags'],blacklist:['h-black','Blacklist'],find:['h-find','Find books']};
