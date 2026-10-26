@@ -17,7 +17,7 @@
   - Keep the tokens in section 1. Never touch 1c: the status colours are locked. Project styles go in section 5.
 -->
 
-<meta name="description" content="Build a library of books you know, tag it, then find more books to read. Searches Open Library by title, author, series or ISBN.">
+<meta name="description" content="Build a library of books you know, tag it, then find more books to read. Also works for comics and graphic novels. Searches Open Library by title, author, series or ISBN.">
 <meta name="author" content="Nuadyr">
 <meta name="application-name" content="Skathach">
 <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
@@ -31,19 +31,19 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Skathach">
 <meta property="og:title" content="Skathach: book finder">
-<meta property="og:description" content="Build a library of books you know, tag it, then find more books to read.">
+<meta property="og:description" content="Build a library of books you know, tag it, then find more books to read. Also works for comics and graphic novels.">
 <meta property="og:url" content="https://nuadyr.github.io/Skathach/">
 <meta property="og:locale" content="en_GB">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Skathach: book finder">
-<meta name="twitter:description" content="Build a library of books you know, tag it, then find more books to read.">
+<meta name="twitter:description" content="Build a library of books you know, tag it, then find more books to read. Also works for comics and graphic novels.">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "WebApplication",
   "name": "Skathach",
   "url": "https://nuadyr.github.io/Skathach/",
-  "description": "Build a library of books you know, tag it, then find more books to read using Open Library.",
+  "description": "Build a library of books you know, tag it, then find more books to read using Open Library. Also supports comics and graphic novels.",
   "applicationCategory": "LifestyleApplication",
   "operatingSystem": "Any",
   "browserRequirements": "Requires JavaScript",
@@ -470,7 +470,7 @@ dialog, .pop { overscroll-behavior: contain; }
 <main id="main" tabindex="-1">
 <header class="site-header">
 <h1>Skathach book finder</h1>
-<p class="lede">Build a library of books you know. Tag it. Then find more books to read. Add books by title, author, series or International Standard Book Number (ISBN).</p>
+<p class="lede">Build a library of books you know. Tag it. Then find more books to read. Comics and graphic novels work too. Add books by title, author, series or International Standard Book Number (ISBN).</p>
 <nav aria-label="Main">
 <ul class="tabs">
 <li><a href="#library" data-v="library">Library</a></li>
@@ -505,6 +505,7 @@ dialog, .pop { overscroll-behavior: contain; }
 <h2 id="h-add" tabindex="-1">Add books</h2>
 <section class="stack" aria-labelledby="h-search">
 <h3 id="h-search">Search by title, author or series</h3>
+<p class="hint">This works for comics and graphic novels as well as books. For a comic, searching by series name often finds its collected volumes.</p>
 <form id="sform" class="stack">
 <div class="field"><label for="stype">Search by</label>
 <select id="stype"><option value="title">Title</option><option value="author">Author</option><option value="both">Title and author</option><option value="series">Series</option></select></div>
@@ -518,6 +519,7 @@ dialog, .pop { overscroll-behavior: contain; }
 </section>
 <section class="stack sub" aria-labelledby="h-isbn">
 <h3 id="h-isbn">Add by ISBN</h3>
+<p class="hint">Collected editions and graphic novels usually have an ISBN. Single comic issues may not, so search for those by title or series instead.</p>
 <div class="field"><label for="isbns">ISBNs, one per line or split by commas (10 or 13 digits)</label>
 <textarea id="isbns" autocomplete="off" spellcheck="false"></textarea></div>
 <div class="row"><button id="add" type="button">Add ISBNs</button></div>
@@ -553,7 +555,7 @@ dialog, .pop { overscroll-behavior: contain; }
 
 <section id="v-find" class="panel" aria-labelledby="h-find" hidden>
 <h2 id="h-find" tabindex="-1">Find books</h2>
-<p>Searches your tags, heaviest first, then pairs of your top five; books must match two tags. Scores use tag weights, ratings (less with few votes), small boosts for newer books, owned authors and sequels, and penalise very popular books. Top 50 become 20, max two per author.</p>
+<p>This searches every tag that is not excluded, heaviest first. Heavier tags return more books. It then searches pairs of your five heaviest tags, which finds books that match several tags at once. Tags and books that match the blacklist are skipped. Only books that match at least two of the remaining tags are shown. Each book is scored in three steps. First it is compared with a profile built from your tag weights, and tags from books you added recently count a little more. The score also uses the community rating, which counts for less when there are few votes. Next the score is adjusted. Newer books are favoured very slightly, a likely sequel to the book you added last gets a large lift, and authors you already own are favoured. Very widely read books are scored down so that they do not crowd out lesser known ones. Last the best 50 books are grouped by subject and cut to a shelf of 20. Variety is sought inside each group, so a book from a different corner is never forced in. No author appears more than twice and no more than three books are series sequels. Tick Did not finish on a library book to switch off the series boost for its sequels and to count its tags for less. A small library gets a small boost for well-known books. The search runs one request every two and a half seconds to stay well inside the Open Library limit, so many tags take time. You can stop it at any point. Tap a book in the results to see which tags it matched. You can also use the other tabs while it runs, and it keeps going if the tab is in the background or the window is minimised. Some phones still pause background pages, so keep the screen on for long searches. While the search runs you see only a grid of covers. It fills as books are found, books that come in are marked New, and books that drop out disappear. Open Changes while searching to see their names. When the search ends the grid is replaced by the full list. Books and tags you add or change during a search apply to the next search, not this one. Comics and graphic novels are searched and scored in the same way as books, using their Open Library subjects. Each result has buttons to add it to your reading list, to add it to your library if you have already read it, or to blacklist that one book. The results of your last search are saved in this browser, so a reload does not lose them.</p>
 <div class="field"><label for="fmode">Shelf style</label>
 <select id="fmode"><option value="dpp">Discover: wide variety across the whole shelf</option><option value="mmr">Continue: close to what you read, with some variety</option></select>
 <p class="hint">You can change the style after a search. The shelf is re-ordered without a new search.</p></div>
