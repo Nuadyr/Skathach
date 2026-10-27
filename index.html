@@ -817,7 +817,14 @@ try{
 const sleep=ms=>tickWorker?new Promise(r=>{const id=++tickN;tickWaits.set(id,r);tickWorker.postMessage({id,ms})}):new Promise(r=>setTimeout(r,ms));
 let LP=1,RLP=1;
 /* Failed image URLs are suppressed briefly, not for the whole session. */
-const BAD=new Map(),isBad=u=>{const t=BAD.get(u);if(t===undefined){return false;}if(Date.now()-t<3e5){return true;}BAD.delete(u);return false};
+/* Open Library serves cover ids from zip shards on archive.org (m_covers_0010_71.zip and so on). When a shard's host has a broken TLS setup
+   (net::ERR_SSL_PROTOCOL_ERROR) every cover in that shard fails the same way, so two different failing ids in one shard
+   mark the whole shard bad for ten minutes and its other ids are skipped instead of requested. */
+const SHARD_FAILS=new Map(),SHARD_BAD=new Map();
+const shardOf=u=>{const m=/\/b\/id\/(\d+)-/.exec(u||'');if(!m){return null;}const n=+m[1];return String(Math.floor(n/1e6)).padStart(4,'0')+'_'+String(Math.floor(n/1e4)%100).padStart(2,'0')};
+const shardBad=u=>{const k=shardOf(u);if(!k){return false;}const t=SHARD_BAD.get(k);if(t===undefined){return false;}if(Date.now()-t<6e5){return true;}SHARD_BAD.delete(k);SHARD_FAILS.delete(k);return false};
+function noteShardFail(u){const k=shardOf(u);if(!k){return false;}const id=/\/b\/id\/(\d+)-/.exec(u)[1],n=Date.now();let f=SHARD_FAILS.get(k);if(!f||n-f.t>3e5){f={t:n,ids:new Set()};SHARD_FAILS.set(k,f);}f.ids.add(id);if(f.ids.size>=2){SHARD_BAD.set(k,n);return true;}return false}
+const BAD=new Map(),isBad=u=>{if(shardBad(u)){return true;}const t=BAD.get(u);if(t===undefined){return false;}if(Date.now()-t<3e5){return true;}BAD.delete(u);return false};
 const CACHE_OK=30*60*1000, CACHE_MISS=2*60*1000;
 function cachedPromise(map,key,loader,hasValue){
  const now=Date.now(),old=map.get(key);
@@ -916,9 +923,10 @@ function editionCovers(path){
 document.addEventListener('error',async e=>{
  const im=e.target;if(!(im instanceof HTMLImageElement)||!im.classList.contains('cv')){return;}
  let alt=[];try{alt=JSON.parse(im.dataset.alt||'[]')}catch{/* no alternatives */}
- if(!im.dataset.retried){im.dataset.retried='1';const u=im.getAttribute('src');setTimeout(async()=>{await gate('cover');if(im.isConnected){im.src=u+(u.includes('?')?'&':'?')+'r=1'}},1500);return}
+ const failed=im.getAttribute('src').replace(/&r=1$/,'');
+ if(!im.dataset.retried){im.dataset.retried='1';const u=im.getAttribute('src');if(!noteShardFail(failed)){setTimeout(async()=>{await gate('cover');if(im.isConnected){im.src=u+(u.includes('?')?'&':'?')+'r=1'}},1500);return}}else{noteShardFail(failed)}
  BAD.set(im.getAttribute('src').replace(/&r=1$/,''),Date.now());noteFail(im.getAttribute('src'));
- let n;while((n=alt.shift())&&cooling(n)){;}
+ let n;while((n=alt.shift())&&(cooling(n)||isBad(n))){;}
  if(n){await gate('cover');if(!im.isConnected){return;}im.dataset.alt=JSON.stringify(alt);im.dataset.retried='';im.src=n;return}
  const wk=im.dataset.work;
  if(wk&&!im.dataset.workTried){im.dataset.workTried='1';const l=(await workCovers(wk)).filter(u=>!isBad(u));if(!im.isConnected){return;}if(l.length){await gate('cover');if(!im.isConnected){return;}im.dataset.alt=JSON.stringify(l.slice(1));im.dataset.retried='';im.src=l[0];return}}
