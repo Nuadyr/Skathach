@@ -1,43 +1,55 @@
 <!DOCTYPE html>
 <html lang="en-GB">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Skathach: book finder</title>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Skathach: book finder</title>
 
-<!--
-  Skathach book finder. Single file, no build step, no dependencies.
-  Built on the Aengus design system by Nuadyr.
+        <!--
+            Skathach book finder. Single file, no build step, no dependencies.
+            Built on the Aengus design system by Nuadyr.
 
-  RULES AENGUS FOLLOWS
-  - Dark mode follows the system setting (light-dark() tokens). Motion follows the reduced motion setting.
-  - Text pairs are 7:1 or better, control edges 3:1 or better. Re-check any colour you change.
-  - Colour never carries meaning alone: every status has its own icon shape and a word.
-  - Touch targets are at least 2.75rem. Everything works with the keyboard and with reduced motion.
-  - Keep the tokens in section 1. Never touch 1c: the status colours are locked. Project styles go in section 5.
--->
+            RULES AENGUS FOLLOWS
+            - Dark mode follows the system setting (light-dark() tokens). Motion follows the reduced motion setting.
+            - Text pairs are 7:1 or better, control edges 3:1 or better. Re-check any colour you change.
+            - Colour never carries meaning alone: every status has its own icon shape and a word.
+            - Touch targets are at least 2.75rem. Everything works with the keyboard and with reduced motion.
+            - Keep the tokens in section 1. Never touch 1c: the status colours are locked. Project styles go in section 5.
+        -->
 
-<meta name="description" content="Build a library of books you know, tag it, then find more books to read. Also works for comics and graphic novels. Searches Open Library by title, author, series or ISBN.">
-<meta name="author" content="Nuadyr">
-<meta name="application-name" content="Skathach">
-<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
-<meta name="color-scheme" content="light dark">
-<meta name="theme-color" content="#f5f6f7" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#111213" media="(prefers-color-scheme: dark)">
-<link rel="canonical" href="https://nuadyr.github.io/Skathach/">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231a1a1d'/%3E%3Cpath d='M9 24V9M16 24V7M23 24V11' fill='none' stroke='%239999cc' stroke-width='3.5' stroke-linecap='round'/%3E%3C/svg%3E">
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="Skathach">
-<meta property="og:title" content="Skathach: book finder">
-<meta property="og:description" content="Build a library of books you know, tag it, then find more books to read. Also works for comics and graphic novels.">
-<meta property="og:url" content="https://nuadyr.github.io/Skathach/">
-<meta property="og:locale" content="en_GB">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Skathach: book finder">
-<meta name="twitter:description" content="Build a library of books you know, tag it, then find more books to read. Also works for comics and graphic novels.">
-<script type="application/ld+json">
+        <meta name="description" content="Build a library of books you know, tag it, then find more books to read. Also works for comics and graphic novels. Searches Open Library by title, author, series or ISBN.">
+        <meta name="author" content="Nuadyr">
+        <meta name="application-name" content="Skathach">
+        <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+        <meta name="color-scheme" content="light dark">
+        <meta
+            name="theme-color"
+            content="#f5f6f7"
+            media="(prefers-color-scheme: light)"
+        >
+        <meta
+            name="theme-color"
+            content="#111213"
+            media="(prefers-color-scheme: dark)"
+        >
+        <link rel="canonical" href="https://nuadyr.github.io/Skathach/">
+        <link
+            rel="icon"
+            type="image/svg+xml"
+            href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231a1a1d'/%3E%3Cpath d='M9 24V9M16 24V7M23 24V11' fill='none' stroke='%239999cc' stroke-width='3.5' stroke-linecap='round'/%3E%3C/svg%3E"
+        >
+        <link rel="manifest" href="manifest.webmanifest">
+        <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+        <meta property="og:type" content="website">
+        <meta property="og:site_name" content="Skathach">
+        <meta property="og:title" content="Skathach: book finder">
+        <meta property="og:description" content="Build a library of books you know, tag it, then find more books to read. Also works for comics and graphic novels.">
+        <meta property="og:url" content="https://nuadyr.github.io/Skathach/">
+        <meta property="og:locale" content="en_GB">
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:title" content="Skathach: book finder">
+        <meta name="twitter:description" content="Build a library of books you know, tag it, then find more books to read. Also works for comics and graphic novels.">
+        <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "WebApplication",
@@ -51,13 +63,13 @@
   "isAccessibleForFree": true,
   "author": { "@type": "Person", "name": "Nuadyr" }
 }
-</script>
-<script>
+        </script>
+        <script>
 /* One-off move of saved data from the old ArShelf storage names, and removal of the retired theme and motion settings.
    Safe to delete once old saves are gone. */
-try { [['arshelf', 'skathach'], ['arshelf-last', 'skathach-last']].forEach(([o, n]) => { const v = localStorage.getItem(o); if (v === null) return; try { if (localStorage.getItem(n) === null) localStorage.setItem(n, v); localStorage.removeItem(o); } catch { /* storage full: keep the old save */ } }); ['kit-theme', 'kit-theme-mode', 'kit-motion-paused', 'aengus-theme', 'aengus-theme-mode', 'aengus-motion-paused'].forEach(k => localStorage.removeItem(k)); } catch { /* storage unavailable */ }
-</script>
-<style>
+try { [['arshelf', 'skathach'], ['arshelf-last', 'skathach-last']].forEach(([o, n]) => { const v = localStorage.getItem(o); if (v === null) {return;} try { if (localStorage.getItem(n) === null) {localStorage.setItem(n, v);} localStorage.removeItem(o); } catch { /* storage full: keep the old save */ } }); ['kit-theme', 'kit-theme-mode', 'kit-motion-paused', 'aengus-theme', 'aengus-theme-mode', 'aengus-motion-paused'].forEach(k => localStorage.removeItem(k)); } catch { /* storage unavailable */ }
+        </script>
+        <style>
 /* Aengus design system.
    Layers: 1 tokens, 2 base, 3 layout, 4 components, 5 your page, 6 user preferences and assistive modes. */
 
@@ -462,153 +474,335 @@ dialog, .pop { overscroll-behavior: contain; }
   .site-footer, .skip-link, .no-print { display: none; }
   body { background: #fff; }
 }
-</style>
-</head>
-<body>
-<a class="skip-link" href="#main">Skip to main content</a>
+        </style>
+    </head>
+    <body>
+        <a class="skip-link" href="#main">Skip to main content</a>
 
-<main id="main" tabindex="-1">
-<header class="site-header">
-<h1>Skathach book finder</h1>
-<p class="lede">Build a library of books you know. Tag it. Then find more books to read. Comics and graphic novels work too. Add books by title, author, series or International Standard Book Number (ISBN).</p>
-<nav aria-label="Main">
-<ul class="tabs">
-<li><a href="#library" data-v="library">Library</a></li>
-<li><a href="#reading" data-v="reading">Reading list</a></li>
-<li><a href="#add" data-v="add">Add books</a></li>
-<li><a href="#tags" data-v="tags">Tags</a></li>
-<li><a href="#blacklist" data-v="blacklist">Blacklist</a></li>
-<li><a href="#find" data-v="find">Find books</a></li>
-</ul>
-</nav>
-</header>
+        <main id="main" tabindex="-1">
+            <header class="site-header">
+                <h1>Skathach book finder</h1>
+                <p class="lede">Build a library of books you know. Tag it. Then find more books to read. Comics and graphic novels work too. Add books by title, author, series or International Standard Book Number (ISBN).</p>
+                <nav aria-label="Main">
+                    <ul class="tabs">
+                        <li><a href="#library" data-v="library">Library</a></li>
+                        <li><a href="#reading" data-v="reading">Reading list</a></li>
+                        <li><a href="#add" data-v="add">Add books</a></li>
+                        <li><a href="#tags" data-v="tags">Tags</a></li>
+                        <li><a href="#blacklist" data-v="blacklist">Blacklist</a></li>
+                        <li><a href="#find" data-v="find">Find books</a></li>
+                    </ul>
+                </nav>
+            </header>
 
-<noscript><p role="alert">Skathach needs JavaScript. Enable it and reload.</p></noscript>
+            <noscript>
+                <p role="alert">Skathach needs JavaScript. Enable it and reload.</p>
+            </noscript>
 
-<section id="v-library" class="panel" aria-labelledby="h-shelf" hidden>
-<h2 id="h-shelf" tabindex="-1">Library</h2>
-<p id="lcount"></p>
-<p class="hint">To import or export your library, press and hold the Library tab. With a keyboard, focus the tab and press the Menu key or Shift and F10.</p>
-<ul id="shelf" class="cards"></ul>
-<nav id="lpager" aria-label="Library pages" hidden></nav>
-</section>
+            <section
+                id="v-library"
+                class="panel"
+                aria-labelledby="h-shelf"
+                hidden
+            >
+                <h2 id="h-shelf" tabindex="-1">Library</h2>
+                <p id="lcount"></p>
+                <p class="hint">To import or export your library, press and hold the Library tab. With a keyboard, focus the tab and press the Menu key or Shift and F10.</p>
+                <ul id="shelf" class="cards"></ul>
+                <nav
+                    id="lpager"
+                    aria-label="Library pages"
+                    hidden
+                ></nav>
+            </section>
 
-<section id="v-reading" class="panel" aria-labelledby="h-reading" hidden>
-<h2 id="h-reading" tabindex="-1">Reading list</h2>
-<p id="rcount"></p>
-<p id="rstatus" role="status"></p>
-<ul id="rlist" class="cards"></ul>
-<nav id="rlpager" aria-label="Reading list pages" hidden></nav>
-</section>
+            <section
+                id="v-reading"
+                class="panel"
+                aria-labelledby="h-reading"
+                hidden
+            >
+                <h2 id="h-reading" tabindex="-1">Reading list</h2>
+                <p id="rcount"></p>
+                <p id="rstatus" role="status"></p>
+                <ul id="rlist" class="cards"></ul>
+                <nav
+                    id="rlpager"
+                    aria-label="Reading list pages"
+                    hidden
+                ></nav>
+            </section>
 
-<section id="v-add" class="panel" aria-labelledby="h-add" hidden>
-<h2 id="h-add" tabindex="-1">Add books</h2>
-<section class="stack" aria-labelledby="h-search">
-<h3 id="h-search">Search by title, author or series</h3>
-<p class="hint">This works for comics and graphic novels as well as books. For a comic, searching by series name often finds its collected volumes.</p>
-<form id="sform" class="stack">
-<div class="field"><label for="stype">Search by</label>
-<select id="stype"><option value="title">Title</option><option value="author">Author</option><option value="both">Title and author</option><option value="series">Series</option></select></div>
-<div class="field"><label for="q1" id="l1">Title</label><input id="q1" type="text" autocomplete="off"></div>
-<div id="w2" class="field" hidden><label for="q2">Author name</label><input id="q2" type="text" autocomplete="off"></div>
-<div class="row"><button type="submit">Search books</button></div>
-</form>
-<p id="sstatus" role="status" tabindex="-1"></p>
-<ul id="sres" class="cards"></ul>
-<nav id="spager" aria-label="Search result pages" hidden></nav>
-</section>
-<section class="stack sub" aria-labelledby="h-isbn">
-<h3 id="h-isbn">Add by ISBN</h3>
-<p class="hint">Collected editions and graphic novels usually have an ISBN. Single comic issues may not, so search for those by title or series instead.</p>
-<div class="field"><label for="isbns">ISBNs, one per line or split by commas (10 or 13 digits)</label>
-<textarea id="isbns" autocomplete="off" spellcheck="false"></textarea></div>
-<div class="row"><button id="add" type="button">Add ISBNs</button></div>
-<p id="status" role="status"></p>
-</section>
-</section>
+            <section
+                id="v-add"
+                class="panel"
+                aria-labelledby="h-add"
+                hidden
+            >
+                <h2 id="h-add" tabindex="-1">Add books</h2>
+                <section class="stack" aria-labelledby="h-search">
+                    <h3 id="h-search">Search by title, author or series</h3>
+                    <p class="hint">This works for comics and graphic novels as well as books. For a comic, searching by series name often finds its collected volumes.</p>
+                    <form id="sform" class="stack">
+                        <div class="field">
+                            <label for="stype">Search by</label>
+                            <select id="stype">
+                                <option value="title">Title</option>
+                                <option value="author">Author</option>
+                                <option value="both">Title and author</option>
+                                <option value="series">Series</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label for="q1" id="l1">Title</label>
+                            <input
+                                id="q1"
+                                type="text"
+                                autocomplete="off"
+                            >
+                        </div>
+                        <div
+                            id="w2"
+                            class="field"
+                            hidden
+                        >
+                            <label for="q2">Author name</label>
+                            <input
+                                id="q2"
+                                type="text"
+                                autocomplete="off"
+                            >
+                        </div>
+                        <div class="row">
+                            <button type="submit">Search books</button>
+                        </div>
+                    </form>
+                    <p
+                        id="sstatus"
+                        role="status"
+                        tabindex="-1"
+                    ></p>
+                    <ul id="sres" class="cards"></ul>
+                    <nav
+                        id="spager"
+                        aria-label="Search result pages"
+                        hidden
+                    ></nav>
+                </section>
+                <section class="stack sub" aria-labelledby="h-isbn">
+                    <h3 id="h-isbn">Add by ISBN</h3>
+                    <p class="hint">Collected editions and graphic novels usually have an ISBN. Single comic issues may not, so search for those by title or series instead.</p>
+                    <div class="field">
+                        <label for="isbns">ISBNs, one per line or split by commas (10 or 13 digits)</label>
+                        <textarea
+                            id="isbns"
+                            autocomplete="off"
+                            spellcheck="false"
+                        ></textarea>
+                    </div>
+                    <div class="row">
+                        <button id="add" type="button">Add ISBNs</button>
+                    </div>
+                    <p id="status" role="status"></p>
+                </section>
+            </section>
 
-<section id="v-tags" class="panel" aria-labelledby="h-tags" hidden>
-<h2 id="h-tags" tabindex="-1">Tags</h2>
-<p>Weight 5 matters most. Tags with weight 4 or 5 search for an exact subject. Tags with weight 1 to 3 search for a similar subject. Tick Exclude to lower the score of books that have that tag.</p>
-<form id="tagform" class="stack">
-<div class="field"><label for="newtag">New tag</label><input id="newtag" type="text" autocomplete="off"></div>
-<div class="row"><button type="submit">Add tag</button></div>
-</form>
-<ul id="tags" class="tags"></ul>
-</section>
+            <section
+                id="v-tags"
+                class="panel"
+                aria-labelledby="h-tags"
+                hidden
+            >
+                <h2 id="h-tags" tabindex="-1">Tags</h2>
+                <p>Weight 5 matters most. Tags with weight 4 or 5 search for an exact subject. Tags with weight 1 to 3 search for a similar subject. Tick Exclude to lower the score of books that have that tag.</p>
+                <form id="tagform" class="stack">
+                    <div class="field">
+                        <label for="newtag">New tag</label>
+                        <input
+                            id="newtag"
+                            type="text"
+                            autocomplete="off"
+                        >
+                    </div>
+                    <div class="row">
+                        <button type="submit">Add tag</button>
+                    </div>
+                </form>
+                <ul id="tags" class="tags"></ul>
+            </section>
 
-<section id="v-blacklist" class="panel" aria-labelledby="h-black" hidden>
-<h2 id="h-black" tabindex="-1">Blacklist</h2>
-<p>Type a word or a sentence to blacklist. Find books never searches a tag that contains it. It also hides any book whose title, author or subjects contain it. Matching ignores capital letters and punctuation, and looks for whole words.</p>
-<form id="bform" class="stack">
-<div class="field"><label for="newblack">Word or sentence to blacklist</label><input id="newblack" type="text" autocomplete="off"></div>
-<div class="row"><button type="submit">Add to blacklist</button></div>
-</form>
-<p id="bstatus" role="status"></p>
-<ul id="blist" class="tags"></ul>
-<section class="stack sub" aria-labelledby="h-bbooks">
-<h3 id="h-bbooks">Blacklisted books</h3>
-<p>Books you blacklist from Find books are listed here. A blacklisted book is never recommended. Remove it from this list to allow it again.</p>
-<ul id="bbooks" class="tags"></ul>
-</section>
-</section>
+            <section
+                id="v-blacklist"
+                class="panel"
+                aria-labelledby="h-black"
+                hidden
+            >
+                <h2 id="h-black" tabindex="-1">Blacklist</h2>
+                <p>Type a word or a sentence to blacklist. Find books never searches a tag that contains it. It also hides any book whose title, author or subjects contain it. Matching ignores capital letters and punctuation, and looks for whole words.</p>
+                <form id="bform" class="stack">
+                    <div class="field">
+                        <label for="newblack">Word or sentence to blacklist</label>
+                        <input
+                            id="newblack"
+                            type="text"
+                            autocomplete="off"
+                        >
+                    </div>
+                    <div class="row">
+                        <button type="submit">Add to blacklist</button>
+                    </div>
+                </form>
+                <p id="bstatus" role="status"></p>
+                <ul id="blist" class="tags"></ul>
+                <section class="stack sub" aria-labelledby="h-bbooks">
+                    <h3 id="h-bbooks">Blacklisted books</h3>
+                    <p>Books you blacklist from Find books are listed here. A blacklisted book is never recommended. Remove it from this list to allow it again.</p>
+                    <ul id="bbooks" class="tags"></ul>
+                </section>
+            </section>
 
-<section id="v-find" class="panel" aria-labelledby="h-find" hidden>
-<h2 id="h-find" tabindex="-1">Find books</h2>
-<p>Find your next book, comic or graphic novel.</p>
-<div class="field"><label for="fmode">Shelf style</label>
-<select id="fmode"><option value="dpp">Discover: wide variety across the whole shelf</option><option value="mmr">Continue: close to what you read, with some variety</option></select>
-<p class="hint">You can change the style after a search. The shelf is re-ordered without a new search.</p></div>
-<div class="row"><button id="find" type="button">Find books</button><button id="stop" type="button" class="secondary" hidden>Stop search</button></div>
-<p id="fstatus" role="status" tabindex="-1"></p>
-<p id="astatus" role="status" tabindex="-1"></p>
-<ul id="cgrid" class="cgrid" aria-label="Covers of the books found so far" hidden></ul>
-<details id="flogbox" hidden><summary>Changes while searching</summary><ul id="flog" class="facts"></ul></details>
-<ol id="results" class="cards"></ol>
-<nav id="rpager" aria-label="Recommended book pages" hidden></nav>
-</section>
-</main>
+            <section
+                id="v-find"
+                class="panel"
+                aria-labelledby="h-find"
+                hidden
+            >
+                <h2 id="h-find" tabindex="-1">Find books</h2>
+                <p>Find your next book, comic or graphic novel.</p>
+                <div class="field">
+                    <label for="fmode">Shelf style</label>
+                    <select id="fmode">
+                        <option value="dpp">Discover: wide variety across the whole shelf</option>
+                        <option value="mmr">Continue: close to what you read, with some variety</option>
+                    </select>
+                    <p class="hint">You can change the style after a search. The shelf is re-ordered without a new search.</p>
+                </div>
+                <div class="row">
+                    <button id="find" type="button">Find books</button>
+                    <button
+                        id="stop"
+                        type="button"
+                        class="secondary"
+                        hidden
+                    >Stop search</button>
+                </div>
+                <p
+                    id="fstatus"
+                    role="status"
+                    tabindex="-1"
+                ></p>
+                <p
+                    id="astatus"
+                    role="status"
+                    tabindex="-1"
+                ></p>
+                <ul
+                    id="cgrid"
+                    class="cgrid"
+                    aria-label="Covers of the books found so far"
+                    hidden
+                ></ul>
+                <details id="flogbox" hidden>
+                    <summary>Changes while searching</summary>
+                    <ul id="flog" class="facts"></ul>
+                </details>
+                <ol id="results" class="cards"></ol>
+                <nav
+                    id="rpager"
+                    aria-label="Recommended book pages"
+                    hidden
+                ></nav>
+            </section>
+        </main>
 
-<footer class="site-footer">
-<div class="wrap">
-<p>Skathach by <a href="https://nuadyr.github.io/">Nuadyr</a>. © 2026.</p>
-<p class="hint">Your library and your last search results stay in this browser. Searches go to Open Library, and previews load from Google Books. Built on the Aengus design system.</p>
-</div>
-</footer>
+        <footer class="site-footer">
+            <div class="wrap">
+                <p>Skathach by <a href="https://nuadyr.github.io/">Nuadyr</a>. © 2026.</p>
+                <p class="hint">Your library and your last search results stay in this browser. Searches go to Open Library, and previews load from Google Books. Built on the Aengus design system.</p>
+            </div>
+        </footer>
 
-<dialog id="pv" class="stack" aria-labelledby="pvt">
-<h2 id="pvt"></h2>
-<p id="pvm" role="status"></p>
-<div id="viewer"></div>
-<button id="pvc" type="button" class="secondary">Close preview</button>
-</dialog>
+        <dialog
+            id="pv"
+            class="stack"
+            aria-labelledby="pvt"
+        >
+            <h2 id="pvt"></h2>
+            <p id="pvm" role="status"></p>
+            <div id="viewer"></div>
+            <button
+                id="pvc"
+                type="button"
+                class="secondary"
+            >Close preview</button>
+        </dialog>
 
-<dialog id="bl" class="stack" aria-labelledby="blt">
-<div class="dlg-head"><h2 id="blt"></h2><button id="blc" type="button" class="secondary" autofocus>Close blurb</button></div>
-<div id="blb"></div>
-<p class="hint">Blurb from Open Library.</p>
-</dialog>
+        <dialog
+            id="bl"
+            class="stack"
+            aria-labelledby="blt"
+        >
+            <div class="dlg-head">
+                <h2 id="blt"></h2>
+                <button
+                    id="blc"
+                    type="button"
+                    class="secondary"
+                    autofocus
+                >Close blurb</button>
+            </div>
+            <div id="blb"></div>
+            <p class="hint">Blurb from Open Library.</p>
+        </dialog>
 
-<dialog id="lm" class="stack" aria-labelledby="lmt">
-<div class="dlg-head"><h2 id="lmt">Import or export library</h2><button id="lmc" type="button" class="secondary" autofocus>Close</button></div>
-<p>Export saves the books in your library as a file you can keep or move to another browser. Import adds books from such a file. Books already in your library are skipped, and nothing is removed.</p>
-<div class="row"><button id="lmx" type="button">Export library</button><button id="lmi" type="button" class="secondary">Import library</button></div>
-<input id="lmf" type="file" accept=".json,application/json" hidden>
-<p id="lms" role="status"></p>
-<p id="lme" role="alert" hidden></p>
-</dialog>
+        <dialog
+            id="lm"
+            class="stack"
+            aria-labelledby="lmt"
+        >
+            <div class="dlg-head">
+                <h2 id="lmt">Import or export library</h2>
+                <button
+                    id="lmc"
+                    type="button"
+                    class="secondary"
+                    autofocus
+                >Close</button>
+            </div>
+            <p>Export saves the books in your library as a file you can keep or move to another browser. Import adds books from such a file. Books already in your library are skipped, and nothing is removed.</p>
+            <div class="row">
+                <button id="lmx" type="button">Export library</button>
+                <button
+                    id="lmi"
+                    type="button"
+                    class="secondary"
+                >Import library</button>
+            </div>
+            <input
+                id="lmf"
+                type="file"
+                accept=".json,application/json"
+                hidden
+            >
+            <p id="lms" role="status"></p>
+            <p
+                id="lme"
+                role="alert"
+                hidden
+            ></p>
+        </dialog>
 
-<script>
+        <script>
 'use strict';
 /* ---------- Skathach ---------- */
 const $=s=>document.querySelector(s);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let S={books:[],tags:[],black:[]};
 try{S=JSON.parse(localStorage.getItem('skathach'))||S}catch(e){console.warn('Skathach: saved shelf could not be read. Starting empty.',e)}
-if(!Array.isArray(S.black))S.black=[];
-if(!Array.isArray(S.reading))S.reading=[];
-if(!Array.isArray(S.blackBooks))S.blackBooks=[];
-if(S.mode!=='mmr')S.mode='dpp';
+if(!Array.isArray(S.black)){S.black=[];}
+if(!Array.isArray(S.reading)){S.reading=[];}
+if(!Array.isArray(S.blackBooks)){S.blackBooks=[];}
+if(S.mode!=='mmr'){S.mode='dpp';}
 const save=()=>{try{localStorage.setItem('skathach',JSON.stringify(S))}catch(e){console.warn('Skathach: the shelf could not be saved in this browser. It lasts until you close the page.',e)}};
 const say=t=>{$('#status').textContent=t};
 /* Waits run in a Web Worker. Browsers slow page timers in background tabs (to one a minute after a few minutes),
@@ -623,12 +817,12 @@ try{
 const sleep=ms=>tickWorker?new Promise(r=>{const id=++tickN;tickWaits.set(id,r);tickWorker.postMessage({id,ms})}):new Promise(r=>setTimeout(r,ms));
 let LP=1,RLP=1;
 /* Failed image URLs are suppressed briefly, not for the whole session. */
-const BAD=new Map(),isBad=u=>{const t=BAD.get(u);if(t===undefined)return false;if(Date.now()-t<3e5)return true;BAD.delete(u);return false};
+const BAD=new Map(),isBad=u=>{const t=BAD.get(u);if(t===undefined){return false;}if(Date.now()-t<3e5){return true;}BAD.delete(u);return false};
 const CACHE_OK=30*60*1000, CACHE_MISS=2*60*1000;
 function cachedPromise(map,key,loader,hasValue){
  const now=Date.now(),old=map.get(key);
- if(old&&old.expiresAt>now)return old.promise;
- if(old)map.delete(key);
+ if(old&&old.expiresAt>now){return old.promise;}
+ if(old){map.delete(key);}
  const entry={expiresAt:now+CACHE_MISS,promise:null};
  entry.promise=Promise.resolve().then(loader).then(value=>{
   entry.expiresAt=Date.now()+(hasValue(value)?CACHE_OK:CACHE_MISS);
@@ -638,13 +832,13 @@ function cachedPromise(map,key,loader,hasValue){
  });
  map.set(key,entry);
  /* Bound memory if a long session searches many different books. */
- if(map.size>250){for(const [k,v] of map){if(v.expiresAt<=Date.now())map.delete(k);if(map.size<=200)break;}if(map.size>250)map.delete(map.keys().next().value)}
+ if(map.size>250){for(const [k,v] of map){if(v.expiresAt<=Date.now()){map.delete(k);}if(map.size<=200){break;}}if(map.size>250){map.delete(map.keys().next().value)}}
  return entry.promise;
 }
 const coverUrl=id=>'https://covers.openlibrary.org/b/id/'+id+'-M.jpg?default=false';
 const olCover=(kind,k)=>'https://covers.openlibrary.org/b/'+kind+'/'+k+'-M.jpg?default=false';
 /* Every cover source we know for a book, best first. */
-const coverList=d=>{const l=[];if(d.cover_i>0)l.push(coverUrl(d.cover_i));if(d.cover_edition_key)l.push(olCover('olid',d.cover_edition_key));const i=(d.isbn||[]).map(x=>isbn13(x)).find(Boolean);if(i)l.push(olCover('isbn',i));return l.filter(u=>!isBad(u)&&!cooling(u))};
+const coverList=d=>{const l=[];if(d.cover_i>0){l.push(coverUrl(d.cover_i));}if(d.cover_edition_key){l.push(olCover('olid',d.cover_edition_key));}const i=(d.isbn||[]).map(x=>isbn13(x)).find(Boolean);if(i){l.push(olCover('isbn',i));}return l.filter(u=>!isBad(u)&&!cooling(u))};
 const cov=(c,t,isbn='',work='')=>{const l=(Array.isArray(c)?c:[c]).filter(u=>u&&!isBad(u));return l.length?`<img class="cv" src="${esc(l[0])}" data-alt="${esc(JSON.stringify(l.slice(1)))}" data-title="${esc(t)}" data-isbn="${esc(isbn)}" data-work="${esc(work)}" alt="Cover of ${esc(t)}" width="72" loading="lazy" referrerpolicy="no-referrer" decoding="async">`:`<span class="cv nocv" data-title="${esc(t)}" data-isbn="${esc(isbn)}" data-work="${esc(work)}">No cover</span>`};
 /* Cover fallback order: retry Open Library once, try its other identifiers, then use Google Books as an independent provider. */
 const GB_COVER_CACHE=new Map();
@@ -655,13 +849,13 @@ async function googleCoverSources(im){
  return cachedPromise(GB_COVER_CACHE,key,async()=>{
   const found=[];
   const queries=[];
-  if(isbn)queries.push('isbn:'+isbn);
-  if(title)queries.push('intitle:'+title);
+  if(isbn){queries.push('isbn:'+isbn);}
+  if(title){queries.push('intitle:'+title);}
   /* Some editions are indexed by title rather than ISBN, so always try both. */
   for(const q of queries){
    try{
     const url='https://www.googleapis.com/books/v1/volumes?q='+encodeURIComponent(q)+'&maxResults=10';
-    await gate('google');const r=await fetch(url);if(!r.ok){if(r.status===429)GATES.google.at=Date.now()+6e4;continue}
+    await gate('google');const r=await fetch(url);if(!r.ok){if(r.status===429){GATES.google.at=Date.now()+6e4;}continue}
     const j=await r.json(),items=Array.isArray(j.items)?j.items:[];
     let ordered=items;
     if(isbn){
@@ -671,12 +865,12 @@ async function googleCoverSources(im){
     for(const item of ordered){
      const links=item.volumeInfo?.imageLinks||{};
      for(const u of [links.extraLarge,links.large,links.medium,links.thumbnail,links.smallThumbnail]){
-      if(!u)continue;
+      if(!u){continue;}
       const secure=u.replace(/^http:/i,'https:').replace(/&zoom=\d+/g,'').replace(/&edge=curl/g,'');
-      if(!found.includes(secure))found.push(secure);
+      if(!found.includes(secure)){found.push(secure);}
      }
     }
-    if(found.length)break;
+    if(found.length){break;}
    }catch{/* Try the next query/provider result. */}
   }
   return found;
@@ -691,17 +885,17 @@ function gate(kind){const g=GATES[kind],now=Date.now(),t=Math.max(now,g.at);g.at
 const KEYED=u=>/\/b\/(olid|isbn)\//.test(u);
 let KF=[],COOL=0;
 const cooling=u=>KEYED(u)&&Date.now()<COOL;
-function noteFail(u){if(!KEYED(u))return;const n=Date.now();KF=KF.filter(t=>n-t<3e5);KF.push(n);if(KF.length>=10){COOL=n+3e5;KF=[]}}
+function noteFail(u){if(!KEYED(u)){return;}const n=Date.now();KF=KF.filter(t=>n-t<3e5);KF.push(n);if(KF.length>=10){COOL=n+3e5;KF=[]}}
 /* Work and edition covers. The search result names one cover for the whole work. When that file is missing, the work record
    and its editions usually list other cover ids. Cover ids are not rate limited the way ISBN and edition key lookups are. */
 const idsToUrls=(ids,max=6)=>[...new Set((ids||[]).filter(n=>Number.isInteger(n)&&n>0))].slice(0,max).map(coverUrl);
 const WK_CACHE=new Map(),ED_CACHE=new Map();
 function workData(path){
- if(!/^\/(works|books)\/OL\w+$/.test(path))return Promise.resolve(null);
+ if(!/^\/(works|books)\/OL\w+$/.test(path)){return Promise.resolve(null);}
  return cachedPromise(WK_CACHE,path,async()=>{
   try{
    await gate('api');const r=await fetch('https://openlibrary.org'+path+'.json',AbortSignal.timeout?{signal:AbortSignal.timeout(15000)}:{});
-   if(!r.ok)return null;
+   if(!r.ok){return null;}
    const j=await r.json();
    return{description:j.description,covers:Array.isArray(j.covers)?j.covers:[]};
   }catch{return null}
@@ -709,27 +903,27 @@ function workData(path){
 }
 async function workCovers(path){const j=await workData(path);return j?idsToUrls(j.covers):[]}
 function editionCovers(path){
- if(!/^\/works\/OL\w+$/.test(path))return Promise.resolve([]);
+ if(!/^\/works\/OL\w+$/.test(path)){return Promise.resolve([]);}
  return cachedPromise(ED_CACHE,path,async()=>{
   try{
    await gate('api');const r=await fetch('https://openlibrary.org'+path+'/editions.json?limit=50',AbortSignal.timeout?{signal:AbortSignal.timeout(15000)}:{});
-   if(!r.ok)return[];
+   if(!r.ok){return[];}
    const j=await r.json();
    return idsToUrls((j.entries||[]).flatMap(e=>e.covers||[]),8);
   }catch{return[]}
  },v=>v.length>0);
 }
 document.addEventListener('error',async e=>{
- const im=e.target;if(!(im instanceof HTMLImageElement)||!im.classList.contains('cv'))return;
+ const im=e.target;if(!(im instanceof HTMLImageElement)||!im.classList.contains('cv')){return;}
  let alt=[];try{alt=JSON.parse(im.dataset.alt||'[]')}catch{/* no alternatives */}
- if(!im.dataset.retried){im.dataset.retried='1';const u=im.getAttribute('src');setTimeout(async()=>{await gate('cover');if(im.isConnected)im.src=u+(u.includes('?')?'&':'?')+'r=1'},1500);return}
+ if(!im.dataset.retried){im.dataset.retried='1';const u=im.getAttribute('src');setTimeout(async()=>{await gate('cover');if(im.isConnected){im.src=u+(u.includes('?')?'&':'?')+'r=1'}},1500);return}
  BAD.set(im.getAttribute('src').replace(/&r=1$/,''),Date.now());noteFail(im.getAttribute('src'));
- let n;while((n=alt.shift())&&cooling(n));
- if(n){await gate('cover');if(!im.isConnected)return;im.dataset.alt=JSON.stringify(alt);im.dataset.retried='';im.src=n;return}
+ let n;while((n=alt.shift())&&cooling(n)){;}
+ if(n){await gate('cover');if(!im.isConnected){return;}im.dataset.alt=JSON.stringify(alt);im.dataset.retried='';im.src=n;return}
  const wk=im.dataset.work;
- if(wk&&!im.dataset.workTried){im.dataset.workTried='1';const l=(await workCovers(wk)).filter(u=>!isBad(u));if(!im.isConnected)return;if(l.length){await gate('cover');if(!im.isConnected)return;im.dataset.alt=JSON.stringify(l.slice(1));im.dataset.retried='';im.src=l[0];return}}
- if(wk&&!im.dataset.edTried){im.dataset.edTried='1';const l=(await editionCovers(wk)).filter(u=>!isBad(u));if(!im.isConnected)return;if(l.length){await gate('cover');if(!im.isConnected)return;im.dataset.alt=JSON.stringify(l.slice(1));im.dataset.retried='';im.src=l[0];return}}
- if(!im.dataset.googleTried){im.dataset.googleTried='1';const covers=await googleCoverSources(im);if(!im.isConnected)return;const next=covers.find(u=>!isBad(u));if(next){await gate('cover');if(!im.isConnected)return;im.dataset.alt=JSON.stringify(covers.filter(u=>u!==next));im.dataset.retried='';im.src=next;return}}
+ if(wk&&!im.dataset.workTried){im.dataset.workTried='1';const l=(await workCovers(wk)).filter(u=>!isBad(u));if(!im.isConnected){return;}if(l.length){await gate('cover');if(!im.isConnected){return;}im.dataset.alt=JSON.stringify(l.slice(1));im.dataset.retried='';im.src=l[0];return}}
+ if(wk&&!im.dataset.edTried){im.dataset.edTried='1';const l=(await editionCovers(wk)).filter(u=>!isBad(u));if(!im.isConnected){return;}if(l.length){await gate('cover');if(!im.isConnected){return;}im.dataset.alt=JSON.stringify(l.slice(1));im.dataset.retried='';im.src=l[0];return}}
+ if(!im.dataset.googleTried){im.dataset.googleTried='1';const covers=await googleCoverSources(im);if(!im.isConnected){return;}const next=covers.find(u=>!isBad(u));if(next){await gate('cover');if(!im.isConnected){return;}im.dataset.alt=JSON.stringify(covers.filter(u=>u!==next));im.dataset.retried='';im.src=next;return}}
  const sp=document.createElement('span');sp.className='cv nocv'+(im.classList.contains('cvg')?' cvg':'');sp.textContent=im.dataset.title||'No cover';im.replaceWith(sp);
 },true);
 
@@ -737,13 +931,13 @@ document.addEventListener('error',async e=>{
 function isbn13(raw){
  const d=raw.replace(/[\s-]/g,'').toUpperCase();
  if(/^\d{9}[\dX]$/.test(d)){
-  let s=0;for(let i=0;i<10;i++)s+=(10-i)*(d[i]==='X'?10:+d[i]);
-  if(s%11)return null;
-  const b='978'+d.slice(0,9);let c=0;for(let i=0;i<12;i++)c+=+b[i]*(i%2?3:1);
+  let s=0;for(let i=0;i<10;i++){s+=(10-i)*(d[i]==='X'?10:+d[i]);}
+  if(s%11){return null;}
+  const b='978'+d.slice(0,9);let c=0;for(let i=0;i<12;i++){c+=+b[i]*(i%2?3:1);}
   return b+(10-c%10)%10;
  }
  if(/^\d{13}$/.test(d)){
-  let c=0;for(let i=0;i<12;i++)c+=+d[i]*(i%2?3:1);
+  let c=0;for(let i=0;i<12;i++){c+=+d[i]*(i%2?3:1);}
   return (10-c%10)%10===+d[12]?d:null;
  }
  return null;
@@ -757,14 +951,14 @@ const inLib=x=>inList(S.books,x);
 function inList(list,x){
  const t=norm(x.title),au=x.authors.map(norm).filter(Boolean);
  return list.some(b=>{
-  if(x.id&&b.id&&x.id===b.id)return true;
-  if(b.isbn&&x.isbns.includes(b.isbn))return true;
-  if(!t||norm(b.title)!==t)return false;
+  if(x.id&&b.id&&x.id===b.id){return true;}
+  if(b.isbn&&x.isbns.includes(b.isbn)){return true;}
+  if(!t||norm(b.title)!==t){return false;}
   const ba=(b.authors||[]).map(norm).filter(Boolean);
   return !au.length||!ba.length||au.some(a=>ba.includes(a));
  });
 }
-function addTag(n){n=String(n).trim().toLowerCase();if(n&&!S.tags.some(t=>t.name===n))S.tags.push({name:n,w:3,x:false})}
+function addTag(n){n=String(n).trim().toLowerCase();if(n&&!S.tags.some(t=>t.name===n)){S.tags.push({name:n,w:3,x:false})}}
 
 function draw(){
  const per=8,pages=Math.max(1,Math.ceil(S.books.length/per));
@@ -821,10 +1015,10 @@ $('#sform').onsubmit=async e=>{
  const t=$('#stype').value,a=$('#q1').value.trim(),b=$('#q2').value.trim(),st=$('#sstatus');
  if(!a||(t==='both'&&!b)){st.textContent=t==='both'?'Type a title and an author.':'Type something to search for.';return}
  const P=new URLSearchParams({limit:10,fields:'key,title,author_name,first_publish_year,subject,isbn,ebook_access,cover_i,cover_edition_key'});
- if(t==='title')P.set('title',a);
- else if(t==='author')P.set('author',a);
+ if(t==='title'){P.set('title',a);}
+ else if(t==='author'){P.set('author',a);}
  else if(t==='both'){P.set('title',a);P.set('author',b)}
- else P.set('q','"'+a+'"');
+ else {P.set('q','"'+a+'"');}
  SQ=P;runSearch(1,false);
 };
 let SQ=null;
@@ -847,14 +1041,14 @@ async function runSearch(page,focus){
   const total=j.numFound??j.num_found??SR.length,pages=Math.max(1,Math.ceil(total/10));
   st.textContent=SR.length?'Found '+total+' books. Page '+page+' of '+pages+'. Add the ones you know.':'No books found. Try fewer words.';
   const shown=renderSearch(),hidden=SR.length-shown;
-  if(SR.length)st.textContent='Found '+total+' books. Page '+page+' of '+pages+'. '+(shown?'Add the ones you know.':'All books on this page are already in your library.')+(shown&&hidden?' '+hidden+' already in your library '+(hidden===1?'is':'are')+' hidden.':'');
+  if(SR.length){st.textContent='Found '+total+' books. Page '+page+' of '+pages+'. '+(shown?'Add the ones you know.':'All books on this page are already in your library.')+(shown&&hidden?' '+hidden+' already in your library '+(hidden===1?'is':'are')+' hidden.':'');}
   pager('#spager',page,pages,'spg');
-  if(focus)st.focus();
+  if(focus){st.focus();}
  }catch{st.textContent='The search failed. Check your connection. Open Library may also refuse requests from this page.'}
 }
 
 function addResult(i){
- const d=SR[i],st=$('#sstatus');if(!d)return;
+ const d=SR[i],st=$('#sstatus');if(!d){return;}
  if(inLib(candOf(d))){const n=renderSearch();st.textContent=d.title+' is already in your library.'+(n?'':' No other books are left on this page.');st.focus();return}
  const subs=(d.subject||[]).slice(0,10);
  S.books.push({id:d.key,isbn:(d.isbn||[]).map(x=>isbn13(x)).find(Boolean)||'',title:d.title,authors:d.author_name||[],subjects:subs,cover:coverList(d)[0]||'',covers:coverList(d)});
@@ -873,43 +1067,43 @@ function acts(d){
  const t=esc(d.title),k=esc(d.key),lib=inLib(candOf(d)),rl=onReading(d)>=0,o=[];
  /* Short visible text so three buttons share one row. The accessible name starts with the visible text and adds the book. */
  const btn=(a,text,name)=>`<button type="button" class="secondary small" data-a="${a}" data-v="${k}" aria-label="${name}: ${t}">${text}</button>`;
- if(lib)o.push('<span class="badge badge--ok">In your library</span>');
+ if(lib){o.push('<span class="badge badge--ok">In your library</span>');}
  else{
   o.push(btn('rl',rl?'Remove from list':'Reading list',rl?'Remove from list, your reading list':'Reading list, add to your reading list'));
-  if(rl)o.unshift('<span class="badge badge--info">On your reading list</span>');
+  if(rl){o.unshift('<span class="badge badge--info">On your reading list</span>');}
   o.push(btn('lib','Add to library','Add to library, I have read it'));
  }
  o.push(btn('bkb','Blacklist','Blacklist, never recommend this book'));
  return o.join('');
 }
 function refreshActs(k,focusA){
- const d=docByKey(k);if(!d)return;
- const row=document.querySelector('[data-acts="'+CSS.escape(k)+'"]');if(!row)return;
+ const d=docByKey(k);if(!d){return;}
+ const row=document.querySelector('[data-acts="'+CSS.escape(k)+'"]');if(!row){return;}
  row.innerHTML=acts(d);
  const f=row.querySelector('[data-a="'+focusA+'"]')||row.querySelector('button')||row.closest('.card').querySelector('h3 button');
- if(f)f.focus();
+ if(f){f.focus();}
 }
 function toggleReading(k){
- const d=docByKey(k);if(!d)return;
+ const d=docByKey(k);if(!d){return;}
  const i=onReading(d),st=$('#astatus');
  if(i>=0){S.reading.splice(i,1);st.textContent='Removed '+d.title+' from your reading list.'}
  else{S.reading.push(bookFields(d));st.textContent='Added '+d.title+' to your reading list.'}
  save();draw();refreshActs(k,'rl');
 }
 function addFromFind(k){
- const d=docByKey(k);if(!d)return;
+ const d=docByKey(k);if(!d){return;}
  const st=$('#astatus');
  if(!inLib(candOf(d))){
   const nb=bookFields(d);S.books.push(nb);nb.subjects.forEach(addTag);
-  const i=onReading(d);if(i>=0)S.reading.splice(i,1);
+  const i=onReading(d);if(i>=0){S.reading.splice(i,1);}
   save();draw();
   st.textContent='Added '+d.title+' to your library. Its subjects were added as tags. Check your tag weights on the Tags tab.';
- }else st.textContent=d.title+' is already in your library.';
+ }else {st.textContent=d.title+' is already in your library.';}
  refreshActs(k,'bkb');
 }
 function blockBook(k){
- const d=docByKey(k);if(!d)return;
- if(!inList(S.blackBooks,candOf(d)))S.blackBooks.push({id:d.key,title:d.title,authors:d.author_name||[]});
+ const d=docByKey(k);if(!d){return;}
+ if(!inList(S.blackBooks,candOf(d))){S.blackBooks.push({id:d.key,title:d.title,authors:d.author_name||[]});}
  RK=RK.filter(o=>o.d.key!==k);
  save();draw();showRanked(RPAGE,false);
  const st=$('#astatus');st.textContent='Blacklisted '+d.title+'. It will not be recommended again. You can allow it again on the Blacklist tab.';st.focus();
@@ -926,29 +1120,29 @@ $('#tagform').onsubmit=e=>{e.preventDefault();addTag($('#newtag').value);$('#new
 const POP='popover' in HTMLElement.prototype;
 function onShelfClick(e){
  const pt=e.target.closest('[popovertarget]');
- if(pt&&!POP){const el=document.getElementById(pt.getAttribute('popovertarget'));if(el)el.classList.toggle('is-open',pt.getAttribute('popovertargetaction')!=='hide');return}
+ if(pt&&!POP){const el=document.getElementById(pt.getAttribute('popovertarget'));if(el){el.classList.toggle('is-open',pt.getAttribute('popovertargetaction')!=='hide');}return}
  const bp=e.target.closest('#results p[data-blurb]');
- if(bp){if(!String(getSelection()))openBlurb(bp.dataset.blurb,bp.parentElement.querySelector('button[data-a="blurb"]'));return}
+ if(bp){if(!String(getSelection())){openBlurb(bp.dataset.blurb,bp.parentElement.querySelector('button[data-a="blurb"]'));}return}
  const card=e.target.closest('#results .card');
  if(card&&!e.target.closest('a,button,input,select,textarea,[popover]')){
   const p=card.querySelector('[popover]');
-  if(p){if(POP){try{p.showPopover()}catch{/* already open */}}else p.classList.add('is-open')}
+  if(p){if(POP){try{p.showPopover()}catch{/* already open */}}else {p.classList.add('is-open')}}
   return;
  }
- const b=e.target.closest('button[data-a]');if(!b)return;
+ const b=e.target.closest('button[data-a]');if(!b){return;}
  const a=b.dataset.a,v=b.dataset.v;
  if(a==='rmb'){S.books=S.books.filter(x=>(x.id||x.isbn)!==v);save();draw();$('#h-shelf').focus()}
  if(a==='rmk'){S.black=S.black.filter(x=>x!==v);save();draw();$('#bstatus').textContent='Removed '+v+' from the blacklist.';$('#h-black').focus()}
  if(a==='rmt'){S.tags=S.tags.filter(x=>x.name!==v);save();draw();$('#h-tags').focus()}
- if(a==='pv')preview(v,b.dataset.t);
- if(a==='blurb')openBlurb(v,b);
- if(a==='addr')addResult(+v);
+ if(a==='pv'){preview(v,b.dataset.t);}
+ if(a==='blurb'){openBlurb(v,b);}
+ if(a==='addr'){addResult(+v);}
  if(a==='lpg'){LP=+v;draw();$('#h-shelf').focus()}
- if(a==='spg')runSearch(+v,true);
- if(a==='rpg')showRanked(+v,true);
- if(a==='rl')toggleReading(v);
- if(a==='lib')addFromFind(v);
- if(a==='bkb')blockBook(v);
+ if(a==='spg'){runSearch(+v,true);}
+ if(a==='rpg'){showRanked(+v,true);}
+ if(a==='rl'){toggleReading(v);}
+ if(a==='lib'){addFromFind(v);}
+ if(a==='bkb'){blockBook(v);}
  if(a==='rlpg'){RLP=+v;draw();$('#h-reading').focus()}
  if(a==='rmrl'){const r=S.reading.find(x=>(x.id||x.isbn)===v);S.reading=S.reading.filter(x=>(x.id||x.isbn)!==v);save();draw();$('#rstatus').textContent=r?'Removed '+r.title+' from your reading list.':'';$('#h-reading').focus()}
  if(a==='rl2lib'){
@@ -964,8 +1158,8 @@ function onShelfClick(e){
 }
 function onShelfChange(e){
  if(e.target.dataset.k==='dnf'){const b=S.books.find(x=>(x.id||x.isbn)===e.target.dataset.v);if(b){b.dnf=e.target.checked;save()}return}
- const t=S.tags.find(x=>x.name===e.target.dataset.t);if(!t)return;
- if(e.target.dataset.k==='w'){t.w=+e.target.value;e.target.closest('li').querySelector('.mode').textContent=t.w>=4?'Exact search':'Fuzzy search'}else t.x=e.target.checked;
+ const t=S.tags.find(x=>x.name===e.target.dataset.t);if(!t){return;}
+ if(e.target.dataset.k==='w'){t.w=+e.target.value;e.target.closest('li').querySelector('.mode').textContent=t.w>=4?'Exact search':'Fuzzy search'}else {t.x=e.target.checked;}
  save();
 }
 function bindShelf(){document.addEventListener('click',onShelfClick);document.addEventListener('change',onShelfChange)}
@@ -984,14 +1178,14 @@ async function fetchQ(q,limit){
  for(let a=0;a<3;a++){
   try{
    const r=await fetch(url,AbortSignal.timeout?{signal:AbortSignal.timeout(30000)}:{});
-   if(r.ok)return await r.json();
+   if(r.ok){return await r.json();}
   }catch{/* try again */}
-  if(a<2)await sleep(4000*(a+1));
+  if(a<2){await sleep(4000*(a+1));}
  }
  throw new Error('Open Library did not answer.');
 }
 $('#find').onclick=async()=>{
- if(BUSY)return;
+ if(BUSY){return;}
  /* Freeze the tags and library for this run. Changes made while it runs apply to the next run. */
  const tags=S.tags.map(t=>({...t})),books=S.books.map(b=>({id:b.id,title:b.title,isbn:b.isbn,authors:[...(b.authors||[])],subjects:[...(b.subjects||[])],dnf:!!b.dnf}));
  const black=blackTerms(),skipped=tags.filter(t=>!t.x&&hit(t.name,black)).length;
@@ -1011,11 +1205,11 @@ $('#find').onclick=async()=>{
    rank([...pool.values()].map(slim),tags,books,black,skipped,failed);
    const cur=new Map(RK.map(o=>[o.d.key,o.d.title]));
    const add=[...cur.keys()].filter(k=>!prev.has(k)),rem=[...prev.keys()].filter(k=>!cur.has(k));
-   if(add.length)FRESH=new Set(add);
+   if(add.length){FRESH=new Set(add);}
    if(add.length||rem.length){
     const li=document.createElement('li');
     li.textContent='After '+label+': '+(add.length?'added '+names(add.map(k=>cur.get(k))):'')+(add.length&&rem.length?'; ':'')+(rem.length?'removed '+names(rem.map(k=>prev.get(k))):'')+'.';
-    const lg=$('#flog');lg.prepend(li);while(lg.children.length>12)lg.lastChild.remove();
+    const lg=$('#flog');lg.prepend(li);while(lg.children.length>12){lg.lastChild.remove();}
    }
    summary=' '+RK.length+(RK.length===1?' book':' books')+' so far. Last update added '+add.length+' and removed '+rem.length+'. Full cards appear when the search ends.';
    showRanked(1,false);
@@ -1023,26 +1217,26 @@ $('#find').onclick=async()=>{
   /* One search per tag, then pairs of the five heaviest tags, which find books that match several tags at once. */
   const jobs=use.map(t=>({label:t.name+' ('+(t.w>=4?'exact':'fuzzy')+')',q:subjectQuery(t),limit:10+t.w*6}));
   const top=use.slice(0,5);
-  for(let a=0;a<top.length;a++)for(let b=a+1;b<top.length;b++)jobs.push({label:top[a].name+' and '+top[b].name+' together',q:'('+subjectQuery(top[a])+') AND ('+subjectQuery(top[b])+')',limit:30});
+  for(let a=0;a<top.length;a++){for(let b=a+1;b<top.length;b++){jobs.push({label:top[a].name+' and '+top[b].name+' together',q:'('+subjectQuery(top[a])+') AND ('+subjectQuery(top[b])+')',limit:30});}}
   try{
    for(let i=0;i<jobs.length&&!STOP;i++){
     f.textContent='Searching '+(i+1)+' of '+jobs.length+': '+jobs[i].label+'.'+summary;
     let got=false;
     try{const j=await fetchQ(jobs[i].q,jobs[i].limit);(j.docs||[]).forEach(d=>pool.set(d.key,d));done++;got=true}catch{failed++}
-    if(got)step(jobs[i].label);
-    if(i<jobs.length-1&&!STOP)await sleep(PACE);
+    if(got){step(jobs[i].label);}
+    if(i<jobs.length-1&&!STOP){await sleep(PACE);}
    }
    LIVE=false;FRESH=new Set();LASTSIG=null;
    if(!done&&failed){RK=keep.RK;LAST=keep.LAST;showRanked(1,false);f.textContent='The search failed. Check your connection. Open Library may also refuse requests from this page.';return}
    LAST=[[...pool.values()].map(slim),tags,books,black,skipped,failed];
    saveLast();
    rank(...LAST);
-   if(STOP)f.textContent+=' Search stopped after '+done+' of '+jobs.length+' searches.';
+   if(STOP){f.textContent+=' Search stopped after '+done+' of '+jobs.length+' searches.';}
   }catch{LIVE=false;showRanked(1,false);f.textContent='The search failed. Check your connection. Open Library may also refuse requests from this page.'}
-  finally{LIVE=false;BUSY=false;$('#stop').hidden=true;$('#flogbox').hidden=true;if(STOP)f.focus()}
+  finally{LIVE=false;BUSY=false;$('#stop').hidden=true;$('#flogbox').hidden=true;if(STOP){f.focus()}}
  };
  /* Holding a Web Lock asks the browser not to freeze or suspend the page while the search runs. */
- if(navigator.locks){try{await navigator.locks.request('skathach-find',run)}catch{if(BUSY)await run()}}else await run();
+ if(navigator.locks){try{await navigator.locks.request('skathach-find',run)}catch{if(BUSY){await run()}}}else {await run();}
 };
 
 function rank(c,tags,books,black,skipped,failed){
@@ -1058,9 +1252,9 @@ function rank(c,tags,books,black,skipped,failed){
  const matches=d=>{
   const subs=(d.subject||[]).map(norm),ti=norm(d.title),r=[];
   tn.forEach(({t,n})=>{
-   if(subs.includes(n))r.push({t,m:1,how:'exact'});
-   else if(subs.some(x=>has(x,n)))r.push({t,m:.6,how:'partial'});
-   else if(has(ti,n))r.push({t,m:.35,how:'title'});
+   if(subs.includes(n)){r.push({t,m:1,how:'exact'});}
+   else if(subs.some(x=>has(x,n))){r.push({t,m:.6,how:'partial'});}
+   else if(has(ti,n)){r.push({t,m:.35,how:'title'});}
   });
   return r;
  };
@@ -1081,9 +1275,9 @@ function rank(c,tags,books,black,skipped,failed){
  const rec=new Map(),own=new Map(),lib=[];
  books.forEach((b,i)=>{
   const r=decay(nb-1-i)*(b.dnf?.25:1),subs=(b.subjects||[]).map(norm),au=(b.authors||[]).map(norm).filter(Boolean);
-  tn.forEach(({t,n})=>{if(subs.some(x=>x===n||has(x,n)))rec.set(t.name,Math.max(rec.get(t.name)||0,r))});
+  tn.forEach(({t,n})=>{if(subs.some(x=>x===n||has(x,n))){rec.set(t.name,Math.max(rec.get(t.name)||0,r))}});
   /* A book you did not finish says little about your taste: its tags count a quarter as much, its author earns no bonus and its sequels get no series boost. */
-  if(!b.dnf)au.forEach(k=>{const o=own.get(k)||{n:0,title:'',r:-1};o.n++;if(r>=o.r){o.r=r;o.title=b.title}own.set(k,o)});
+  if(!b.dnf){au.forEach(k=>{const o=own.get(k)||{n:0,title:'',r:-1};o.n++;if(r>=o.r){o.r=r;o.title=b.title}own.set(k,o)});}
   lib.push({title:b.title,au,tk:toks(b.title),r:decay(nb-1-i),dnf:!!b.dnf});
  });
  /* Tags that appear in books you added recently count up to 20 percent more. */
@@ -1097,7 +1291,7 @@ function rank(c,tags,books,black,skipped,failed){
  const collab=d=>{const n=d.ratings_count||0,a=d.ratings_average||0;return((n>0&&a?(n*a+8*3.5)/(n+8):3.5)-1)/4};
  /* Publication recency: a gentle decay (rate 1/15 per year) that never takes a book below 92 percent. Classics do not decay. */
  const yearNow=new Date().getFullYear();
- const recency=d=>{const y=d.first_publish_year;if(!y)return 1;const lam=(d.subject||[]).some(x=>hit(x,['classic','classics']))?0:1/15;return .92+.08*Math.exp(-lam*Math.max(0,yearNow-y))};
+ const recency=d=>{const y=d.first_publish_year;if(!y){return 1;}const lam=(d.subject||[]).some(x=>hit(x,['classic','classics']))?0:1/15;return .92+.08*Math.exp(-lam*Math.max(0,yearNow-y))};
  /* Exposure P(i): editions and ratings stand in for how often a book has been shown, scaled so the most exposed candidate is 1. */
  const popOf=d=>Math.log10(2+(d.edition_count||0)+2*(d.ratings_count||0));
  const pMax=Math.max(.5,...c.map(popOf));
@@ -1107,12 +1301,12 @@ function rank(c,tags,books,black,skipped,failed){
  /* Series: same author and a title that shares its key words with a book you own. Newer library books count more. */
  const seriesOf=d=>{
   const au=(d.author_name||[]).map(norm),tk=toks(d.title);let best=null;
-  if(!tk.size)return null;
+  if(!tk.size){return null;}
   lib.forEach(b=>{
-   if(b.dnf||!b.tk.size||!b.au.some(a=>au.includes(a)))return;
-   let k=0;tk.forEach(w=>{if(b.tk.has(w))k++});
+   if(b.dnf||!b.tk.size||!b.au.some(a=>au.includes(a))){return;}
+   let k=0;tk.forEach(w=>{if(b.tk.has(w)){k++}});
    const j=k/(tk.size+b.tk.size-k);
-   if(((k>=2&&j>=.4)||(k>=1&&j>=.5))&&(!best||b.r>best.r))best={title:b.title,r:b.r};
+   if(((k>=2&&j>=.4)||(k>=1&&j>=.5))&&(!best||b.r>best.r)){best={title:b.title,r:b.r};}
   });
   return best;
  };
@@ -1133,27 +1327,27 @@ function rank(c,tags,books,black,skipped,failed){
   s*=f*recency(d);
   /* Series continuity: a likely sequel to the newest book in your library gets x(1 + 0.5). A sequel to an older book gets a smaller step, never under 0.1. */
   const se=seriesOf(d);
-  if(se)s*=1+Math.max(.1,DELTA*se.r);
+  if(se){s*=1+Math.max(.1,DELTA*se.r);}
   /* Popularity debiasing. Truncated inverse propensity weight 1/max(P, 0.4), set against the median book and raised to the power BPOP = 0.35 (the steepness of the penalty), clipped to 85 to 120 percent. Then the log-Q term: s - ETA x ln P, which is largest for the least exposed books. Both are off for a small library. */
   const P=Pof(d);
   if(!cold){s*=Math.min(1.2,Math.max(.85,Math.pow(ipsW(P)/ipsW(Pmed),BPOP)));s-=ETA*Math.log(P)}
   /* Authors you own more books by count for more. */
   const au=(d.author_name||[]).map(a=>own.get(norm(a))).filter(Boolean).sort((a,b)=>b.n-a.n||b.r-a.r)[0];
-  if(au)s+=Math.min(.15,.06+.03*au.n);
+  if(au){s+=Math.min(.15,.06+.03*au.n);}
   /* Cold start: with a small library, a little weight goes to well-known books. */
-  if(cold)s+=.12*Math.min(1,popOf(d)/3);
+  if(cold){s+=.12*Math.min(1,popOf(d)/3);}
   /* Excluded tags lower the score by how strongly they match: exact x0.4, inside a subject x0.7, title only x0.85. */
-  if(ex.length)s*=Math.max(.15,ex.reduce((a,x)=>a*(x.m>=1?.4:x.m>=.6?.7:.85),1));
+  if(ex.length){s*=Math.max(.15,ex.reduce((a,x)=>a*(x.m>=1?.4:x.m>=.6?.7:.85),1));}
   const top=pos.slice().sort((a,b)=>we(b.t)*b.m-we(a.t)*a.m).slice(0,3).map(x=>x.t.name);
   const why=['it matches your '+(top.length>1?'tags ':'tag ')+nm(top)];
-  if(au)why.push('you own “'+au.title+'” by the same author');
-  if(se)why.push('it looks like it continues the series of “'+se.title+'”');
-  if(!cold&&P<.3)why.push('it is less widely read than most of the results');
+  if(au){why.push('you own “'+au.title+'” by the same author');}
+  if(se){why.push('it looks like it continues the series of “'+se.title+'”');}
+  if(!cold&&P<.3){why.push('it is less widely read than most of the results');}
   return{d,ms,off,au:!!au,ex,n:pos.length,rel:s,P,se:!!se,pin:!!se&&se.r>=.999,sc:Math.round(Math.min(1,s)*100),why:'Recommended because '+why.join('; ')+'.'};
  }).filter(o=>o.sc>0&&o.n>=MINT).sort((a,b)=>b.rel-a.rel||b.n-a.n);
  /* One result per book: different works with the same title and author count once. The best 50 go on to Stage 3. */
  const seen=new Set();
- const pool=out.filter(o=>{const k=norm(o.d.title)+'|'+norm((o.d.author_name||[])[0]);if(seen.has(k))return false;seen.add(k);return true}).slice(0,50);
+ const pool=out.filter(o=>{const k=norm(o.d.title)+'|'+norm((o.d.author_name||[])[0]);if(seen.has(k)){return false;}seen.add(k);return true}).slice(0,50);
  /* ---- Stage 3: shelf curation (spec 5.1 to 5.3) ----
     1. Similarity: cosine similarity of subject vectors (1 if a subject is present, else 0).
     2. Intent-bound clusters: average-linkage clustering of the 50 books, merging groups while their mean similarity is at least 0.3.
@@ -1164,22 +1358,22 @@ function rank(c,tags,books,black,skipped,failed){
     4. Rules: a likely sequel to your newest book goes in first, no author appears more than twice, and no more than three books are series sequels (series lock-in). */
  const SHELF=20,LAM=.75,CAP=2,SCAP=3,CL_T=.3,n=pool.length,MODE=S.mode==='mmr'?'mmr':'dpp';
  const sv=pool.map(o=>new Set((o.d.subject||[]).map(norm).filter(Boolean)));
- const cosS=(i,j)=>{if(!sv[i].size||!sv[j].size)return 0;let k=0;sv[i].forEach(x=>{if(sv[j].has(x))k++});return k/Math.sqrt(sv[i].size*sv[j].size)};
+ const cosS=(i,j)=>{if(!sv[i].size||!sv[j].size){return 0;}let k=0;sv[i].forEach(x=>{if(sv[j].has(x)){k++}});return k/Math.sqrt(sv[i].size*sv[j].size)};
  const raw=Array.from({length:n},()=>new Float64Array(n));
- for(let i=0;i<n;i++)for(let j=i+1;j<n;j++)raw[i][j]=raw[j][i]=cosS(i,j);
- let groups=pool.map((o,i)=>[i]);
+ for(let i=0;i<n;i++){for(let j=i+1;j<n;j++){raw[i][j]=raw[j][i]=cosS(i,j);}}
+ const groups=pool.map((o,i)=>[i]);
  for(;;){
   let bi=-1,bj=-1,bv=CL_T;
-  for(let a=0;a<groups.length;a++)for(let b=a+1;b<groups.length;b++){
+  for(let a=0;a<groups.length;a++){for(let b=a+1;b<groups.length;b++){
    let t=0;groups[a].forEach(x=>groups[b].forEach(y=>{t+=raw[x][y]}));
    const v=t/(groups[a].length*groups[b].length);
    if(v>bv){bv=v;bi=a;bj=b}
-  }
-  if(bi<0)break;
+  }}
+  if(bi<0){break;}
   groups[bi]=groups[bi].concat(groups[bj]);groups.splice(bj,1);
  }
  const cl=new Array(n).fill(0),inPool=new Map(),label=new Map();
- pool.forEach(o=>(o.d.subject||[]).forEach(x=>{const k=norm(x);if(k){inPool.set(k,(inPool.get(k)||0)+1);if(!label.has(k))label.set(k,x)}}));
+ pool.forEach(o=>(o.d.subject||[]).forEach(x=>{const k=norm(x);if(k){inPool.set(k,(inPool.get(k)||0)+1);if(!label.has(k)){label.set(k,x)}}}));
  groups.forEach((g,k)=>{
   const c2=new Map();g.forEach(i=>{cl[i]=k;sv[i].forEach(x=>c2.set(x,(c2.get(x)||0)+1))});
   let best='',bs=-9;c2.forEach((v,x)=>{const sc=v/g.length-.5*inPool.get(x)/n;if(sc>bs){bs=sc;best=x}});
@@ -1191,21 +1385,21 @@ function rank(c,tags,books,black,skipped,failed){
   pool.forEach((o,i)=>{if(strength[cl[i]]>=med2&&o.P<Pmed){o.rel*=1+.1*(1-o.P/Pmed);o.sc=Math.round(Math.min(1,o.rel)*100)}});
  }
  const Sm=Array.from({length:n},()=>new Float64Array(n));
- for(let i=0;i<n;i++){Sm[i][i]=1;for(let j=i+1;j<n;j++)if(cl[i]===cl[j])Sm[i][j]=Sm[j][i]=.97*raw[i][j]}
+ for(let i=0;i<n;i++){Sm[i][i]=1;for(let j=i+1;j<n;j++){if(cl[i]===cl[j]){Sm[i][j]=Sm[j][i]=.97*raw[i][j]}}}
  const aa=pool.map(o=>(o.d.author_name||[]).map(norm).filter(Boolean));
  const cnt=new Map(),sel=[],used=new Set(),forced=pool.map((o,i)=>i).filter(i=>pool[i].pin).slice(0,2);
  let nser=0;
  const ok=i=>!used.has(i)&&!aa[i].some(a=>(cnt.get(a)||0)>=CAP)&&!(pool[i].se&&nser>=SCAP);
- const take=j=>{used.add(j);sel.push(j);aa[j].forEach(a=>cnt.set(a,(cnt.get(a)||0)+1));if(pool[j].se)nser++};
+ const take=j=>{used.add(j);sel.push(j);aa[j].forEach(a=>cnt.set(a,(cnt.get(a)||0)+1));if(pool[j].se){nser++}};
  let order;
  if(MODE==='mmr'){
   const mx=new Float64Array(n);
   while(sel.length<Math.min(SHELF,n)){
    let j=forced.find(ok);
-   if(j===undefined){j=-1;let bv=-1e9;for(let i=0;i<n;i++)if(ok(i)){const v=LAM*pool[i].rel-(1-LAM)*mx[i];if(v>bv){bv=v;j=i}}}
-   if(j<0)break;
+   if(j===undefined){j=-1;let bv=-1e9;for(let i=0;i<n;i++){if(ok(i)){const v=LAM*pool[i].rel-(1-LAM)*mx[i];if(v>bv){bv=v;j=i}}}}
+   if(j<0){break;}
    take(j);
-   for(let i=0;i<n;i++)if(!used.has(i))mx[i]=Math.max(mx[i],Sm[j][i]);
+   for(let i=0;i<n;i++){if(!used.has(i)){mx[i]=Math.max(mx[i],Sm[j][i]);}}
   }
   order=sel;
  }else{
@@ -1213,14 +1407,14 @@ function rank(c,tags,books,black,skipped,failed){
   const d2=qq.map(v=>v*v),cv=pool.map(()=>[]);
   while(sel.length<Math.min(SHELF,n)){
    let j=forced.find(ok);
-   if(j===undefined){j=-1;let bv=1e-12;for(let i=0;i<n;i++)if(ok(i)&&d2[i]>bv){bv=d2[i];j=i}}
-   if(j<0)break;
+   if(j===undefined){j=-1;let bv=1e-12;for(let i=0;i<n;i++){if(ok(i)&&d2[i]>bv){bv=d2[i];j=i}}}
+   if(j<0){break;}
    take(j);
    const dj=Math.sqrt(Math.max(d2[j],1e-12));
-   for(let i=0;i<n;i++)if(!used.has(i)){
-    let dt=0;for(let k=0;k<cv[j].length;k++)dt+=cv[j][k]*cv[i][k];
+   for(let i=0;i<n;i++){if(!used.has(i)){
+    let dt=0;for(let k=0;k<cv[j].length;k++){dt+=cv[j][k]*cv[i][k];}
     const e=(qq[j]*qq[i]*Sm[j][i]-dt)/dj;cv[i].push(e);d2[i]-=e*e;
-   }
+   }}
   }
   const rest=sel.slice(),mx=new Map(sel.map(i=>[i,0]));order=[];
   while(rest.length){
@@ -1231,8 +1425,8 @@ function rank(c,tags,books,black,skipped,failed){
   }
  }
  RK=order.map(i=>pool[i]);
- if(cold)NOTE=(NOTE?NOTE.trim()+' ':'')+'Your library or tag list is small, so well-known books got a small boost.';
- if(LIVE)return;
+ if(cold){NOTE=(NOTE?NOTE.trim()+' ':'')+'Your library or tag list is small, so well-known books got a small boost.';}
+ if(LIVE){return;}
  showRanked(1,false);
 }
 /* Milliseconds between searches. Slow on purpose, so the Open Library limit is never reached and the list has time to update. */
@@ -1242,7 +1436,7 @@ let RPAGE=1,RK=[],MINT=2,NOTE='',LAST=null,LIVE=false,FRESH=new Set(),LASTSIG=nu
 /* The last search is kept in this browser so that a reload does not lose a long search. Only the fields the ranking and the cards use are kept. */
 const slim=d=>({key:d.key,title:d.title,author_name:(d.author_name||[]).slice(0,4),first_publish_year:d.first_publish_year,subject:(d.subject||[]).slice(0,25),isbn:(d.isbn||[]).slice(0,6),ebook_access:d.ebook_access,cover_i:d.cover_i,cover_edition_key:d.cover_edition_key,edition_count:d.edition_count,ratings_average:d.ratings_average,ratings_count:d.ratings_count});
 function saveLast(){
- if(!LAST)return;
+ if(!LAST){return;}
  try{localStorage.setItem('skathach-last',JSON.stringify({when:Date.now(),c:LAST[0],tags:LAST[1],books:LAST[2],black:LAST[3],skipped:LAST[4],failed:LAST[5]}))}
  catch(e){console.warn('Skathach: the search results could not be saved in this browser.',e)}
 }
@@ -1256,7 +1450,7 @@ function showRanked(page,focus){
   /* While a search runs, only a grid of covers is shown. The full cards come when it ends. */
   $('#results').hidden=true;$('#rpager').hidden=true;$('#cgrid').hidden=false;
   const sig=RK.map(o=>o.d.key+(FRESH.has(o.d.key)?'*':'')).join('|');
-  if(sig===LASTSIG)return;LASTSIG=sig;
+  if(sig===LASTSIG){return;}LASTSIG=sig;
   /* Each book keeps its own tile, so a cover that has loaded is not fetched again when the grid changes. */
   const tiles=RK.map(o=>{
    const d=o.d,isNew=FRESH.has(d.key);
@@ -1269,15 +1463,15 @@ function showRanked(page,focus){
    }
    li.classList.toggle('cgrid__item--new',isNew);
    const bd=li.querySelector('.badge');
-   if(isNew&&!bd)li.insertAdjacentHTML('beforeend','<span class="badge badge--info">New</span>');
-   if(!isNew&&bd)bd.remove();
+   if(isNew&&!bd){li.insertAdjacentHTML('beforeend','<span class="badge badge--info">New</span>');}
+   if(!isNew&&bd){bd.remove();}
    return li;
   });
   $('#cgrid').replaceChildren(...tiles);
   return;
  }
  $('#cgrid').hidden=true;$('#cgrid').innerHTML='';GRID.clear();$('#results').hidden=false;
- if(!LIVE)f.textContent=RK.length?'Found '+RK.length+' books that match at least '+(MINT>1?'two tags':'one tag')+', ordered by match with some variety. Page '+page+' of '+pages+'.'+(NOTE?' '+NOTE.trim():''):'No books matched at least '+(MINT>1?'two':'one')+' of your tags. Try other tags.'+(NOTE?' '+NOTE.trim():'');
+ if(!LIVE){f.textContent=RK.length?'Found '+RK.length+' books that match at least '+(MINT>1?'two tags':'one tag')+', ordered by match with some variety. Page '+page+' of '+pages+'.'+(NOTE?' '+NOTE.trim():''):'No books matched at least '+(MINT>1?'two':'one')+' of your tags. Try other tags.'+(NOTE?' '+NOTE.trim():'');}
  $('#results').setAttribute('start',(page-1)*per+1);
  $('#results').style.counterReset='card '+((page-1)*per);
  const how={exact:' (exact)',partial:' (partial)',title:' (title only)'};
@@ -1301,7 +1495,7 @@ function showRanked(page,focus){
  $('#results').querySelectorAll('[data-preview-slot]').forEach(slot=>addPreviewButton(slot,slot.dataset.previewSlot,slot.dataset.title));
  loadBlurbs();
  pager('#rpager',page,pages,'rpg');
- if(focus)f.focus();
+ if(focus){f.focus();}
 }
 
 /* Confirm the exact ISBN against Google Books metadata before offering an embedded preview. */
@@ -1309,15 +1503,15 @@ const GB_CACHE=new Map();
 function normalizeISBN(value){return String(value||'').replace(/[^0-9X]/gi,'').toUpperCase()}
 async function googleBookInfo(isbn){
  const key=normalizeISBN(isbn);
- if(!key)return null;
+ if(!key){return null;}
  return cachedPromise(GB_CACHE,key,async()=>{
   try{
    await gate('google');const r=await fetch('https://www.googleapis.com/books/v1/volumes?q='+encodeURIComponent('isbn:'+key)+'&maxResults=10');
-   if(!r.ok){if(r.status===429)GATES.google.at=Date.now()+6e4;return null}
+   if(!r.ok){if(r.status===429){GATES.google.at=Date.now()+6e4;}return null}
    const j=await r.json(),items=Array.isArray(j.items)?j.items:[];
    /* Search results are not guaranteed to put the exact matching volume first. */
    const item=items.find(v=>(v.volumeInfo?.industryIdentifiers||[]).some(id=>normalizeISBN(id.identifier)===key));
-   if(!item)return null;
+   if(!item){return null;}
    const access=item.accessInfo||{};
    return {embeddable:access.embeddable===true};
   }catch{return null}
@@ -1325,9 +1519,9 @@ async function googleBookInfo(isbn){
 }
 async function addPreviewButton(slot,isbn,title){
  const info=await googleBookInfo(isbn);
- if(!slot.isConnected)return;
+ if(!slot.isConnected){return;}
  /* Fail closed: never offer Preview unless Google's API explicitly confirms embeddability. */
- if(!info||info.embeddable!==true)return;
+ if(!info||info.embeddable!==true){return;}
  const b=document.createElement('button');b.type='button';b.dataset.a='pv';b.dataset.v=isbn;b.dataset.t=title;b.textContent='Preview '+title;
  slot.replaceWith(b);
 }
@@ -1339,7 +1533,7 @@ function blurbText(desc){
  let t=typeof desc==='string'?desc:(desc&&typeof desc.value==='string'?desc.value:'');
  t=t.replace(/\r\n?/g,'\n');
  const dash=t.search(/^[ \t]*-{5,}[ \t]*$/m);
- if(dash>0)t=t.slice(0,dash);
+ if(dash>0){t=t.slice(0,dash);}
  return t.replace(/\(\s*\[source\]\s*(?:\[\d*\]|\([^)]*\))\s*\)/gi,'')
   .replace(/^[ \t]*\[\d+\]:.*$/gm,'')
   .replace(/\[([^\]]+)\](?:\[\d*\]|\([^)]*\))/g,'$1')
@@ -1349,27 +1543,27 @@ function blurbText(desc){
 /* The capped text is 255 characters or fewer, including the ellipsis, and ends on a whole word where it can. */
 function capBlurb(t){
  const flat=t.replace(/\s+/g,' ').trim();
- if(flat.length<=BLURB_CAP)return{short:flat,cut:false};
+ if(flat.length<=BLURB_CAP){return{short:flat,cut:false};}
  let s=flat.slice(0,BLURB_CAP-1);
  const sp=s.lastIndexOf(' ');
- if(sp>BLURB_CAP*.6)s=s.slice(0,sp);
+ if(sp>BLURB_CAP*.6){s=s.slice(0,sp);}
  s=s.replace(/[\ud800-\udbff]$/,'').replace(/[\s,;:.\-]+$/,'');
  return{short:s+'\u2026',cut:true};
 }
 /* One book at a time, so ten cards do not send ten requests at once. A book with no blurb keeps its "Recommended because" line. */
 async function loadBlurbs(){
  for(const p of $('#results').querySelectorAll('p[data-work]')){
-  if(!p.isConnected)break;
+  if(!p.isConnected){break;}
   const wd=await workData(p.dataset.work);
-  if(!p.isConnected)continue;
+  if(!p.isConnected){continue;}
   /* A card that started with no usable cover URL gets the work's own covers. Earlier failures are forgotten so they are tried again. */
   const sp=p.closest('.card')?.querySelector('.book span.cv.nocv[data-work]');
   if(sp&&wd){const l=idsToUrls(wd.covers);if(l.length){l.forEach(u=>BAD.delete(u));sp.outerHTML=cov(l,sp.dataset.title,sp.dataset.isbn,sp.dataset.work)}}
   const text=wd?blurbText(wd.description):'';
-  if(!text)continue;
+  if(!text){continue;}
   const{short,cut}=capBlurb(text);
   p.textContent=short;
-  if(!cut)continue;
+  if(!cut){continue;}
   const key=p.dataset.work;
   BLURBS.set(key,{title:p.dataset.title,text});
   p.dataset.blurb=key;p.classList.add('why--more');
@@ -1381,20 +1575,20 @@ async function loadBlurbs(){
 }
 function openBlurb(key,opener){
  const b=BLURBS.get(key),dlg=$('#bl');
- if(!b||dlg.open)return;
+ if(!b||dlg.open){return;}
  $('#blt').textContent='Blurb for '+b.title;
  $('#blb').replaceChildren(...b.text.split(/\n{2,}/).map(x=>x.trim()).filter(Boolean).map(x=>{const q=document.createElement('p');q.textContent=x;return q}));
  /* Focus goes back to the button that opened the dialog, if it is still on the page. */
- dlg.addEventListener('close',()=>{if(opener&&opener.isConnected)opener.focus()},{once:true});
+ dlg.addEventListener('close',()=>{if(opener&&opener.isConnected){opener.focus()}},{once:true});
  dlg.showModal();
  dlg.scrollTop=0;
 }
 $('#blc').onclick=()=>$('#bl').close();
 /* A tap or click on the backdrop closes the dialog. Escape and the Close blurb button also work. */
 $('#bl').addEventListener('click',e=>{
- if(e.target!==e.currentTarget)return;
+ if(e.target!==e.currentTarget){return;}
  const r=e.currentTarget.getBoundingClientRect();
- if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)e.currentTarget.close();
+ if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom){e.currentTarget.close();}
 });
 /* ---------- Library import and export: opened by pressing and holding the Library tab ---------- */
 const LM=$('#lm'),LMS=$('#lms'),LME=$('#lme');
@@ -1402,9 +1596,9 @@ const lmSay=t=>{LME.textContent='';LME.hidden=true;LMS.textContent=t};
 const lmFail=t=>{LMS.textContent='';LME.textContent=t;LME.hidden=false};
 let holdFired=false;
 function openLibMenu(opener){
- if(LM.open)return;
+ if(LM.open){return;}
  lmSay('');
- LM.addEventListener('close',()=>{holdFired=false;if(opener&&opener.isConnected)opener.focus()},{once:true});
+ LM.addEventListener('close',()=>{holdFired=false;if(opener&&opener.isConnected){opener.focus()}},{once:true});
  LM.showModal();
 }
 (function(){
@@ -1412,11 +1606,11 @@ function openLibMenu(opener){
  let timer=null,sx=0,sy=0;
  const cancel=()=>{clearTimeout(timer);timer=null};
  tab.addEventListener('pointerdown',e=>{
-  if(e.pointerType==='mouse'&&e.button!==0)return;
+  if(e.pointerType==='mouse'&&e.button!==0){return;}
   holdFired=false;cancel();sx=e.clientX;sy=e.clientY;
   timer=setTimeout(()=>{timer=null;holdFired=true;openLibMenu(tab)},550);
  });
- tab.addEventListener('pointermove',e=>{if(timer&&Math.hypot(e.clientX-sx,e.clientY-sy)>10)cancel()});
+ tab.addEventListener('pointermove',e=>{if(timer&&Math.hypot(e.clientX-sx,e.clientY-sy)>10){cancel()}});
  ['pointerup','pointercancel','pointerleave'].forEach(t=>tab.addEventListener(t,cancel));
  /* A press that opened the menu must not also open the Library view. */
  tab.addEventListener('click',e=>{if(holdFired){e.preventDefault();holdFired=false}});
@@ -1426,9 +1620,9 @@ function openLibMenu(opener){
 })();
 $('#lmc').onclick=()=>LM.close();
 LM.addEventListener('click',e=>{
- if(e.target!==e.currentTarget)return;
+ if(e.target!==e.currentTarget){return;}
  const r=e.currentTarget.getBoundingClientRect();
- if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)e.currentTarget.close();
+ if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom){e.currentTarget.close();}
 });
 function exportLibrary(){
  if(!S.books.length){lmFail('Your library is empty, so there is nothing to export.');return}
@@ -1444,14 +1638,14 @@ const lmStr=(v,max)=>typeof v==='string'?v.trim().slice(0,max):'';
 const lmUrl=v=>{v=lmStr(v,500);return /^https:\/\//i.test(v)?v:''};
 const lmList=(v,n,max)=>Array.isArray(v)?v.map(x=>lmStr(x,max)).filter(Boolean).slice(0,n):[];
 function cleanBook(b){
- if(!b||typeof b!=='object')return null;
- const title=lmStr(b.title,300);if(!title)return null;
+ if(!b||typeof b!=='object'){return null;}
+ const title=lmStr(b.title,300);if(!title){return null;}
  const covers=(Array.isArray(b.covers)?b.covers:[]).map(lmUrl).filter(Boolean).slice(0,6);
  const cover=lmUrl(b.cover)||covers[0]||'';
  return {id:/^\/works\/OL\w+$/.test(lmStr(b.id,40))?lmStr(b.id,40):'',isbn:isbn13(lmStr(b.isbn,20))||'',title,authors:lmList(b.authors,20,200),subjects:lmList(b.subjects,50,100),cover,covers};
 }
 async function importLibrary(file){
- if(!file)return;
+ if(!file){return;}
  if(file.size>5*1024*1024){lmFail('That file is larger than 5 megabytes, so it was not read.');return}
  let data;
  try{data=JSON.parse(await file.text())}catch{lmFail('That file could not be read as a library file.');return}
@@ -1466,9 +1660,9 @@ async function importLibrary(file){
  });
  if(added){save();draw()}
  const parts=['Imported '+added+(added===1?' book':' books')+'.'];
- if(dupes)parts.push(dupes+(dupes===1?' was':' were')+' already in your library.');
- if(bad)parts.push(bad+(bad===1?' entry':' entries')+' could not be used.');
- if(list.length>5000)parts.push('Only the first 5000 entries were read.');
+ if(dupes){parts.push(dupes+(dupes===1?' was':' were')+' already in your library.');}
+ if(bad){parts.push(bad+(bad===1?' entry':' entries')+' could not be used.');}
+ if(list.length>5000){parts.push('Only the first 5000 entries were read.');}
  lmSay(parts.join(' '));
 }
 $('#lmx').onclick=exportLibrary;
@@ -1480,18 +1674,18 @@ const BOOKS_JS='https://www.google.com/books/jsapi.js';
    Here the script is added later, on the first click, after the page has already loaded, so that callback may never run.
    The loader's own callback option and a short check for the viewer class are backups. Whichever answers first wins. */
 function loadBooksApi(){
- if(gReady)return Promise.resolve();
- if(gScriptPromise)return gScriptPromise;
+ if(gReady){return Promise.resolve();}
+ if(gScriptPromise){return gScriptPromise;}
  gScriptPromise=new Promise((resolve,reject)=>{
   let done=false,poll=null,wait=null;
   const stop=()=>{done=true;clearInterval(poll);clearTimeout(wait)};
-  const ok=()=>{if(done)return;stop();gReady=true;resolve()};
-  const bad=e=>{if(done)return;stop();reject(e)};
+  const ok=()=>{if(done){return;}stop();gReady=true;resolve()};
+  const bad=e=>{if(done){return;}stop();reject(e)};
   const s=document.createElement('script');
   s.src=BOOKS_JS;
   s.onload=()=>{
    try{google.books.load({callback:ok});google.books.setOnLoadCallback(ok)}catch(e){bad(e);return}
-   wait=setTimeout(()=>{let n=0;poll=setInterval(()=>{if(window.google&&google.books&&typeof google.books.DefaultViewer==='function')ok();else if(++n>40)bad(new Error('The Google Books viewer did not start.'))},250)},1500);
+   wait=setTimeout(()=>{let n=0;poll=setInterval(()=>{if(window.google&&google.books&&typeof google.books.DefaultViewer==='function'){ok();}else if(++n>40){bad(new Error('The Google Books viewer did not start.'))}},250)},1500);
   };
   s.onerror=()=>bad(new Error('The Google Books script did not load.'));
   document.head.append(s);
@@ -1507,11 +1701,11 @@ function preview(isbn,title){
  const bookUrl='https://books.google.com/books?vid=ISBN'+encodeURIComponent(isbn);
  let settled=false;
  const fallback=()=>{
-  if(settled)return;settled=true;clearTimeout(previewTimer);viewer.textContent='';
+  if(settled){return;}settled=true;clearTimeout(previewTimer);viewer.textContent='';
   m.replaceChildren(document.createTextNode('The embedded preview did not load. '));
   const a=document.createElement('a');a.href=bookUrl;a.textContent='Open on Google Books';a.target='_blank';a.rel='noopener noreferrer';m.append(a);
  };
- const success=()=>{if(settled)return;settled=true;clearTimeout(previewTimer);m.textContent=''};
+ const success=()=>{if(settled){return;}settled=true;clearTimeout(previewTimer);m.textContent=''};
  clearTimeout(previewTimer);
  previewTimer=setTimeout(fallback,20000);
  /* As in the guide: make the viewer, then load the book with a not found callback and a success callback. */
@@ -1524,14 +1718,14 @@ $('#pvc').onclick=()=>$('#pv').close();
 const VIEWS={library:['h-shelf','Library'],reading:['h-reading','Reading list'],add:['h-add','Add books'],tags:['h-tags','Tags'],blacklist:['h-black','Blacklist'],find:['h-find','Find books']};
 function show(focus){
  let v=location.hash.slice(1);
- if(!VIEWS[v])v=S.books.length?'library':'add';
+ if(!VIEWS[v]){v=S.books.length?'library':'add';}
  Object.keys(VIEWS).forEach(k=>{$('#v-'+k).hidden=k!==v});
- document.querySelectorAll('.tabs a').forEach(a=>{if(a.dataset.v===v)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current')});
+ document.querySelectorAll('.tabs a').forEach(a=>{if(a.dataset.v===v){a.setAttribute('aria-current','page');}else {a.removeAttribute('aria-current')}});
  document.title=VIEWS[v][1]+' | Skathach';
- if(focus)$('#'+VIEWS[v][0]).focus();
+ if(focus){$('#'+VIEWS[v][0]).focus();}
 }
 $('#fmode').value=S.mode;
-$('#fmode').onchange=e=>{S.mode=e.target.value==='mmr'?'mmr':'dpp';save();if(LAST&&!BUSY)rank(...LAST)};
+$('#fmode').onchange=e=>{S.mode=e.target.value==='mmr'?'mmr':'dpp';save();if(LAST&&!BUSY){rank(...LAST)}};
 window.onhashchange=()=>show(true);
 draw();
 show(false);
@@ -1543,6 +1737,6 @@ try{
   $('#fstatus').textContent+=' These results are saved from your search on '+new Date(r.when).toLocaleString('en-GB')+'.';
  }
 }catch(e){console.warn('Skathach: the saved search results could not be read.',e)}
-</script>
-</body>
+        </script>
+    </body>
 </html>
