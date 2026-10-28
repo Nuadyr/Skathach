@@ -478,6 +478,10 @@ ul.cards, ol.cards { list-style: none; padding: 0; }
 /* The Library tab opens the import and export menu on a long press, so its text cannot be selected and no touch menu opens. */
 .tabs a[data-v="library"] { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
 
+/* Row lists (tags, blacklist). A grid column with no set width grows to its widest row, which pushed rows past the panel edge on a narrow screen. */
+.tags { grid-template-columns: minmax(0, 1fr); }
+.tags > li { min-inline-size: 0; }
+
 /* Books: cover plus details */
 .book { display: flex; align-items: flex-start; gap: var(--s-3); }
 .book__body { flex: 1; min-inline-size: 0; display: grid; gap: var(--s-3); justify-items: start; }
@@ -550,7 +554,7 @@ img.cv { block-size: auto; aspect-ratio: 2 / 3; object-fit: contain; overflow: h
         <main id="main" tabindex="-1">
             <header class="site-header">
                 <h1>Skathach book finder</h1>
-                <p class="lede">Build a library of books you know. Tag it. Then find more books to read. Comics and graphic novels work too. Add books by title, author, series or International Standard Book Number (ISBN).</p>
+                <p class="lede">Tell Skathach which books you’ve enjoyed, tag them, and it will suggest what to read next. It works for comics, graphic novels and manga too, and you can add books by title, author, series or International Standard Book Number (ISBN).</p>
                 <nav aria-label="Main">
                     <ul class="tabs">
                         <li><a href="#library" data-v="library">Library</a></li>
