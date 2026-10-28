@@ -7,14 +7,17 @@
 
         <!--
             Skathach book finder. Single file, no build step, no dependencies.
-            Built on the Aengus design system by Nuadyr.
+            Built on the Aengus boilerplate by Nuadyr.
 
-            RULES AENGUS FOLLOWS
+            RULES THIS KIT FOLLOWS
             - Dark mode follows the system setting (light-dark() tokens). Motion follows the reduced motion setting.
             - Text pairs are 7:1 or better, control edges 3:1 or better. Re-check any colour you change.
             - Colour never carries meaning alone: every status has its own icon shape and a word.
             - Touch targets are at least 2.75rem. Everything works with the keyboard and with reduced motion.
-            - Keep the tokens in section 1. Never touch 1c: the status colours are locked. Project styles go in section 5.
+            - Use only the HTML elements your page needs. The kit styles many elements, but no page has to use them all.
+            Styles for an element that is not on the page do nothing, so you can leave them or delete them.
+            - Keep the tokens in section 1. Change colours there and nowhere else. Never touch 1c: the status colours are locked.
+            - Project styles go in section 5. Motion that is not essential runs only inside @media (prefers-reduced-motion: no-preference).
         -->
 
         <meta name="description" content="Build a library of books you know, tag it, then find more books to read. Also works for comics and graphic novels. Searches Open Library by title, author, series or ISBN.">
@@ -22,6 +25,7 @@
         <meta name="application-name" content="Skathach">
         <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
         <meta name="color-scheme" content="light dark">
+        <!-- eslint-disable @html-eslint/use-baseline -- Kept on purpose: browsers without theme-color ignore it. -->
         <meta
             name="theme-color"
             content="#f5f6f7"
@@ -32,13 +36,16 @@
             content="#111213"
             media="(prefers-color-scheme: dark)"
         >
+        <!-- eslint-enable @html-eslint/use-baseline -->
         <link rel="canonical" href="https://nuadyr.github.io/Skathach/">
         <link
             rel="icon"
             type="image/svg+xml"
             href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231a1a1d'/%3E%3Cpath d='M9 24V9M16 24V7M23 24V11' fill='none' stroke='%239999cc' stroke-width='3.5' stroke-linecap='round'/%3E%3C/svg%3E"
         >
+        <!-- eslint-disable @html-eslint/use-baseline -- Kept on purpose: browsers without manifest support ignore it. -->
         <link rel="manifest" href="manifest.webmanifest">
+        <!-- eslint-enable @html-eslint/use-baseline -->
         <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
         <meta property="og:type" content="website">
         <meta property="og:site_name" content="Skathach">
@@ -81,32 +88,31 @@ try { [['arshelf', 'skathach'], ['arshelf-last', 'skathach-last']].forEach(([o, 
 :root {
   /* Black Steel: cool charcoal greys with a faint blue tint. Every neutral in the UI comes from here. */
   --Nuadyr-color-steel-100: rgba(245, 246, 247, 1);
-  --Nuadyr-color-steel-200: rgba(233, 234, 236, 1);
-  --Nuadyr-color-steel-300: rgba(209, 211, 215, 1);
-  --Nuadyr-color-steel-400: rgba(173, 176, 184, 1);
-  --Nuadyr-color-steel-500: rgba(136, 138, 150, 1);
-  --Nuadyr-color-steel-600: rgba(101, 102, 114, 1);
-  --Nuadyr-color-steel-700: rgba(67, 68, 75, 1);
-  --Nuadyr-color-steel-800: rgba(44, 44, 48, 1);
-  --Nuadyr-color-steel-900: rgba(26, 26, 29, 1);
-  --Nuadyr-color-steel-950: rgba(17, 18, 19, 1);
-
+--Nuadyr-color-steel-200: rgba(233, 234, 236, 1);
+--Nuadyr-color-steel-300: rgba(209, 211, 215, 1);
+--Nuadyr-color-steel-400: rgba(173, 176, 184, 1);
+--Nuadyr-color-steel-500: rgba(136, 138, 150, 1);
+--Nuadyr-color-steel-600: rgba(101, 102, 114, 1);
+--Nuadyr-color-steel-700: rgba(67, 68, 75, 1);
+--Nuadyr-color-steel-800: rgba(44, 44, 48, 1);
+--Nuadyr-color-steel-900: rgba(26, 26, 29, 1);
+--Nuadyr-color-steel-950: rgba(17, 18, 19, 1);
   /* Periwinkle: the one accent hue, a muted blue-violet that deepens to a steel blue in the darkest steps. Used only for actions, links, focus and chart marks.
      25 and 50 are lighter tints of 100 (same hue and saturation) for dark-mode text: 100 alone only reaches about 6.9:1 on steel-950. */
-  --Nuadyr-color-periwinkle-25: rgba(207, 207, 231, 1);
-  --Nuadyr-color-periwinkle-50: rgba(187, 187, 221, 1);
-  --Nuadyr-color-periwinkle-100: rgb(153, 153, 204);
-  --Nuadyr-color-periwinkle-200: rgba(142, 144, 199, 1);
-  --Nuadyr-color-periwinkle-300: rgba(131, 135, 195, 1);
-  --Nuadyr-color-periwinkle-400: rgba(101, 114, 183, 1);
-  --Nuadyr-color-periwinkle-500: rgba(74, 97, 166, 1);
-  --Nuadyr-color-periwinkle-600: rgba(59, 87, 138, 1);
-  --Nuadyr-color-periwinkle-700: rgba(46, 74, 111, 1);
-  --Nuadyr-color-periwinkle-800: rgba(34, 61, 85, 1);
-  --Nuadyr-color-periwinkle-900: rgba(25, 49, 66, 1);
-  --Nuadyr-color-periwinkle-950: rgba(18, 37, 48, 1);
+--Nuadyr-color-periwinkle-25: rgba(207, 207, 231, 1);
+--Nuadyr-color-periwinkle-50: rgba(187, 187, 221, 1);
+--Nuadyr-color-periwinkle-100: rgb(153, 153, 204);
+--Nuadyr-color-periwinkle-200: rgba(142, 144, 199, 1);
+--Nuadyr-color-periwinkle-300: rgba(131, 135, 195, 1);
+--Nuadyr-color-periwinkle-400: rgba(101, 114, 183, 1);
+--Nuadyr-color-periwinkle-500: rgba(74, 97, 166, 1);
+--Nuadyr-color-periwinkle-600: rgba(59, 87, 138, 1);
+--Nuadyr-color-periwinkle-700: rgba(46, 74, 111, 1);
+--Nuadyr-color-periwinkle-800: rgba(34, 61, 85, 1);
+--Nuadyr-color-periwinkle-900: rgba(25, 49, 66, 1);
+--Nuadyr-color-periwinkle-950: rgba(18, 37, 48, 1);
 
-  --Nuadyr-color-white: rgba(255, 255, 255, 1);
+--Nuadyr-color-white: rgba(255, 255, 255, 1);
 }
 
 /* 1b. Roles. */
@@ -115,6 +121,7 @@ try { [['arshelf', 'skathach'], ['arshelf-last', 'skathach-last']].forEach(([o, 
 
   --font-body: "Atkinson Hyperlegible Next", "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-head: "Fraunces", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --font-mono: ui-monospace, "Cascadia Mono", Consolas, monospace;
 
   --paper:         light-dark(var(--Nuadyr-color-steel-100), var(--Nuadyr-color-steel-950));
   --surface:       light-dark(var(--Nuadyr-color-white), var(--Nuadyr-color-steel-900));
@@ -143,6 +150,9 @@ try { [['arshelf', 'skathach'], ['arshelf-last', 'skathach-last']].forEach(([o, 
   --chart:         light-dark(var(--Nuadyr-color-periwinkle-700), var(--Nuadyr-color-periwinkle-400));
   --chart-line: var(--ink);
 
+  --mark:          light-dark(var(--Nuadyr-color-periwinkle-50), var(--Nuadyr-color-periwinkle-800));
+  --scrim:         rgba(17, 18, 19, 0.72);
+
   --s-1: 0.25rem; --s-2: 0.5rem; --s-3: 0.75rem; --s-4: 1rem; --s-5: 1.5rem; --s-6: 2rem; --s-7: 3rem; --s-8: 4rem;
   --r-1: 0.25rem; --r-2: 0.5rem; --r-3: 0.875rem;
   --t-sm:   clamp(0.875rem, 0.84rem + 0.15vw, 0.9375rem);
@@ -163,14 +173,14 @@ try { [['arshelf', 'skathach'], ['arshelf-last', 'skathach-last']].forEach(([o, 
   --mask-problem: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 2.8 21.2 12 12 21.2 2.8 12z' fill='none' stroke='black' stroke-width='2.2' stroke-linejoin='round'/%3E%3Cpath d='m9 9 6 6M15 9l-6 6' stroke='black' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E");
 }
 
-/* 1c. LOCKED status colours. Frozen at Aengus's original values.
+/* 1c. LOCKED status colours. Frozen at the kit's original values.
    Literal values only: no var(), no primitives, no roles. A palette change in 1a or 1b cannot reach them.
    Do not edit, override or redefine these anywhere else. Every status also has its own icon shape and a word. */
 :root {
-  --ok-ink:      light-dark(#064e3f, #8fe0c0); --ok-mark:      light-dark(#0b7a56, #4fcf9f); --ok-tint:      light-dark(#e0f3ec, #12302a);
-  --warn-ink:    light-dark(#5a3d00, #f2cf85); --warn-mark:    light-dark(#a85f00, #e8a23a); --warn-tint:    light-dark(#fbf0d6, #33280f);
-  --problem-ink: light-dark(#7a0f1f, #ffb3bb); --problem-mark: light-dark(#c0262d, #ff6f78); --problem-tint: light-dark(#fbe4e7, #38161b);
-  --info-ink:    light-dark(#0f3f7a, #a9cdf5); --info-mark:    light-dark(#1f66b0, #6fb0f0); --info-tint:    light-dark(#e1ecf8, #14283f);
+  --ok-ink:      light-dark(#064e3f, #00FF00CC); --ok-mark:      light-dark(#0b7a56, #66FF33); --ok-tint:      light-dark(#e0f3ec, #12302a);
+  --warn-ink:    light-dark(#5a3d00, #FFFF33CC); --warn-mark:    light-dark(#a85f00, #FFFFF66); --warn-tint:    light-dark(#fbf0d6, #33280f);
+  --problem-ink: light-dark(#7a0f1f, #FF3333E6); --problem-mark: light-dark(#c0262d, #FF3333); --problem-tint: light-dark(#fbe4e7, #330000);
+  --info-ink:    light-dark(#0f3f7a, #a9cdf5); --info-mark:    light-dark(#1f66b0, #55aff0); --info-tint:    light-dark(#e1ecf8, #052136);
 }
 
 /* 2. Base */
@@ -192,7 +202,7 @@ p, ul, ol, dl { margin: 0; }
 p + p { margin-block-start: var(--s-3); }
 a { color: var(--link); text-decoration-thickness: 0.09em; text-underline-offset: 0.18em; }
 a:hover { text-decoration-thickness: 0.18em; }
-code { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: 0.9em; background: var(--surface-2); padding: 0 0.25em; border-radius: var(--r-1); }
+code { font-family: var(--font-mono); font-size: 0.9em; background: var(--surface-2); padding: 0 0.25em; border-radius: var(--r-1); }
 img, svg { max-inline-size: 100%; }
 [hidden] { display: none !important; }
 
@@ -240,7 +250,7 @@ button.small { padding: var(--s-1) var(--s-3); font-size: var(--t-sm); }
 .field { display: grid; gap: var(--s-1); }
 .field > label, legend { font-weight: 700; }
 fieldset { margin: 0; padding: 0; border: 0; min-inline-size: 0; }
-input[type="text"], input[type="search"], input[type="number"], input[type="email"], input[type="url"], select, textarea {
+input[type="text"], input[type="search"], input[type="number"], input[type="email"], input[type="url"], input[type="tel"], input[type="password"], input[type="date"], input[type="time"], select, textarea {
   inline-size: 100%; min-block-size: var(--target); padding: var(--s-2) var(--s-3);
   font: inherit; color: var(--ink); background: var(--surface); border: var(--rule) solid var(--line); border-radius: var(--r-2);
 }
@@ -303,7 +313,7 @@ caption { text-align: start; font-weight: 700; padding: var(--s-2) var(--s-3); }
 th, td { text-align: start; padding: var(--s-2) var(--s-3); vertical-align: top; }
 thead th { background: var(--surface-2); border-block-end: var(--rule) solid var(--line); white-space: nowrap; }
 tbody th, tbody td { border-block-end: 1px solid var(--line-soft); }
-td.num { text-align: end; }
+th.num, td.num { text-align: end; }
 
 /* Numbered result cards, stat tiles, fact lists, chips */
 .cards { display: grid; gap: var(--s-5); counter-reset: card; }
@@ -322,21 +332,80 @@ td.num { text-align: end; }
 .chips { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 1fr)); gap: var(--s-2); }
 .chip { display: flex; align-items: center; min-inline-size: 0; min-block-size: 1.75rem; padding: var(--s-1) var(--s-3); background: var(--surface); border: var(--rule) solid var(--line); border-radius: var(--r-2); font-size: var(--t-sm); overflow-wrap: anywhere; }
 
+/* Content elements: text, lists, quotes, code, media, dialog. Wrap long-form text in .prose.
+   Use only the elements your page needs. A rule for an element you never use is harmless: leave it or delete it. */
+.prose { max-inline-size: var(--text-measure); }
+.prose :is(ul, ol) { padding-inline-start: var(--s-5); }
+.prose :is(ul, ol) > li + li, .prose :is(ul, ol) :is(ul, ol) { margin-block-start: var(--s-1); }
+menu { display: flex; flex-wrap: wrap; gap: var(--s-2); margin: 0; padding: 0; list-style: none; }
+dt { font-weight: 700; }
+dd { margin-inline: 0; padding-inline-start: var(--s-4); }
+dd + dt { margin-block-start: var(--s-3); }
+blockquote { margin: 0; padding-inline-start: var(--s-4); border-inline-start: 0.25rem solid var(--line); }
+figure { margin: 0; }
+figcaption { margin-block-start: var(--s-2); color: var(--ink-soft); font-size: var(--t-sm); }
+img { block-size: auto; border-radius: var(--r-2); }
+cite, var { font-style: italic; }
+address { font-style: normal; }
+abbr[title] { text-decoration: underline dotted; text-underline-offset: 0.18em; }
+mark { padding-inline: 0.2em; color: var(--ink); background: var(--mark); border-radius: var(--r-1); }
+kbd, samp { font-family: var(--font-mono); font-size: 0.9em; }
+kbd { padding: 0.05em 0.4em; background: var(--surface); border: 1px solid var(--line); border-block-end-width: 0.2em; border-radius: var(--r-1); white-space: nowrap; }
+samp { padding: 0 0.25em; background: var(--surface-2); border-radius: var(--r-1); }
+sub, sup { font-size: 0.75em; line-height: 0; }
+small { font-size: var(--t-sm); }
+ins { text-decoration-style: double; }
+/* Edits are announced to screen readers with hidden start and end labels, so they do not rely on the line style alone. */
+ins::before, ins::after, del::before, del::after { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+ins::before { content: " [inserted text start] "; } ins::after { content: " [inserted text end] "; }
+del::before { content: " [deleted text start] "; } del::after { content: " [deleted text end] "; }
+pre { margin: 0; padding: var(--s-3) var(--s-4); overflow-x: auto; font-family: var(--font-mono); font-size: var(--t-sm); line-height: 1.5; tab-size: 2; color: var(--ink); background: var(--surface-2); border: var(--rule) solid var(--line-soft); border-radius: var(--r-2); }
+pre code { padding: 0; font-size: inherit; background: none; }
+pre:focus-visible { outline-offset: 0; }
+hr { block-size: 0; margin: 0; border: 0; border-block-start: var(--rule) solid var(--line-soft); }
+
+/* Navigation lists (in-page links, breadcrumbs), search, sample boxes, canvas, dialog */
+search { display: block; }
+.navlist { display: flex; flex-wrap: wrap; gap: 0 var(--s-4); margin: 0; padding: 0; list-style: none; }
+.navlist a { display: inline-flex; align-items: center; min-block-size: var(--target); }
+.navlist--crumbs li + li::before { content: "/"; content: "/" / ""; margin-inline-end: var(--s-4); color: var(--ink-soft); }
+.sample { padding: var(--s-4); background: var(--surface-2); border: var(--rule) solid var(--line-soft); border-radius: var(--r-2); }
+.sample .sample { background: var(--surface); }
+canvas { display: block; inline-size: 100%; max-inline-size: var(--text-measure); block-size: auto; color: var(--chart); background: var(--surface); border: var(--rule) solid var(--line); border-radius: var(--r-2); }
+dialog { inline-size: min(calc(100% - 2rem), 32rem); max-block-size: calc(100% - 2rem); padding: 0; color: var(--ink); background: var(--surface); border: var(--rule) solid var(--line); border-radius: var(--r-3); }
+dialog::backdrop { background: var(--scrim); }
+.dialog__body { padding: var(--s-5); }
+/* Scroll lock. While a dialog or popover is open, the page behind it cannot scroll.
+   The scrollbar space stays reserved so the layout does not jump, and scrolling inside the dialog never carries on to the page.
+   Each selector has its own rule so a browser that lacks one of them still applies the others. */
+html:has(dialog[open]) { overflow: hidden; scrollbar-gutter: stable; }
+html:has(.pop.is-open) { overflow: hidden; scrollbar-gutter: stable; }
+html:has(.pop:popover-open) { overflow: hidden; scrollbar-gutter: stable; }
+dialog, .pop { overscroll-behavior: contain; }
+/* Title on the left, close button on the right. Wraps on a narrow screen. */
+.dlg-head { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: var(--s-3); }
+.dlg-head > :is(h2, h3, h4) { flex: 1 1 12rem; min-inline-size: 0; margin: 0; }
+
+/* Table extras and form extras */
+tfoot th, tfoot td { font-weight: 700; background: var(--surface-2); border-block-start: var(--rule) solid var(--line); }
+col.col-wide { inline-size: 50%; }
+fieldset > legend { padding: 0; margin-block-end: var(--s-1); }
+input[type="color"] { inline-size: 4.5rem; min-block-size: var(--target); padding: var(--s-1); cursor: pointer; background: var(--surface); border: var(--rule) solid var(--line); border-radius: var(--r-2); }
+input[type="range"] { inline-size: 100%; max-inline-size: var(--text-measure); min-block-size: var(--target); margin: 0; accent-color: var(--action); }
+::placeholder { color: var(--ink-soft); opacity: 1; }
+:is(input, select, textarea):disabled { cursor: not-allowed; color: var(--ink-soft); background: var(--surface-2); border-style: dashed; }
+output { font-weight: 700; font-variant-numeric: tabular-nums; }
+
 /* Meter and bar chart (draw with inline SVG or HTML and these tokens) */
 .meter { inline-size: 100%; max-inline-size: var(--text-measure); block-size: 1rem; accent-color: var(--chart); }
 .chart text { fill: var(--ink); font-family: var(--font-body); font-size: 0.75rem; }
 .chart__axis { stroke: var(--line); stroke-width: 1; }
 .chart__bar { fill: var(--chart); stroke: var(--chart-line); stroke-width: 1; }
 
-/* Footer */
-.site-footer { background: var(--brand); color: var(--on-brand); padding-block: var(--s-5); }
-.site-footer a { color: var(--on-brand); }
-.site-footer .hint { color: var(--on-brand-soft); }
-
-/* 5. Your page */
-
 /* Main navigation: a rounded track of pills. Each pill has an icon and a word. The current pill is filled, underlined and marked with aria-current,
-   so colour is never the only cue. Narrow screens show three pills per row with the icon above the word; wide screens show one row. */
+   so colour is never the only cue. Narrow screens show three pills per row with the icon above the word; wide screens show one row.
+   Set the number of pills with style="--tab-count: 4" on the list. Give each link a data-v and map it to an icon below.
+   If you use initViews(), data-v must match the view id. */
 :root {
   --mask-nav-library: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2.8' y='4' width='3.8' height='16' rx='1'/%3E%3Crect x='8.6' y='4' width='3.8' height='16' rx='1'/%3E%3Cpath d='M14.8 6.4l3.4-.9 3.9 14.3-3.4.9z'/%3E%3C/svg%3E");
   --mask-nav-reading: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 3.8h10v16.4l-5-3.6-5 3.6z'/%3E%3C/svg%3E");
@@ -355,22 +424,59 @@ td.num { text-align: end; }
 .tabs a[data-v="tags"] { --nav-icon: var(--mask-nav-tags); }
 .tabs a[data-v="blacklist"] { --nav-icon: var(--mask-nav-blacklist); }
 .tabs a[data-v="find"] { --nav-icon: var(--mask-nav-find); }
-.tabs a[data-v="library"] { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
 .tabs a:hover { color: var(--ink); background: var(--surface); }
 .tabs a[aria-current="page"] { color: var(--on-action); background: var(--action); text-decoration: underline; text-decoration-thickness: 0.125rem; text-underline-offset: 0.25em; }
 .tabs a[aria-current="page"]:hover { background: var(--action-hover); }
 @media (prefers-reduced-motion: no-preference) { .tabs a { transition: background-color 0.18s ease, color 0.18s ease; } }
 @media (width >= 56rem) {
-  .tabs { grid-template-columns: repeat(6, auto); inline-size: fit-content; }
+  .tabs { grid-template-columns: repeat(var(--tab-count, 6), auto); inline-size: fit-content; }
   .tabs a { flex-direction: row; gap: var(--s-2); min-block-size: var(--target); padding-inline: var(--s-4); font-size: var(--t-base); }
 }
 
-/* Panels and forms */
+/* Panel extras: readable line length, a divided sub-section, empty lists hidden, list resets for cards */
 .panel > p, .panel .field { max-inline-size: var(--text-measure); }
 .panel > .sub { padding-block-start: var(--s-5); border-block-start: var(--rule) solid var(--line-soft); }
 .panel ul:empty, .panel ol:empty { display: none; }
-ul.cards, ol.cards { list-style: none; padding: 0; }
 .panel nav .row { gap: var(--s-3) var(--s-4); }
+ul.cards, ol.cards { list-style: none; padding: 0; }
+/* Card titles that hold a link or button. The number badge gets an edge so it stays visible in dark mode, where it matches the card. */
+.card > h3 { align-items: flex-start; }
+.card > h3::before { border: var(--rule) solid var(--line); }
+.card > h3 .linklike { min-inline-size: 0; overflow-wrap: anywhere; font: inherit; line-height: 1.25; color: var(--link); text-align: start; padding-inline: 0; }
+
+/* Action buttons: equal-width buttons share one row where they fit and wrap together where they do not.
+   Keep the visible text short. Put the full name in aria-label, starting with the visible text. */
+.acts { display: grid; grid-template-columns: repeat(auto-fit, minmax(5.5rem, 1fr)); gap: var(--s-2); inline-size: 100%; }
+.acts button { inline-size: 100%; padding: var(--s-2); font-size: var(--t-sm); line-height: 1.25; }
+.acts .badge { grid-column: 1 / -1; justify-self: start; }
+
+/* Row list: a name on the left and its controls beside it. Wraps on a narrow screen. */
+.tags { display: grid; gap: var(--s-3); list-style: none; padding: 0; }
+.tagrow { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-3) var(--s-4); padding: var(--s-3) var(--s-4); background: var(--surface-2); border: var(--rule) solid var(--line-soft); border-radius: var(--r-2); }
+.tagrow__name { flex: 1 1 10rem; min-inline-size: 0; font: 600 var(--t-md) / 1.2 var(--font-head); }
+.tagrow .field { grid-auto-flow: column; align-items: center; gap: var(--s-2); inline-size: auto; }
+.tagrow select { inline-size: auto; }
+
+/* Popover card: a small panel opened by a button with popovertarget. Closes on Escape or a tap outside.
+   Browsers without the popover API use the .is-open class, which bindPopoverFallback() sets. */
+.pop, .card > .pop { margin: auto; inline-size: min(92vw, 28rem); max-block-size: 80vh; overflow: auto; padding: var(--s-5); color: var(--ink); background: var(--surface); border: var(--rule) solid var(--line); border-radius: var(--r-3); }
+.pop::backdrop { background: var(--scrim); }
+.pop > * { margin: 0; }
+.pop > * + * { margin-block-start: var(--s-3); }
+@supports not selector(:popover-open) {
+  .pop { display: none; }
+  .pop.is-open { display: block; position: fixed; inset: 0; block-size: fit-content; z-index: 20; }
+}
+
+/* Footer */
+.site-footer { background: var(--brand); color: var(--on-brand); padding-block: var(--s-5); }
+.site-footer a { color: var(--on-brand); }
+.site-footer .hint { color: var(--on-brand-soft); }
+
+/* 5. Your page */
+
+/* The Library tab opens the import and export menu on a long press, so its text cannot be selected and no touch menu opens. */
+.tabs a[data-v="library"] { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
 
 /* Books: cover plus details */
 .book { display: flex; align-items: flex-start; gap: var(--s-3); }
@@ -383,8 +489,6 @@ ul.cards, ol.cards { list-style: none; padding: 0; }
 /* A cover keeps its 2:3 box while it loads, retries or fails. The broken-image alt text is clipped, so it can never stretch the card. The alt text is still read by screen readers. */
 img.cv { block-size: auto; aspect-ratio: 2 / 3; object-fit: contain; overflow: hidden; font-size: 0; line-height: 0; color: transparent; background: var(--surface-2); border: var(--rule) solid var(--line-soft); border-radius: var(--r-1); }
 .cgrid__item img.cvg { aspect-ratio: 2 / 3; }
-.card > h3 { align-items: flex-start; }
-.card > h3 .linklike { line-height: 1.25; }
 /* Cover grid shown while a search runs */
 .cgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 5.25rem), 1fr)); gap: var(--s-3); list-style: none; padding: 0; }
 .cgrid__item { position: relative; min-inline-size: 0; }
@@ -395,67 +499,28 @@ img.cv { block-size: auto; aspect-ratio: 2 / 3; object-fit: contain; overflow: h
 @keyframes cgin { from { opacity: 0; transform: scale(0.92); } to { opacity: 1; transform: none; } }
 .nocv { min-block-size: 6rem; display: grid; place-items: center; padding: var(--s-1); text-align: center; font-size: var(--t-sm); color: var(--ink-soft); border: var(--rule) dashed var(--line); border-radius: var(--r-1); }
 
-/* Result card actions: three equal buttons share one row where they fit, and wrap together where they do not. */
-.acts { display: grid; grid-template-columns: repeat(auto-fit, minmax(5.5rem, 1fr)); gap: var(--s-2); inline-size: 100%; }
-.acts button { inline-size: 100%; padding: var(--s-2); font-size: var(--t-sm); line-height: 1.25; }
-.acts .badge { grid-column: 1 / -1; justify-self: start; }
-
-/* Tags */
-.tags { display: grid; gap: var(--s-3); list-style: none; padding: 0; }
-.tagrow { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-3) var(--s-4); padding: var(--s-3) var(--s-4); background: var(--surface-2); border: var(--rule) solid var(--line-soft); border-radius: var(--r-2); }
-.tagrow__name { flex: 1 1 10rem; min-inline-size: 0; font: 600 var(--t-md) / 1.2 var(--font-head); }
-.tagrow .field { grid-auto-flow: column; align-items: center; gap: var(--s-2); inline-size: auto; }
-.tagrow select { inline-size: auto; }
-
 /* Result cards: tap anywhere on a card to open its matched-tags popover */
 #results .card { cursor: pointer; }
-.card > h3 .linklike { font: inherit; color: var(--link); text-align: start; padding-inline: 0; }
-.pop, .card > .pop { margin: auto; inline-size: min(92vw, 28rem); max-block-size: 80vh; overflow: auto; padding: var(--s-5); color: var(--ink); background: var(--surface); border: var(--rule) solid var(--line); border-radius: var(--r-3); }
-.pop::backdrop { background: rgba(17, 18, 19, 0.6); }
-.pop > * { margin: 0; }
-.pop > * + * { margin-block-start: var(--s-3); }
-@supports not selector(:popover-open) {
-  .pop { display: none; }
-  .pop.is-open { display: block; position: fixed; inset: 0; block-size: fit-content; z-index: 20; }
-}
 
 /* Result cards. The cover, author and score sit side by side. The blurb, library offer and links use the full card width below them. */
 .book__more { display: grid; gap: var(--s-3); justify-items: start; }
 .book__more > * { margin: 0; max-inline-size: 100%; }
 .book__more .row { inline-size: 100%; }
-/* The number badge uses the same colour as the card in dark mode, so it gets an edge to stay visible. */
-.card > h3::before { border: var(--rule) solid var(--line); }
-.card > h3 .linklike { min-inline-size: 0; overflow-wrap: anywhere; }
 /* Recommendation blurb: the capped text opens the full blurb in a dialog */
 .why--more { cursor: pointer; }
 /* Sits flush with the blurb above it. The negative margin cancels the grid gap and the button keeps its full touch target. */
 .book__more .linklike { padding-inline: 0; margin-block-start: calc(var(--s-2) * -1); }
-.dlg-head { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: var(--s-3); }
-.dlg-head > h2 { flex: 1 1 12rem; min-inline-size: 0; margin: 0; }
-#bl { inline-size: min(95vw, 36rem); }
+
+/* Dialogs. The kit supplies the dialog box, .dialog__body, .dlg-head and the scroll lock. These set the widths: the blurb is narrower, the preview wider. */
+#bl { inline-size: min(calc(100% - 2rem), 36rem); }
 #blb > * { margin: 0; max-inline-size: var(--text-measure); white-space: pre-line; }
 #blb > * + * { margin-block-start: var(--s-3); }
-
-/* Book preview dialog */
-dialog { inline-size: min(95vw, 50rem); max-block-size: 92vh; overflow: auto; padding: var(--s-5); color: var(--ink); background: var(--surface); border: var(--rule) solid var(--line); border-radius: var(--r-3); }
-dialog::backdrop { background: rgba(17, 18, 19, 0.75); }
+#pv { inline-size: min(calc(100% - 2rem), 50rem); }
 #viewer { inline-size: 100%; block-size: min(60vh, 30rem); }
 
-/* Scroll lock. While a dialog or the matched-tags popover is open, the page behind it cannot scroll.
-   The scrollbar space stays reserved so the layout does not jump, and scrolling inside the dialog never carries on to the page.
-   Each selector has its own rule so a browser that lacks one of them still applies the others. */
-html:has(dialog[open]) { overflow: hidden; scrollbar-gutter: stable; }
-html:has(.pop.is-open) { overflow: hidden; scrollbar-gutter: stable; }
-html:has(.pop:popover-open) { overflow: hidden; scrollbar-gutter: stable; }
-dialog, .pop { overscroll-behavior: contain; }
-
 @media (forced-colors: active) {
-  .tabs a, .tagrow, dialog, .pop, .nocv, img.cv { border-color: CanvasText; }
-  .tabs { border-color: CanvasText; }
-  .tabs a::before { forced-color-adjust: none; background-color: CanvasText; }
-  .tabs a[aria-current="page"] { border-color: Highlight; text-decoration: underline; }
+  .nocv, img.cv { border-color: CanvasText; }
 }
-
 
 /* 6. User preferences and assistive modes */
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
@@ -464,6 +529,9 @@ dialog, .pop { overscroll-behavior: contain; }
   .note::before, [role="alert"]:not([hidden])::before, .badge::before, summary::before { forced-color-adjust: none; background-color: CanvasText; }
   .card > h3::before { border: var(--rule) solid CanvasText; }
   .card, .stat, .chip, .panel { border-color: CanvasText; }
+  .tabs, .tabs a, .tagrow, dialog, .pop { border-color: CanvasText; }
+  .tabs a::before { forced-color-adjust: none; background-color: CanvasText; }
+  .tabs a[aria-current="page"] { border-color: Highlight; text-decoration: underline; }
   .chart text { fill: CanvasText; }
   .chart__axis, .chart__bar { stroke: CanvasText; }
   .chart__bar { forced-color-adjust: none; fill: Highlight; }
@@ -724,72 +792,75 @@ dialog, .pop { overscroll-behavior: contain; }
 
         <dialog
             id="pv"
-            class="stack"
             aria-labelledby="pvt"
         >
-            <h2 id="pvt"></h2>
-            <p id="pvm" role="status"></p>
-            <div id="viewer"></div>
-            <button
-                id="pvc"
-                type="button"
-                class="secondary"
-            >Close preview</button>
+            <div class="dialog__body stack">
+                <h2 id="pvt"></h2>
+                <p id="pvm" role="status"></p>
+                <div id="viewer"></div>
+                <button
+                    id="pvc"
+                    type="button"
+                    class="secondary"
+                >Close preview</button>
+            </div>
         </dialog>
 
         <dialog
             id="bl"
-            class="stack"
             aria-labelledby="blt"
         >
-            <div class="dlg-head">
-                <h2 id="blt"></h2>
-                <button
-                    id="blc"
-                    type="button"
-                    class="secondary"
-                    autofocus
-                >Close blurb</button>
+            <div class="dialog__body stack">
+                <div class="dlg-head">
+                    <h2 id="blt"></h2>
+                    <button
+                        id="blc"
+                        type="button"
+                        class="secondary"
+                        autofocus
+                    >Close blurb</button>
+                </div>
+                <div id="blb"></div>
+                <p class="hint">Blurb from Open Library.</p>
             </div>
-            <div id="blb"></div>
-            <p class="hint">Blurb from Open Library.</p>
         </dialog>
 
         <dialog
             id="lm"
-            class="stack"
             aria-labelledby="lmt"
         >
-            <div class="dlg-head">
-                <h2 id="lmt">Import or export library</h2>
-                <button
-                    id="lmc"
-                    type="button"
-                    class="secondary"
-                    autofocus
-                >Close</button>
+            <div class="dialog__body stack">
+                <div class="dlg-head">
+                    <h2 id="lmt">Import or export library</h2>
+                    <button
+                        id="lmc"
+                        type="button"
+                        class="secondary"
+                        autofocus
+                    >Close</button>
+                </div>
+                <p>Export saves the books in your library as a file you can keep or move to another browser. Import adds books from such a file. Books already in your library are skipped, and nothing is removed.</p>
+                <div class="row">
+                    <button id="lmx" type="button">Export library</button>
+                    <button
+                        id="lmi"
+                        type="button"
+                        class="secondary"
+                    >Import library</button>
+                </div>
+                <input
+                    id="lmf"
+                    type="file"
+                    accept=".json,application/json"
+                    hidden
+                >
+                <p id="lms" role="status"></p>
+                <p
+                    id="lme"
+                    role="alert"
+                    hidden
+                ></p>
             </div>
-            <p>Export saves the books in your library as a file you can keep or move to another browser. Import adds books from such a file. Books already in your library are skipped, and nothing is removed.</p>
-            <div class="row">
-                <button id="lmx" type="button">Export library</button>
-                <button
-                    id="lmi"
-                    type="button"
-                    class="secondary"
-                >Import library</button>
-            </div>
-            <input
-                id="lmf"
-                type="file"
-                accept=".json,application/json"
-                hidden
-            >
-            <p id="lms" role="status"></p>
-            <p
-                id="lme"
-                role="alert"
-                hidden
-            ></p>
         </dialog>
 
         <script>
